@@ -1,0 +1,37 @@
+# Global configuration parameters
+local_params = {
+    'data_path': "dataset/dataset.parquet",
+    'p1_path':   "dataset/p1.parquet",
+    'p2_path':   "dataset/p2.parquet",
+    'p11_path':  "dataset/p11.parquet",
+    'p12_path':  "dataset/p12.parquet",
+    'p21_path':  "dataset/p21.parquet",
+    'p22_path':  "dataset/p22.parquet",
+    'feature_columns': [
+        'protocol',
+        'bidirectional_min_ps',
+        'bidirectional_mean_ps',
+        'bidirectional_stddev_ps',
+        'bidirectional_max_ps',
+        'src2dst_stddev_ps',
+        'src2dst_max_ps',
+        'dst2src_min_ps',
+        'dst2src_mean_ps',
+        'dst2src_stddev_ps',
+        'dst2src_max_ps',
+        'bidirectional_stddev_piat_ms',
+        'bidirectional_max_piat_ms',
+        'bidirectional_rst_packets'
+    ],
+    'target_column': 'application_name',
+    'initial_split_ratio': 0.5,
+    'test_split_ratio': 0.2,
+    'epochs': 2,
+    'federated_rounds': 20,
+    'batch_size': 256,
+    'learning_rate': 0.001,
+    'input_dim': None,
+    'num_classes': None,
+    "noise_levels": [None, 0.33, 0.67, 1.00, 1.33, 1.67, 2.00],  # CHANGE HERE privacy-NOISE parameters
+    "max_grad_norm": 1.0,
+}

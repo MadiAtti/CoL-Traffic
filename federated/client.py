@@ -3,14 +3,14 @@ import torch
 from collections import OrderedDict
 from utils.training import train_local_model, train_local_dp_model
 from utils.evaluation import evaluate_model
-from models.neural_network import NeuralNetwork # Feltételezve az új nevet
+from models.neural_network import NeuralNetwork
+from config import local_params 
 
 class FlowerClient(fl.client.NumPyClient):
-    def __init__(self, cid, train_loader, test_loader, local_params):
+    def __init__(self, cid, train_loader, test_loader):
         self.cid = cid
         self.train_loader = train_loader
         self.test_loader = test_loader
-        self.params = local_params
         # Minden kliens saját modellel indul
         self.model = NeuralNetwork(local_params['input_dim'], local_params['num_classes'])
         self.criterion = torch.nn.CrossEntropyLoss()

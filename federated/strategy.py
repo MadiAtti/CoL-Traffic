@@ -1,6 +1,6 @@
 import flwr as fl
 
-def get_strategy(local_params, current_noise=None):
+def get_strategy(current_noise=None):
     
     def on_fit_config_fn(server_round: int):
         return {

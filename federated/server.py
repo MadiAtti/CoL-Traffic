@@ -1,14 +1,15 @@
 import flwr as fl
 from federated.client import FlowerClient
 from federated.strategy import get_strategy
+from config import local_params
 
-def run_flower_simulation(client_data_map, local_params, noise=None):
+def run_flower_simulation(client_data_map, noise=None):
     
     def client_fn(cid: str):
         train_loader, test_loader = client_data_map[cid]
-        return FlowerClient(cid, train_loader, test_loader, local_params)
+        return FlowerClient(cid, train_loader, test_loader)
 
-    strategy = get_strategy(local_params, current_noise=noise)
+    strategy = get_strategy( current_noise=noise)
 
     history = fl.simulation.start_simulation(
         client_fn=client_fn,

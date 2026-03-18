@@ -50,11 +50,11 @@ def main():
     # 4. Kliens generáló függvény
     def client_fn(cid: str) -> FlowerClient:
         train_loader, test_loader = client_data_map[cid]
-        return FlowerClient(cid, train_loader, test_loader, local_params)
+        return FlowerClient(cid, train_loader, test_loader)
 
     # 5. Stratégia kiválasztása (Zajszint beállítása, ha DP fut)
     current_noise = local_params['noise_levels'][0] if args.exp == "dp" else None
-    strategy = get_strategy(local_params, current_noise=current_noise)
+    strategy = get_strategy(current_noise=current_noise)
 
     # 6. SZIMULÁCIÓ INDÍTÁSA
     print(f"Indul a Flower szimuláció! Típus: {args.exp.upper()}, Zaj: {current_noise}")

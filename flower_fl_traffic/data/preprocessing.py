@@ -182,21 +182,21 @@ def prepare_data(seed):
                 X_p21_train, X_p21_test, y_p21_train, y_p21_test,
                 X_p22_train, X_p22_test, y_p22_train, y_p22_test)
 
-def create_data_loaders(X_train, X_test, y_train, y_test):
+def create_data_loaders(X_train, X_test, y_train, y_test, batch_size):
     """Create train and test data loaders"""
     train_dataset = custom_dataset(X_train, y_train)
     test_dataset = custom_dataset(X_test, y_test)
     
     train_loader = DataLoader(
         train_dataset,
-        batch_size=local_params['batch_size'],
+        batch_size=batch_size,
         shuffle=True,
         pin_memory=True
     )
     
     test_loader = DataLoader(
         test_dataset,
-        batch_size=local_params['batch_size'],
+        batch_size=batch_size,
         shuffle=False,
         pin_memory=True
     )

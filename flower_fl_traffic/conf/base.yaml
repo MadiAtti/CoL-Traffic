@@ -1,10 +1,13 @@
-num_rounds: 10
+num_rounds: 2 #20           
 num_clients: 2
+
 config:
   lr: 0.001
   seed: 42
-  num_epochs: 2
+  num_epochs: 2         
   batch_size: 256
+  max_grad_norm: 1.0     
+  noise_levels: [null, 0.33] #, 0.67, 1.0, 1.33, 1.67, 2.0]
 
 dataset:
   input_path: "dataset/dataset.parquet"
@@ -33,3 +36,10 @@ dataset:
   target_column: 'application_name'
   initial_split_ratio: 0.5
   test_split_ratio: 0.2
+
+hydra:
+  job:
+    chdir: True
+  run:
+    dir: .          
+  output_subdir: null 

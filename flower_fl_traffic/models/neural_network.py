@@ -1,8 +1,8 @@
 import torch.nn as nn
 
-class NeuralNetwork(nn.Module):
+class TrafficNN(nn.Module):
     def __init__(self, input_dim, num_classes):
-        super(NeuralNetwork, self).__init__()
+        super(TrafficNN, self).__init__()
         
         hidden_layer1_neurons = int((2 / 3) * input_dim + num_classes)
         hidden_layer2_neurons = input_dim

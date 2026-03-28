@@ -6,8 +6,8 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-from config import local_params
-from federated.experiment_runner import run_dp
+from flower_fl_traffic.old_config import local_params
+from flower_fl_traffic.federated.old_experiment_runner import run_dp
 
 # Suppress specific warnings
 warnings.filterwarnings("ignore", message="Secure RNG turned off.*")

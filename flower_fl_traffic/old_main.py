@@ -5,10 +5,10 @@ import numpy as np
 import torch
 import json
 import os
-from config import local_params
-from data.preprocessing import prepare_data, create_data_loaders
-from federated.client import FlowerClient
-from federated.strategy import get_strategy
+from flower_fl_traffic.old_config import local_params
+from flower_fl_traffic.data.old_preprocessing import prepare_data, create_data_loaders
+from flower_fl_traffic.federated.old_client import FlowerClient
+from flower_fl_traffic.federated.old_strategy import get_strategy
 
 def set_seed(seed):
     """

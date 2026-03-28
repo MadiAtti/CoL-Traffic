@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.calibration import LabelEncoder
 from sklearn.discriminant_analysis import StandardScaler
 from sklearn.model_selection import train_test_split
-from config import local_params
+from flower_fl_traffic.old_config import local_params
 from data.custom_dataset import CustomDataset as custom_dataset
 from torch.utils.data import DataLoader
 

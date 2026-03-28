@@ -9,8 +9,8 @@ import torch.optim as optim
 from itertools import product
 
 
-from config import local_params
-from data.preprocessing import average_models, create_data_loaders, create_data_loaders_sup, create_suppressed_dataset, generate_feature_combinations
+from flower_fl_traffic.old_config import local_params
+from flower_fl_traffic.data.old_preprocessing import average_models, create_data_loaders, create_data_loaders_sup, create_suppressed_dataset, generate_feature_combinations
 from models import neural_network
 from utils.evaluation import evaluate_model
 from utils.training import train_local_dp_model, train_local_model, train_model

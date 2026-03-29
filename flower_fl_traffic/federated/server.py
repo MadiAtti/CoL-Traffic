@@ -1,14 +1,15 @@
-def get_on_fit_config(p1_noise, p2_noise):
+def get_on_fit_config(**kwargs):
     """
-    Ez a függvény generálja azt a konfigurációt, amit a szerver 
-    minden kör elején leküld a klienseknek.
+    Univerzális konfiguráció generáló. 
+    Bármilyen kulcsszavas érvet (kwargs) kap, azt minden körben leküldi a klienseknek.
     """
     def fit_config_fn(server_round: int):
-        # Itt adjuk át a mátrixodból jövő zajszinteket
-        return {
-            "p1_noise": p1_noise,
-            "p2_noise": p2_noise,
-            "current_round": server_round,
-        }
+        # Alapértelmezett adatok, amik mindig kellenek (pl. aktuális kör)
+        config = {"current_round": server_round}
+        
+        # Hozzáadjuk a kísérlet-specifikus paramétereket
+        config.update(kwargs)
+        
+        return config
     
     return fit_config_fn

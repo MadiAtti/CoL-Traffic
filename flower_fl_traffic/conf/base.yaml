@@ -1,13 +1,14 @@
-num_rounds: 2 #20           
 num_clients: 2
 
 config:
   lr: 0.001
   seed: 42
+  federated_rounds: 2 #20
   num_epochs: 2         
   batch_size: 256
   max_grad_norm: 1.0     
   noise_levels: [null, 0.33] #, 0.67, 1.0, 1.33, 1.67, 2.0]
+  sup_levels: [14, 12] #, 10, 8, 6, 4, 2, 0]
 
 dataset:
   input_path: "dataset/dataset.parquet"

@@ -2,6 +2,8 @@ from collections import OrderedDict
 import os
 import flwr as fl
 import torch
+from data.custom_dataset import CustomDataset
+from torch.utils.data import DataLoader
 from models.neural_network import TrafficNN
 from utils.evaluation import evaluate_model
 from utils.training import train_dp, train_standard
@@ -28,12 +30,51 @@ class UniversalTrafficClient(fl.client.NumPyClient):
     def fit(self, parameters, config):
         self.set_parameters(parameters)
         
-        if self.cid == "0":
-            noise = config.get("p1_noise")
-        else:
-            noise = config.get("p2_noise")
+        # --- 1. OPTIMALIZÁLT SUPPRESSION KEZELÉSE ---
+        f_limit = config.get("p1_features") if self.cid == "0" else config.get("p2_features")
+        server_round = config.get("current_round", 1)
+
+        # Csak az ELSŐ KÖRBEN cserélünk Loadert, vagy ha még nem történt meg
+        if f_limit is not None and server_round == 1:
+            f_limit = int(f_limit)
+            total_features = self.cfg.dataset.input_dim
+            
+            # Kinyerjük az eredeti adatokat (csak egyszer a kísérlet elején)
+            raw_x = self.trainloader.dataset.X.numpy()
+            raw_y = self.trainloader.dataset.y.numpy()
+            
+            # Szeletelés és visszahizlalás nullákkal
+            x_sub = raw_x[:, :f_limit]
+            new_ds = CustomDataset(
+                X=x_sub, 
+                y=raw_y, 
+                feature_indices=range(f_limit), 
+                total_features=total_features
+            )
+
+            # --- ELLENŐRZÉS: Első 5 sor kiírása ---
+            # print(f"\n🔍 [DEBUG - Client {self.cid}] Adatellenőrzés (Limit: {f_limit}):")
+            # # Megnézzük az első 5 sort a hálónak átadott formátumban
+            # for i in range(min(5, len(new_ds))):
+            #     sample_x, _ = new_ds[i]
+            #     # Kerekítve írjuk ki, hogy átlátható legyen
+            #     formatted_row = [round(float(val), 4) for val in sample_x]
+            #     print(f"  Sor {i}: {formatted_row}")
+            # print(f"✅ Loader sikeresen frissítve.\n")
+            # --------------------------------------
+            
+            # Loader csere (ez kitart a 20. kör végéig)
+            self.trainloader = DataLoader(
+                new_ds, 
+                batch_size=self.cfg.config.batch_size, 
+                shuffle=True
+            )
+            print(f"✅ [Client {self.cid}] Adatok előkészítve a kísérlethez: {f_limit}/{total_features} feature")
+
+        noise = config.get("p1_noise") if self.cid == "0" else config.get("p2_noise")
         
-        if noise is None or noise == "None": 
+        # Tisztítjuk a noise értéket
+        if noise is None or str(noise) == "None": 
             noise = 0.0
         else:
             noise = float(noise)

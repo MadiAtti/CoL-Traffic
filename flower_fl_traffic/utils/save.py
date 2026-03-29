@@ -2,8 +2,7 @@ import os
 import json
 from omegaconf import OmegaConf
 
-def setup_file(config, subdir):
-    base_dir = "4_noise"
+def setup_file(config, subdir, base_dir):
     target_path = os.path.join(base_dir, subdir)
     os.makedirs(target_path, exist_ok=True)
     file_path = os.path.join(target_path, f"{config.config.seed}.json")
@@ -17,11 +16,12 @@ def setup_file(config, subdir):
     with open(file_path, "w") as f:
         json.dump(initial_log, f, indent=4)
 
-def save_federated_history(history, config, c1_noise, c2_noise, subdir):
+def save_federated_history(history, config, val1, val2, subdir, base_dir, metric_name):
     """
-    A Flower history objektumát a 0.json formátumra alakítja és menti.
+    val1, val2: a két kliens aktuális értéke (zajszint VAGY feature szám)
+    metric_name: "noise" vagy "features"
     """
-    # 1. Adatok kigyűjtése (ugyanaz mint eddig)
+    # 1. Körök adatainak kigyűjtése
     rounds_list = []
     for r in range(len(history.losses_distributed)):
         rounds_list.append({
@@ -33,9 +33,10 @@ def save_federated_history(history, config, c1_noise, c2_noise, subdir):
             "loss": history.losses_distributed[r][1]
         })
 
+    # 2. Az experiment bejegyzés összeállítása dinamikus kulcsokkal
     experiment_entry = {
-        "noise_multiplier_p1": c1_noise,
-        "noise_multiplier_p2": c2_noise,
+        f"{metric_name}_p1": val1,
+        f"{metric_name}_p2": val2,
         "rounds": rounds_list,
         "final_evaluation": {
             "P1": {"accuracy": history.metrics_distributed["client1_accuracy"][-1][1]},
@@ -43,18 +44,16 @@ def save_federated_history(history, config, c1_noise, c2_noise, subdir):
         }
     }
 
-    # 2. Útvonal (mint eddig)
-    file_path = os.path.join("4_noise", subdir, f"{config.config.seed}.json")
+    # 3. Útvonal meghatározása
+    file_path = os.path.join(base_dir, subdir, f"{config.config.seed}.json")
 
-    # 3. Betöltés és HOZZÁADÁS
-    # Itt már feltételezzük, hogy a fájl létezik (a runner létrehozta)
+    # 4. Betöltés és HOZZÁADÁS
     with open(file_path, "r") as f:
         full_log = json.load(f)
     
-    # Egyszerűen hozzáfűzzük (nem vizsgáljuk, volt-e már ilyen zaj)
     full_log["experiments"].append(experiment_entry)
 
-    # 4. Mentés
+    # 5. Mentés
     with open(file_path, "w") as f:
         json.dump(full_log, f, indent=4)
     

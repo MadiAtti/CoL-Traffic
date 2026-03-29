@@ -7,9 +7,8 @@ from data.custom_dataset import CustomDataset
 def setup_directories(cfg):
     base_results_dirs = [
         '1_local_baseline', 
-        '2_fl_baseline', 
-        '3_suppression', 
-        '4_noise'
+        '2_suppression', 
+        '3_noise'
     ]
     
     for base in base_results_dirs:

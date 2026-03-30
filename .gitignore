@@ -1,2 +1,3 @@
 *.parquet
-/dataset
+/outputs
+*.log

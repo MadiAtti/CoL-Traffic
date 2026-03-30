@@ -42,18 +42,18 @@ def prepare_data_and_loaders(cfg):
     X = StandardScaler().fit_transform(df[ds_cfg.feature_columns].values.astype(np.float32))
     y = LabelEncoder().fit_transform(df[ds_cfg.target_column].values).astype(np.int32)
 
-    # Hierarchical splits and saving (only if not already done)
-    if not os.path.exists(ds_cfg.paths.p1):
-        # Base -> P1, P2
-        X1, X2, y1, y2 = train_test_split(X, y, test_size=ds_cfg.initial_split_ratio, stratify=y, random_state=seed)
-        # P1 -> P11, P12
-        X11, X12, y11, y12 = train_test_split(X1, y1, test_size=ds_cfg.initial_split_ratio, stratify=y1, random_state=seed)
-        # P2 -> P21, P22
-        X21, X22, y21, y22 = train_test_split(X2, y2, test_size=ds_cfg.initial_split_ratio, stratify=y2, random_state=seed)
-        
-        data_to_save = {'p1':(X1,y1), 'p2':(X2,y2), 'p11':(X11,y11), 'p12':(X12,y12), 'p21':(X21,y21), 'p22':(X22,y22)}
-        for key, (sX, sy) in data_to_save.items():
-            pd.DataFrame(sX, columns=ds_cfg.feature_columns).assign(**{ds_cfg.target_column: sy}).to_parquet(ds_cfg.paths[key], index=False)
+    # Hierarchical splits and saving
+    # Base -> P1, P2
+    X1, X2, y1, y2 = train_test_split(X, y, test_size=ds_cfg.initial_split_ratio, stratify=y, random_state=seed)
+    # P1 -> P11, P12
+    X11, X12, y11, y12 = train_test_split(X1, y1, test_size=ds_cfg.initial_split_ratio, stratify=y1, random_state=seed)
+    # P2 -> P21, P22
+    X21, X22, y21, y22 = train_test_split(X2, y2, test_size=ds_cfg.initial_split_ratio, stratify=y2, random_state=seed)
+    
+    # Overwrite previous Parquet files with the new seed-based partitions
+    data_to_save = {'p1':(X1,y1), 'p2':(X2,y2), 'p11':(X11,y11), 'p12':(X12,y12), 'p21':(X21,y21), 'p22':(X22,y22)}
+    for key, (sX, sy) in data_to_save.items():
+        pd.DataFrame(sX, columns=ds_cfg.feature_columns).assign(**{ds_cfg.target_column: sy}).to_parquet(ds_cfg.paths[key], index=False)
 
     # Create DataLoader objects for each split, returning them in a structured dict format
     loaders = {}

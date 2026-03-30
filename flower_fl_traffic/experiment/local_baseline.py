@@ -8,27 +8,27 @@ from utils.evaluation import evaluate_model
 
 def run_local_experiment(config, train_loaders, test_loaders, subdir, client_ids=None):
     """
-    Lefuttatja a lokális baseline tanítást (M1 és M2) és a kért JSON formátumban ment.
+    Runs a local baseline experiment where each client trains its own model independently.
     """
-    # 1. Konfiguráció letisztítása (Hydra -> Sima Python Dict)
-    # Ez küszöböli ki a ContainerMetadata hibát
+    # Configuration cleaning: Convert OmegaConf to a regular dict for JSON serialization
     clean_params = OmegaConf.to_container(config, resolve=True)
 
-    # 2. Alapstruktúra létrehozása (a 0.json minta alapján)
+    # Results structure initialization
     results = {
         "parameters": clean_params,
         "models": {}
     }
 
-    # Kliensnevek kezelése (ha lista érkezik a main-ből)
+    # Client names handling (if a list is passed from main.py, use it; otherwise default to P1, P2)
     if client_ids is None:
         client_ids = ["P1", "P2"]
 
-    # 3. Kliensek tanítása (M1, M2...)
+    # Training and evaluation loop for each client
     for i, train_loader in enumerate(train_loaders):
         model_key = f"M{i+1}"
-        print(f"  --- {model_key} lokális tanítása indult ---")
+        print(f"  --- {model_key} Start local training ---")
         
+        # Same model architecture as the federated clients, but trained independently
         model = TrafficNN(input_dim=config.dataset.input_dim, num_classes=config.dataset.num_classes)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model.to(device)
@@ -36,9 +36,10 @@ def run_local_experiment(config, train_loaders, test_loaders, subdir, client_ids
         optimizer = torch.optim.Adam(model.parameters(), lr=config.config.lr)
         criterion = nn.CrossEntropyLoss()
         
-        # Összes epoch: körök * belső epochok
+        # Training loop: models will be trained for the same total number of epochs as in the federated setting
         total_epochs = config.config.federated_rounds * config.config.num_epochs 
         
+        # Training history list to store epoch-level metrics
         training_history = []
         for epoch in range(1, total_epochs + 1):
             model.train()
@@ -58,7 +59,6 @@ def run_local_experiment(config, train_loaders, test_loaders, subdir, client_ids
                 correct += (outputs.argmax(1) == labels).sum().item()
                 total += labels.size(0)
             
-            # Epoch szintű statisztika mentése a listába
             training_history.append({
                 "epoch": epoch,
                 "loss": running_loss / total,
@@ -68,8 +68,7 @@ def run_local_experiment(config, train_loaders, test_loaders, subdir, client_ids
             if epoch % 10 == 0:
                 print(f"    Epoch {epoch}/{total_epochs} kész.")
 
-        # 4. Értékelés (Cross-evaluation)
-        # Itt minden modell lefut minden kliens tesztadatán
+        # Evaluation on the test set(s) for this client
         evaluation_results = {}
         for j, test_loader in enumerate(test_loaders):
             target_name = client_ids[j]
@@ -79,18 +78,16 @@ def run_local_experiment(config, train_loaders, test_loaders, subdir, client_ids
                 "accuracy": float(acc)
             }
 
-        # Adatok hozzáadása a fő objektumhoz
+        # Store the training history and evaluation results in the results dict under the model key (M1, M2, etc.)
         results["models"][model_key] = {
             "training": training_history,
             "evaluation": evaluation_results
         }
 
-    # 5. Mentés (a seed alapján elnevezett fájlba)
+    # Save the results in a structured JSON file under the appropriate directory
     target_path = os.path.join("1_local_baseline", subdir)
     os.makedirs(target_path, exist_ok=True)
     file_path = os.path.join(target_path, f"{config.config.seed}.json")
 
     with open(file_path, "w") as f:
         json.dump(results, f, indent=4)
-    
-    print(f"✅ Lokális baseline sikeresen mentve: {file_path}")

@@ -3,6 +3,9 @@ import numpy as np
 from torch.utils.data import Dataset
 
 class CustomDataset(Dataset):
+    '''
+    Custom dataset for handling tabular data with optional feature selection.
+    '''
     def __init__(self, X, y, feature_indices=None, total_features=None):
         if total_features is None:
             self.X = torch.tensor(X, dtype=torch.float32)

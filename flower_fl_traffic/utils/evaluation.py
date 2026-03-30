@@ -2,6 +2,11 @@ import torch
 
 @torch.no_grad()
 def evaluate_model(model, test_loader, criterion):
+    '''
+    Evaluate the given model on the test set using the provided criterion (loss function).
+    Returns the average loss and accuracy over the test set.
+    '''
+
     model.eval()
     total_loss = 0
     correct = 0

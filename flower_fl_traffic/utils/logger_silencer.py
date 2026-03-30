@@ -4,28 +4,30 @@ import warnings
 import ray
 
 def silence_log():
-    """Minden felesleges zajt elnyomunk a konzolon (Ray, Flower, Opacus, Torch)."""
+    """
+    Function to silence logs from Ray, Flower, and other libraries to keep the output clean during federated learning experiments.
+    This function sets environment variables, configures Python warnings, and adjusts logging levels to minimize unnecessary output from the libraries used in the project.
+    """
     
-    # 1. Környezeti változók (Még a Ray/Torch inicializálása előtt)
+    # Environment variables to reduce logging from Ray and other libraries
     os.environ["RAY_DEDUP_LOGS"] = "0"
     os.environ["PYTHONWARNINGS"] = "ignore"
-    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3" # Ha esetleg befigyelne a TF
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
     
-    # 2. Python warnings globális némítása
+    # Filter oit warnings form python, opacus, and torch to keep the output clean during experiments
     warnings.filterwarnings("ignore") 
-    # Speciális szűrés az Opacus és a Torch backward hook üzeneteire
     warnings.filterwarnings("ignore", category=UserWarning, module="opacus")
     warnings.filterwarnings("ignore", category=UserWarning, module="torch")
     warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-    # 3. Flower naplózás némítása
+    # Turn off logging for Flower to minimize output during federated learning experiments
     logging.getLogger("flwr").setLevel(logging.ERROR)
     
-    # 4. Ray inicializálása csendes módban
+    # Initialize Ray with logging disabled to prevent worker logs from cluttering the output during federated learning simulations. This is especially important when running multiple rounds of training, as Ray can produce a lot of log messages by default.
     if not ray.is_initialized():
         ray.init(
             logging_level=logging.ERROR, 
-            log_to_driver=False,       # Ne küldje a worker logokat a fő képernyőre
-            configure_logging=True,    # Engedjük, hogy a Ray saját magát némítsa
-            include_dashboard=False    # Dashboard sem kell, kevesebb log
+            log_to_driver=False,       # Disable logging to the driver to prevent cluttering the console output
+            configure_logging=True,    # Configure logging to ensure that the logging level is set correctly for all Ray components
+            include_dashboard=False    # Disable the Ray dashboard to reduce resource usage and prevent additional log messages related to the dashboard
         )

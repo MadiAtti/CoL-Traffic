@@ -5,6 +5,9 @@ from torch.utils.data import DataLoader
 from data.custom_dataset import CustomDataset
 
 def setup_directories(cfg):
+    '''
+    Folder structure initialization based on the provided configuration.
+    '''
     base_results_dirs = [
         '1_local_baseline', 
         '2_suppression', 
@@ -24,18 +27,22 @@ def setup_directories(cfg):
                 if directory:
                     os.makedirs(directory, exist_ok=True)
 
-    print("Mappastruktúra sikeresen inicializálva.")
+    print("Folder structure initialized successfully.")
 
 def prepare_data_and_loaders(cfg):
+    '''
+    1. Load raw data, scale features, and encode target.
+    2. Perform hierarchical splits (Base -> P1/P2, then P1 -> P11/P12, P2 -> P21/P22) and save them if not already done.
+    3. Create DataLoader objects for each split and return them in a structured dict format'''
     ds_cfg = cfg.dataset
     seed = cfg.config.seed
     
-    # 1. Alapadat betöltés és skálázás
+    # Load raw data, scale features, and encode target.
     df = pd.read_parquet(ds_cfg.input_path, columns=ds_cfg.feature_columns + [ds_cfg.target_column]).dropna()
     X = StandardScaler().fit_transform(df[ds_cfg.feature_columns].values.astype(np.float32))
     y = LabelEncoder().fit_transform(df[ds_cfg.target_column].values).astype(np.int32)
 
-    # 2. Hierarchikus split és mentés (ha a p1 hiányzik, újrageneráljuk mindet)
+    # Hierarchical splits and saving (only if not already done)
     if not os.path.exists(ds_cfg.paths.p1):
         # Base -> P1, P2
         X1, X2, y1, y2 = train_test_split(X, y, test_size=ds_cfg.initial_split_ratio, stratify=y, random_state=seed)
@@ -48,7 +55,7 @@ def prepare_data_and_loaders(cfg):
         for key, (sX, sy) in data_to_save.items():
             pd.DataFrame(sX, columns=ds_cfg.feature_columns).assign(**{ds_cfg.target_column: sy}).to_parquet(ds_cfg.paths[key], index=False)
 
-    # 3. Loaderek létrehozása a kért dict formátumban
+    # Create DataLoader objects for each split, returning them in a structured dict format
     loaders = {}
     for key in ds_cfg.paths.keys():
         df_p = pd.read_parquet(ds_cfg.paths[key])

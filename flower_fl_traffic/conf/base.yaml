@@ -1,8 +1,10 @@
-num_clients: 2
+# Base configuration file for the federated learning experiment on traffic classification using Flower framework
 
-config:
+num_clients: 2 # Total number of clients in the federated learning simulation
+
+config: # Configuration for the training process, including hyperparameters and settings
   lr: 0.001
-  seed: 42
+  seed: 0 ## Random seed for reproducibility, change it for different runs
   federated_rounds: 2 #20
   num_epochs: 2         
   batch_size: 256
@@ -10,7 +12,7 @@ config:
   noise_levels: [null, 0.33] #, 0.67, 1.0, 1.33, 1.67, 2.0]
   sup_levels: [14, 12] #, 10, 8, 6, 4, 2, 0]
 
-dataset:
+dataset: # Configuration related to the dataset, including paths and feature/target columns
   input_path: "dataset/dataset.parquet"
   paths:
     p1: "dataset/p1.parquet"
@@ -38,7 +40,7 @@ dataset:
   initial_split_ratio: 0.5
   test_split_ratio: 0.2
 
-hydra:
+hydra: # Configuration for Hydra, which manages the experiment's configuration and execution
   job:
     chdir: True
   run:

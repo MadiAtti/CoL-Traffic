@@ -2,7 +2,7 @@ import torch
 from opacus import PrivacyEngine
 
 def train_standard(model, loader, optimizer, epochs, device):
-    """Sima tanítás (Baseline, FL, Suppression - mindenhez jó, ami nem zajos)"""
+    """Standard training loop for federated learning without differential privacy."""
     model.train()
     criterion = torch.nn.CrossEntropyLoss()
     for _ in range(epochs):
@@ -15,9 +15,9 @@ def train_standard(model, loader, optimizer, epochs, device):
     return model
 
 def train_dp(model, loader, optimizer, epochs, noise, max_grad_norm, device):
-    """Zajos tanítás (DP-FL)"""
+    """Differential privacy training loop for federated learning."""
+    # Initialize the PrivacyEngine to make the model and optimizer private with the specified noise and max_grad_norm
     privacy_engine = PrivacyEngine()
-    # Az Opacus 'felokosítja' a modellt és a loadert
     model, optimizer, loader = privacy_engine.make_private(
         module=model, optimizer=optimizer, data_loader=loader,
         noise_multiplier=noise, max_grad_norm=max_grad_norm,

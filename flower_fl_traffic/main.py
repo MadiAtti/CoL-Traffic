@@ -4,16 +4,21 @@ import torch
 from data.dataset import prepare_data_and_loaders, setup_directories
 from experiment.experiment_runner import run_experiment
 from experiment.local_baseline import run_local_experiment
+from utils.seed import set_seed
 from utils.logger_silencer import silence_log
 
 
 @hydra.main(config_path="conf", config_name="base", version_base=None)
 def main(config: DictConfig):
+    
+    ## Set random seed for reproducibility
+    set_seed(config.config.seed)
 
     ## Load configuration and setup directories
     silence_log()
     OmegaConf.set_struct(config, False)
     setup_directories(config)
+
 
     ## Prepare dataset and update config with dataset info (input_dim, num_classes)
     loaders = prepare_data_and_loaders(config)               
@@ -34,17 +39,16 @@ def main(config: DictConfig):
     ]
 
     ## Run local baseline experiments (M1, M2, M11, M12, M21, M22)
-
     for exp_name, client1_key, client2_key, subdir in experiments:
         print(f"\n{'#'*80}")
-        print(f"🚀 INDUL AZ EXPERIMENT: {exp_name} (BASELINE)🚀")
+        print(f"🚀 START EXPERIMENT: {exp_name} (BASELINE)🚀")
         print(f"{'#'*80}\n")
 
-        # Listákat készítünk a loaderekből
+        # setup train and test loaders for the current experiment
         train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
         test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
         
-        # Átadjuk a kliens ID-kat is a JSON címkézéshez
+        # run the local experiment and save results
         run_local_experiment(
             config=config, 
             train_loaders=train_loaders, 
@@ -53,37 +57,41 @@ def main(config: DictConfig):
             client_ids=[client1_key, client2_key]
         )
 
+
     ## Run experiments with different noise levels
+    for exp_name, client1_key, client2_key, subdir in experiments:
+        print(f"\n{'#'*80}")
+        print(f"START EXPERIMENT: {exp_name} (DP)🚀")
+        print(f"{'#'*80}\n")
 
-    # for exp_name, client1_key, client2_key, subdir in experiments:
-    #     print(f"\n{'#'*80}")
-    #     print(f"🚀 INDUL AZ EXPERIMENT: {exp_name} (DP)🚀")
-    #     print(f"{'#'*80}\n")
+        # setup train and test loaders for the current experiment
+        train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
+        test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
 
-    #     train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
-    #     test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
+        #run the federated experiment with DP and save results
+        run_experiment(
+            config=config, 
+            train_loaders=train_loaders, 
+            test_loaders=test_loaders, 
+            subdir=subdir, mode="dp")
 
-    #     run_experiment(
-    #         config=config, 
-    #         train_loaders=train_loaders, 
-    #         test_loaders=test_loaders, 
-    #         subdir=subdir, mode="dp")
 
     ## Run experiments with different suppression levels
-    
-    # for exp_name, client1_key, client2_key, subdir in experiments:
-    #     print(f"\n{'#'*80}")
-    #     print(f"🚀 INDUL AZ EXPERIMENT: {exp_name} (SUP)🚀")
-    #     print(f"{'#'*80}\n")
+    for exp_name, client1_key, client2_key, subdir in experiments:
+        print(f"\n{'#'*80}")
+        print(f"START EXPERIMENT: {exp_name} (SUP)🚀")
+        print(f"{'#'*80}\n")
 
-    #     train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
-    #     test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
+        # setup train and test loaders for the current experiment
+        train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
+        test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
 
-    #     run_experiment(
-    #         config=config, 
-    #         train_loaders=train_loaders, 
-    #         test_loaders=test_loaders, 
-    #         subdir=subdir, mode="sup")
+        # run the federated experiment with feature suppression and save results
+        run_experiment(
+            config=config, 
+            train_loaders=train_loaders, 
+            test_loaders=test_loaders, 
+            subdir=subdir, mode="sup")
 
 if __name__ == "__main__":
     

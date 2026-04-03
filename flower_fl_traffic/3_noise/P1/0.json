@@ -1,0 +1,315 @@
+{
+    "parameters": {
+        "num_clients": 2,
+        "config": {
+            "lr": 0.001,
+            "seed": 0,
+            "federated_rounds": 20,
+            "num_epochs": 2,
+            "batch_size": 256,
+            "max_grad_norm": 1.0,
+            "noise_levels": [
+                null,
+                1.0
+            ],
+            "sup_levels": [
+                14,
+                12,
+                10,
+                8,
+                6,
+                4,
+                2,
+                0
+            ]
+        },
+        "dataset": {
+            "input_path": "dataset/dataset.parquet",
+            "paths": {
+                "p1": "dataset/p1.parquet",
+                "p2": "dataset/p2.parquet",
+                "p11": "dataset/p11.parquet",
+                "p12": "dataset/p12.parquet",
+                "p21": "dataset/p21.parquet",
+                "p22": "dataset/p22.parquet"
+            },
+            "feature_columns": [
+                "protocol",
+                "bidirectional_min_ps",
+                "bidirectional_mean_ps",
+                "bidirectional_stddev_ps",
+                "bidirectional_max_ps",
+                "src2dst_stddev_ps",
+                "src2dst_max_ps",
+                "dst2src_min_ps",
+                "dst2src_mean_ps",
+                "dst2src_stddev_ps",
+                "dst2src_max_ps",
+                "bidirectional_stddev_piat_ms",
+                "bidirectional_max_piat_ms",
+                "bidirectional_rst_packets"
+            ],
+            "target_column": "application_name",
+            "initial_split_ratio": 0.5,
+            "test_split_ratio": 0.2,
+            "input_dim": 14,
+            "num_classes": 10
+        }
+    },
+    "experiments": [
+        {
+            "noise_p1": null,
+            "noise_p2": null,
+            "rounds": [
+                {
+                    "round": 1,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9096432387322742
+                        },
+                        "P2": {
+                            "accuracy": 0.910649032078597
+                        }
+                    },
+                    "loss": 0.25347241818918875
+                },
+                {
+                    "round": 2,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9394401102583231
+                        },
+                        "P2": {
+                            "accuracy": 0.9392500616413674
+                        }
+                    },
+                    "loss": 0.1751935278909932
+                },
+                {
+                    "round": 3,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9447314016930829
+                        },
+                        "P2": {
+                            "accuracy": 0.9454145434774363
+                        }
+                    },
+                    "loss": 0.15973617310054009
+                },
+                {
+                    "round": 4,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9471907341961018
+                        },
+                        "P2": {
+                            "accuracy": 0.9480192699179385
+                        }
+                    },
+                    "loss": 0.15311782950134809
+                },
+                {
+                    "round": 5,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9470516459825634
+                        },
+                        "P2": {
+                            "accuracy": 0.9482026123130224
+                        }
+                    },
+                    "loss": 0.14880497652482255
+                },
+                {
+                    "round": 6,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9515659969400786
+                        },
+                        "P2": {
+                            "accuracy": 0.950920827195539
+                        }
+                    },
+                    "loss": 0.14329965941926107
+                },
+                {
+                    "round": 7,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9516289126462797
+                        },
+                        "P2": {
+                            "accuracy": 0.9524953532186073
+                        }
+                    },
+                    "loss": 0.13877188705262433
+                },
+                {
+                    "round": 8,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.952412864395314
+                        },
+                        "P2": {
+                            "accuracy": 0.9534247094971361
+                        }
+                    },
+                    "loss": 0.13696850589209503
+                },
+                {
+                    "round": 9,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9549167372640257
+                        },
+                        "P2": {
+                            "accuracy": 0.9540250232340538
+                        }
+                    },
+                    "loss": 0.13394007006779127
+                },
+                {
+                    "round": 10,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9554098650852858
+                        },
+                        "P2": {
+                            "accuracy": 0.9547204643017455
+                        }
+                    },
+                    "loss": 0.13150331806410395
+                },
+                {
+                    "round": 11,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.955776270286332
+                        },
+                        "P2": {
+                            "accuracy": 0.9565921074259992
+                        }
+                    },
+                    "loss": 0.12870343686186592
+                },
+                {
+                    "round": 12,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9587732497123421
+                        },
+                        "P2": {
+                            "accuracy": 0.9575085507640368
+                        }
+                    },
+                    "loss": 0.12558547843596268
+                },
+                {
+                    "round": 13,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9603535369500483
+                        },
+                        "P2": {
+                            "accuracy": 0.9613147546372982
+                        }
+                    },
+                    "loss": 0.11936264776015547
+                },
+                {
+                    "round": 14,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9647287164767914
+                        },
+                        "P2": {
+                            "accuracy": 0.9643049066528422
+                        }
+                    },
+                    "loss": 0.10789766019794628
+                },
+                {
+                    "round": 15,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9687430851030201
+                        },
+                        "P2": {
+                            "accuracy": 0.9692174440805695
+                        }
+                    },
+                    "loss": 0.09640683757262573
+                },
+                {
+                    "round": 16,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9715250293980048
+                        },
+                        "P2": {
+                            "accuracy": 0.9712213841806123
+                        }
+                    },
+                    "loss": 0.08988640833832111
+                },
+                {
+                    "round": 17,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9714553052670177
+                        },
+                        "P2": {
+                            "accuracy": 0.972214143917458
+                        }
+                    },
+                    "loss": 0.08781590324750285
+                },
+                {
+                    "round": 18,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9728208986363033
+                        },
+                        "P2": {
+                            "accuracy": 0.9733584533488436
+                        }
+                    },
+                    "loss": 0.08637871439262924
+                },
+                {
+                    "round": 19,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9730864306803311
+                        },
+                        "P2": {
+                            "accuracy": 0.9733584533488436
+                        }
+                    },
+                    "loss": 0.08519815310112412
+                },
+                {
+                    "round": 20,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9740663703666239
+                        },
+                        "P2": {
+                            "accuracy": 0.9744458634162378
+                        }
+                    },
+                    "loss": 0.08304950249275098
+                }
+            ],
+            "final_evaluation": {
+                "P1": {
+                    "accuracy": 0.9740663703666239
+                },
+                "P2": {
+                    "accuracy": 0.9744458634162378
+                }
+            }
+        }
+    ]
+}

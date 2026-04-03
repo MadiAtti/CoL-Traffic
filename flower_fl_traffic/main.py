@@ -38,24 +38,24 @@ def main(config: DictConfig):
         ("P21-P22", "p21", "p22", "P2") 
     ]
 
-    ## Run local baseline experiments (M1, M2, M11, M12, M21, M22)
-    for exp_name, client1_key, client2_key, subdir in experiments:
-        print(f"\n{'#'*80}")
-        print(f"🚀 START EXPERIMENT: {exp_name} (BASELINE)🚀")
-        print(f"{'#'*80}\n")
+    # ## Run local baseline experiments (M1, M2, M11, M12, M21, M22)
+    # for exp_name, client1_key, client2_key, subdir in experiments:
+    #     print(f"\n{'#'*80}")
+    #     print(f"🚀 START EXPERIMENT: {exp_name} (BASELINE)🚀")
+    #     print(f"{'#'*80}\n")
 
-        # setup train and test loaders for the current experiment
-        train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
-        test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
+    #     # setup train and test loaders for the current experiment
+    #     train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
+    #     test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
         
-        # run the local experiment and save results
-        run_local_experiment(
-            config=config, 
-            train_loaders=train_loaders, 
-            test_loaders=test_loaders, 
-            subdir=subdir,
-            client_ids=[client1_key, client2_key]
-        )
+    #     # run the local experiment and save results
+    #     run_local_experiment(
+    #         config=config, 
+    #         train_loaders=train_loaders, 
+    #         test_loaders=test_loaders, 
+    #         subdir=subdir,
+    #         client_ids=[client1_key, client2_key]
+    #     )
 
 
     ## Run experiments with different noise levels
@@ -76,22 +76,22 @@ def main(config: DictConfig):
             subdir=subdir, mode="dp")
 
 
-    ## Run experiments with different suppression levels
-    for exp_name, client1_key, client2_key, subdir in experiments:
-        print(f"\n{'#'*80}")
-        print(f"START EXPERIMENT: {exp_name} (SUP)🚀")
-        print(f"{'#'*80}\n")
+    # ## Run experiments with different suppression levels
+    # for exp_name, client1_key, client2_key, subdir in experiments:
+    #     print(f"\n{'#'*80}")
+    #     print(f"START EXPERIMENT: {exp_name} (SUP)🚀")
+    #     print(f"{'#'*80}\n")
 
-        # setup train and test loaders for the current experiment
-        train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
-        test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
+    #     # setup train and test loaders for the current experiment
+    #     train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
+    #     test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
 
-        # run the federated experiment with feature suppression and save results
-        run_experiment(
-            config=config, 
-            train_loaders=train_loaders, 
-            test_loaders=test_loaders, 
-            subdir=subdir, mode="sup")
+    #     # run the federated experiment with feature suppression and save results
+    #     run_experiment(
+    #         config=config, 
+    #         train_loaders=train_loaders, 
+    #         test_loaders=test_loaders, 
+    #         subdir=subdir, mode="sup")
 
 if __name__ == "__main__":
     

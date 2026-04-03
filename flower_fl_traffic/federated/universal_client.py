@@ -1,5 +1,4 @@
 from collections import OrderedDict
-from flwr.common import Context
 import os
 import flwr as fl
 import torch
@@ -117,9 +116,7 @@ def create_client_fn(trainloader, testloader, cfg):
 
     # The client_fn that will be passed to the Flower simulation, which creates a UniversalTrafficClient 
     # instance for each client ID (cid) with the corresponding train and test loaders and configuration
-    def client_fn(context: Context):
-
-        cid = str(context.node_config["partition-id"])
+    def client_fn(cid: str):
 
         return UniversalTrafficClient(cid = cid,
                                     model = TrafficNN(input_dim=cfg.dataset.input_dim, num_classes=cfg.dataset.num_classes),

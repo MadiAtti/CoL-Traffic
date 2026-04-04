@@ -1,3 +1,5 @@
+import os
+import multiprocessing as mp
 import hydra
 from omegaconf import DictConfig, OmegaConf
 import torch
@@ -94,5 +96,19 @@ def main(config: DictConfig):
             subdir=subdir, mode="sup")
 
 if __name__ == "__main__":
-    
+    # Ensure the 'spawn' start method is used for multiprocessing.
+    # This is the default on macOS but must be explicitly set on Linux 
+    # to avoid deadlocks when using Ray/Flower within parallel processes.
+    try:
+        mp.set_start_method('spawn', force=True)
+    except RuntimeError:
+        pass
+
+    # Set Ray to use an ephemeral port for the GCS server.
+    # This prevents port collision when multiple independent Ray instances 
+    # are launched in parallel on the same machine.
+    os.environ["RAY_GCS_SERVER_PORT"] = "0"
+
+    # Now it is safe to invoke the Hydra-decorated main function.
+
     main()

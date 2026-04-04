@@ -13,6 +13,9 @@ def silence_log():
     os.environ["RAY_DEDUP_LOGS"] = "0"
     os.environ["PYTHONWARNINGS"] = "ignore"
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
+    os.environ["OMP_NUM_THREADS"] = "1"
+    os.environ["MKL_NUM_THREADS"] = "1"
     
     # Filter oit warnings form python, opacus, and torch to keep the output clean during experiments
     warnings.filterwarnings("ignore") 

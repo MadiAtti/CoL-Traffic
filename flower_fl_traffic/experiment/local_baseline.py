@@ -12,6 +12,9 @@ def _train_single_local_model(args):
     Helper function to train a single local model in a separate process.
     This ensures that independent client training can happen in parallel.
     """
+
+    torch.set_num_threads(1)  # Ensure that each process uses only one thread to prevent oversubscription of CPU resources
+
     (i, train_loader, test_loaders, config, client_ids, device) = args
     model_key = f"M{i+1}"
     pid = os.getpid()

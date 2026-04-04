@@ -1,3 +1,5 @@
+import logging
+
 from utils.logger_silencer import silence_log
 import flwr as fl
 import ray
@@ -40,7 +42,12 @@ def _run_single_scenario(args):
         num_clients=config.num_clients,
         config=fl.server.ServerConfig(num_rounds=config.config.federated_rounds),
         strategy=strategy,
-        client_resources={"num_cpus": 1, "num_gpus": 0.0}
+        client_resources={"num_cpus": 1, "num_gpus": 0.0},
+        ray_init_args={
+            "logging_level": logging.ERROR,
+            "log_to_driver": False,
+            "num_cpus": 2,
+        }
     )
 
     # Save the history and results
@@ -92,7 +99,7 @@ def run_experiment(config, train_loaders, test_loaders, subdir, mode):
     # Determine the number of parallel processes
     # Since each scenario uses 2 clients (2 CPUs), 4 processes use 8 CPUs.
     # Adjust this number based on your available RAM.
-    num_parallel_scenarios = 7
+    num_parallel_scenarios = 4
 
     print(f"\n{'#'*60}")
     print(f"🔥 Starting Parallel Runner | Mode: {mode.upper()} | Processes: {num_parallel_scenarios}")

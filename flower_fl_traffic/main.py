@@ -60,22 +60,22 @@ def main(config: DictConfig):
     #     )
 
 
-    ## Run experiments with different noise levels
-    for exp_name, client1_key, client2_key, subdir in experiments:
-        print(f"\n{'#'*80}")
-        print(f"START EXPERIMENT: {exp_name} (DP)🚀")
-        print(f"{'#'*80}\n")
+    # ## Run experiments with different noise levels
+    # for exp_name, client1_key, client2_key, subdir in experiments:
+    #     print(f"\n{'#'*80}")
+    #     print(f"START EXPERIMENT: {exp_name} (DP)🚀")
+    #     print(f"{'#'*80}\n")
 
-        # setup train and test loaders for the current experiment
-        train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
-        test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
+    #     # setup train and test loaders for the current experiment
+    #     train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
+    #     test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
 
-        #run the federated experiment with DP and save results
-        run_experiment(
-            config=config, 
-            train_loaders=train_loaders, 
-            test_loaders=test_loaders, 
-            subdir=subdir, mode="dp")
+    #     #run the federated experiment with DP and save results
+    #     run_experiment(
+    #         config=config, 
+    #         train_loaders=train_loaders, 
+    #         test_loaders=test_loaders, 
+    #         subdir=subdir, mode="dp")
 
 
     ## Run experiments with different suppression levels

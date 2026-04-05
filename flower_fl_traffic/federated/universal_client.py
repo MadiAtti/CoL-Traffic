@@ -2,8 +2,6 @@ from collections import OrderedDict
 import os
 import flwr as fl
 import torch
-from data.custom_dataset import CustomDataset
-from torch.utils.data import DataLoader
 from models.neural_network import TrafficNN
 from utils.evaluation import evaluate_model
 from utils.training import train_dp, train_standard
@@ -23,7 +21,7 @@ class UniversalTrafficClient(fl.client.NumPyClient):
         self.trainloader = trainloader
         self.testloader = testloader
         self.cfg = cfg 
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cpu")
         self.model.to(self.device)
 
     def get_parameters(self, config):
@@ -38,39 +36,20 @@ class UniversalTrafficClient(fl.client.NumPyClient):
     def fit(self, parameters, config):
         self.set_parameters(parameters)
         
-        # Feature suppression handling: Only modify the trainloader if a feature limit is specified and it's the first round
-        f_limit = config.get("p1_features") if self.cid == "0" else config.get("p2_features")
-        server_round = config.get("current_round", 1)
-
-        # Overwrite the trainloader with a new one that has limited features if f_limit is set and it's the first round
-        if f_limit is not None and server_round == 1:
-            f_limit = int(f_limit)
-            total_features = self.cfg.dataset.input_dim
-            
-            # Get the raw data from the original trainloader's dataset (assuming it's a CustomDataset)
-            raw_x = self.trainloader.dataset.X.numpy()
-            raw_y = self.trainloader.dataset.y.numpy()
-            
-            # Create a new dataset with only the first f_limit features and the same labels
-            # upload with zero padding for the missing features to maintain the same input dimension for the model
-            x_sub = raw_x[:, :f_limit]
-            new_ds = CustomDataset(
-                X=x_sub, 
-                y=raw_y, 
-                feature_indices=range(f_limit), 
-                total_features=total_features
-            )
-            
-            # Overwrite the trainloader with the new dataset that has limited features
-            self.trainloader = DataLoader(
-                new_ds, 
-                batch_size=self.cfg.config.batch_size, 
-                shuffle=True
-            )
-            print(f"✅ [Client {self.cid}] Adatok előkészítve a kísérlethez: {f_limit}/{total_features} feature")
-
-
+        # 1. Adatellenőrzés (vágás validálása)
+        test_batch_x, _ = next(iter(self.trainloader))
+        num_active = torch.any(test_batch_x != 0, dim=0).sum().item()
+        
+        # 2. Várt érték kinyerése (None, ha DP mód van)
+        exp = config.get("client1_features") if self.cid == "0" else config.get("client2_features")
+        
+        # 3. Egyetlen lényegre törő sor:
+        print(f"   - [Client {self.cid}] Non-zero columns: {num_active} (Expected: {exp if exp is not None else 'Full'})", flush=True)
         # DP handling: Determine the noise level for this client based on the config parameters
+
+        sample_data = test_batch_x[:5, :14].numpy() 
+        # print(f"    First 5 rows (first 14 cols):\n{sample_data}", flush=True)
+
         noise = config.get("client1_noise") if self.cid == "0" else config.get("client2_noise")
         
         # Ensure noise is a float and handle the case where it might be None or "None"

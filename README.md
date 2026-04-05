@@ -49,28 +49,11 @@ The system expects the primary file at: ./dataset/dataset.parquet.
 
 This project uses **Conda** to manage dependencies and **Hydra** for configuration. Follow these steps to set up your local environment:
 
-### 1. Create the Environment
+### Create the Environment
 Use the provided `enviroment.yml` to recreate the exact Python environment. This ensures all versions (Flower, PyTorch, Opacus) are compatible.
 ```bash
 conda env create -f enviroment.yml
 conda activate flower-fl-traffic
-```
-
-### 2. Set the Project Root
-
-To ensure internal imports work correctly, add the project root to your PYTHONPATH while inside the project folder. This allows the scripts to recognize the utils, models, and other modules without path errors.
-
-**Linux / macOS:**
-
-```Bash
-export PYTHONPATH=$PYTHONPATH:$(pwd)
-```
-
-**Windows** (PowerShell):
-
-```Bash
-PowerShell
-$env:PYTHONPATH += ";$pwd"
 ```
 
 ---

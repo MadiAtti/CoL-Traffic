@@ -1,5 +1,7 @@
 import logging
 
+from data.custom_dataset import CustomDataset
+from torch.utils.data import DataLoader
 from utils.logger_silencer import silence_log
 import flwr as fl
 import ray
@@ -17,8 +19,45 @@ def _run_single_scenario(args):
 
     silence_log()
 
-    (val1, val2, config, train_loaders, test_loaders, subdir, 
+    (val1, val2, config, raw_train_loaders, test_loaders, subdir, 
      mode, base_dir, metric_name, param_keys) = args
+
+    active_loaders = []
+
+    if mode == "sup":
+        total_f = config.dataset.input_dim  # Ez a 14
+        active_loaders = []
+        
+        for i, limit in enumerate([val1, val2]):
+            limit = int(limit)
+            
+            # 1. KINYERÉS ÉS MÁSOLÁS (Hogy ne legyen shared memory ütközés)
+            # A régi kódod alapján: X_p1_train, y_p1_train kinyerése
+            X_orig = raw_train_loaders[i].dataset.X.cpu().numpy().copy()
+            y_orig = raw_train_loaders[i].dataset.y.cpu().numpy().copy()
+            
+            # 2. FIZIKAI VÁGÁS (Ahogy a régi kódod create_suppressed_dataset-je csinálta)
+            # Csak az első 'limit' számú oszlopot tartjuk meg
+            feature_indices = list(range(limit))
+            X_cut = X_orig[:, feature_indices]
+            
+            # 3. CUSTOM DATASET INICIALIZÁLÁS
+            # Átadjuk a vágott X-et (X_cut), és megmondjuk, hova pakolja a 14-es vázban
+            new_ds = CustomDataset(
+                X=X_cut, 
+                y=y_orig, 
+                feature_indices=feature_indices, 
+                total_features=total_f
+            )
+            
+            active_loaders.append(DataLoader(
+                new_ds, 
+                batch_size=config.config.batch_size, 
+                shuffle=True
+            ))
+    else:
+        # Ha nem suppression, akkor az eredeti loadereket használjuk
+        active_loaders = raw_train_loaders
 
     print(f"\n🚀 Starting Parallel Simulation ({mode.upper()}) | Client1: {val1} | Client2: {val2}")
     
@@ -38,14 +77,14 @@ def _run_single_scenario(args):
     # Start the Flower simulation
     # Note: client_resources is set to 1 CPU per client to allow effective parallelism
     history = fl.simulation.start_simulation(
-        client_fn=create_client_fn(train_loaders, test_loaders, config),
+        client_fn=create_client_fn(active_loaders, test_loaders, config),
         num_clients=config.num_clients,
         config=fl.server.ServerConfig(num_rounds=config.config.federated_rounds),
         strategy=strategy,
         client_resources={"num_cpus": 1, "num_gpus": 0.0},
         ray_init_args={
             "logging_level": logging.ERROR,
-            "log_to_driver": False,
+            "log_to_driver": True,
             "num_cpus": 2,
         }
     )

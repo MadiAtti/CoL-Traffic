@@ -1,0 +1,2098 @@
+{
+    "parameters": {
+        "num_clients": 2,
+        "config": {
+            "lr": 0.001,
+            "seed": 0,
+            "federated_rounds": 20,
+            "num_epochs": 2,
+            "batch_size": 256,
+            "max_grad_norm": 1.0,
+            "noise_levels": [
+                null,
+                0.33,
+                0.67,
+                1.0,
+                1.33,
+                1.67,
+                2.0
+            ],
+            "sup_levels": [
+                14,
+                12,
+                10,
+                8,
+                6,
+                4,
+                2,
+                0
+            ]
+        },
+        "dataset": {
+            "input_path": "dataset/dataset.parquet",
+            "paths": {
+                "p1": "dataset/p1.parquet",
+                "p2": "dataset/p2.parquet",
+                "p11": "dataset/p11.parquet",
+                "p12": "dataset/p12.parquet",
+                "p21": "dataset/p21.parquet",
+                "p22": "dataset/p22.parquet"
+            },
+            "feature_columns": [
+                "protocol",
+                "bidirectional_min_ps",
+                "bidirectional_mean_ps",
+                "bidirectional_stddev_ps",
+                "bidirectional_max_ps",
+                "src2dst_stddev_ps",
+                "src2dst_max_ps",
+                "dst2src_min_ps",
+                "dst2src_mean_ps",
+                "dst2src_stddev_ps",
+                "dst2src_max_ps",
+                "bidirectional_stddev_piat_ms",
+                "bidirectional_max_piat_ms",
+                "bidirectional_rst_packets"
+            ],
+            "target_column": "application_name",
+            "initial_split_ratio": 0.5,
+            "test_split_ratio": 0.2,
+            "input_dim": 14,
+            "num_classes": 10
+        }
+    },
+    "experiments": [
+        {
+            "features_p1": 14,
+            "features_p2": 14,
+            "rounds": [
+                {
+                    "round": 1,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9139742118622904
+                        },
+                        "P2": {
+                            "accuracy": 0.9138224797453429
+                        }
+                    },
+                    "loss": 0.22771719297014395
+                },
+                {
+                    "round": 2,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9676652536613276
+                        },
+                        "P2": {
+                            "accuracy": 0.9676336428036302
+                        }
+                    },
+                    "loss": 0.10375408346020289
+                },
+                {
+                    "round": 3,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9698716915286062
+                        },
+                        "P2": {
+                            "accuracy": 0.9697484091835864
+                        }
+                    },
+                    "loss": 0.09338160632645355
+                },
+                {
+                    "round": 4,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.970835822688377
+                        },
+                        "P2": {
+                            "accuracy": 0.9704280426240806
+                        }
+                    },
+                    "loss": 0.08903599990995957
+                },
+                {
+                    "round": 5,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9723246940859246
+                        },
+                        "P2": {
+                            "accuracy": 0.9721634787116679
+                        }
+                    },
+                    "loss": 0.08443966067567901
+                },
+                {
+                    "round": 6,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9732224424445308
+                        },
+                        "P2": {
+                            "accuracy": 0.972928461467945
+                        }
+                    },
+                    "loss": 0.0821911668635507
+                },
+                {
+                    "round": 7,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9743098559493215
+                        },
+                        "P2": {
+                            "accuracy": 0.9741770903469924
+                        }
+                    },
+                    "loss": 0.07992120004563463
+                },
+                {
+                    "round": 8,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9752139264794671
+                        },
+                        "P2": {
+                            "accuracy": 0.974973683960967
+                        }
+                    },
+                    "loss": 0.0771529900292869
+                },
+                {
+                    "round": 9,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9750590332767499
+                        },
+                        "P2": {
+                            "accuracy": 0.975593256771836
+                        }
+                    },
+                    "loss": 0.0753760975906113
+                },
+                {
+                    "round": 10,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9774045589178971
+                        },
+                        "P2": {
+                            "accuracy": 0.9771327055416995
+                        }
+                    },
+                    "loss": 0.07290319517227704
+                },
+                {
+                    "round": 11,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9781568973310952
+                        },
+                        "P2": {
+                            "accuracy": 0.9779830376137596
+                        }
+                    },
+                    "loss": 0.07121770824629717
+                },
+                {
+                    "round": 12,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9789092357442934
+                        },
+                        "P2": {
+                            "accuracy": 0.9787827923135038
+                        }
+                    },
+                    "loss": 0.06962211430600232
+                },
+                {
+                    "round": 13,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9792759216935834
+                        },
+                        "P2": {
+                            "accuracy": 0.9792348275785767
+                        }
+                    },
+                    "loss": 0.06884866906443013
+                },
+                {
+                    "round": 14,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9795572583270902
+                        },
+                        "P2": {
+                            "accuracy": 0.9797121515298075
+                        }
+                    },
+                    "loss": 0.06795714957930425
+                },
+                {
+                    "round": 15,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9799460718767682
+                        },
+                        "P2": {
+                            "accuracy": 0.9801199315941039
+                        }
+                    },
+                    "loss": 0.06592459740188021
+                },
+                {
+                    "round": 16,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9803854627987622
+                        },
+                        "P2": {
+                            "accuracy": 0.9805498392587886
+                        }
+                    },
+                    "loss": 0.06484094965512771
+                },
+                {
+                    "round": 17,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9808438202353744
+                        },
+                        "P2": {
+                            "accuracy": 0.9808027261203678
+                        }
+                    },
+                    "loss": 0.06341696435074747
+                },
+                {
+                    "round": 18,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9809481360657759
+                        },
+                        "P2": {
+                            "accuracy": 0.980764793091131
+                        }
+                    },
+                    "loss": 0.06348189714961477
+                },
+                {
+                    "round": 19,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9818806563678493
+                        },
+                        "P2": {
+                            "accuracy": 0.9821208988863495
+                        }
+                    },
+                    "loss": 0.05973402997946011
+                },
+                {
+                    "round": 20,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9816309305920398
+                        },
+                        "P2": {
+                            "accuracy": 0.9816246084205003
+                        }
+                    },
+                    "loss": 0.05852915352914169
+                }
+            ],
+            "final_evaluation": {
+                "P1": {
+                    "accuracy": 0.9816309305920398
+                },
+                "P2": {
+                    "accuracy": 0.9816246084205003
+                }
+            }
+        },
+        {
+            "features_p1": 14,
+            "features_p2": 6,
+            "rounds": [
+                {
+                    "round": 1,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.5272153679345781
+                        },
+                        "P2": {
+                            "accuracy": 0.5274872213107759
+                        }
+                    },
+                    "loss": 2.138593271230031
+                },
+                {
+                    "round": 2,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8232036339842009
+                        },
+                        "P2": {
+                            "accuracy": 0.822631477459878
+                        }
+                    },
+                    "loss": 1.0250274221319402
+                },
+                {
+                    "round": 3,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.861345294881886
+                        },
+                        "P2": {
+                            "accuracy": 0.8619111292346695
+                        }
+                    },
+                    "loss": 0.7232624170729065
+                },
+                {
+                    "round": 4,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8793350339974775
+                        },
+                        "P2": {
+                            "accuracy": 0.8792054294809181
+                        }
+                    },
+                    "loss": 0.4835720557393959
+                },
+                {
+                    "round": 5,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8983426427309252
+                        },
+                        "P2": {
+                            "accuracy": 0.8991013033156628
+                        }
+                    },
+                    "loss": 0.3354628116591656
+                },
+                {
+                    "round": 6,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8712995539707978
+                        },
+                        "P2": {
+                            "accuracy": 0.8708949349922711
+                        }
+                    },
+                    "loss": 0.42718108625280815
+                },
+                {
+                    "round": 7,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8801663995549192
+                        },
+                        "P2": {
+                            "accuracy": 0.8808333886523343
+                        }
+                    },
+                    "loss": 0.4487763968474174
+                },
+                {
+                    "round": 8,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.871603018204693
+                        },
+                        "P2": {
+                            "accuracy": 0.872709398224102
+                        }
+                    },
+                    "loss": 0.7004233602808131
+                },
+                {
+                    "round": 9,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8557596563267551
+                        },
+                        "P2": {
+                            "accuracy": 0.8548429414535305
+                        }
+                    },
+                    "loss": 0.8713307685330269
+                },
+                {
+                    "round": 10,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8586678552349161
+                        },
+                        "P2": {
+                            "accuracy": 0.8575836028158952
+                        }
+                    },
+                    "loss": 0.8326503998181002
+                },
+                {
+                    "round": 11,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8433523946805249
+                        },
+                        "P2": {
+                            "accuracy": 0.8424830960938463
+                        }
+                    },
+                    "loss": 0.9197193768755518
+                },
+                {
+                    "round": 12,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.833338074961988
+                        },
+                        "P2": {
+                            "accuracy": 0.8326742469503425
+                        }
+                    },
+                    "loss": 0.9054233518739542
+                },
+                {
+                    "round": 13,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8211141562904026
+                        },
+                        "P2": {
+                            "accuracy": 0.8222932412825157
+                        }
+                    },
+                    "loss": 0.8993367830285364
+                },
+                {
+                    "round": 14,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8330757048430996
+                        },
+                        "P2": {
+                            "accuracy": 0.834115702061344
+                        }
+                    },
+                    "loss": 0.8267722129942338
+                },
+                {
+                    "round": 15,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8200899645010068
+                        },
+                        "P2": {
+                            "accuracy": 0.8211299617192513
+                        }
+                    },
+                    "loss": 0.7713966329120896
+                },
+                {
+                    "round": 16,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8380828647023679
+                        },
+                        "P2": {
+                            "accuracy": 0.8375865742365187
+                        }
+                    },
+                    "loss": 0.655098809236751
+                },
+                {
+                    "round": 17,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8361293136966685
+                        },
+                        "P2": {
+                            "accuracy": 0.8355097408857994
+                        }
+                    },
+                    "loss": 0.6728974473346205
+                },
+                {
+                    "round": 18,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8625243798739991
+                        },
+                        "P2": {
+                            "accuracy": 0.8622019491254856
+                        }
+                    },
+                    "loss": 0.5485674211194793
+                },
+                {
+                    "round": 19,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8626381789617098
+                        },
+                        "P2": {
+                            "accuracy": 0.8636117933787898
+                        }
+                    },
+                    "loss": 0.5541941820972367
+                },
+                {
+                    "round": 20,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8555889576951892
+                        },
+                        "P2": {
+                            "accuracy": 0.854751269966208
+                        }
+                    },
+                    "loss": 0.5880460853426202
+                }
+            ],
+            "final_evaluation": {
+                "P1": {
+                    "accuracy": 0.8555889576951892
+                },
+                "P2": {
+                    "accuracy": 0.854751269966208
+                }
+            }
+        },
+        {
+            "features_p1": 12,
+            "features_p2": 14,
+            "rounds": [
+                {
+                    "round": 1,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.6999908328512677
+                        },
+                        "P2": {
+                            "accuracy": 0.6992669442099972
+                        }
+                    },
+                    "loss": 1.5020219142816986
+                },
+                {
+                    "round": 2,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9121471042873807
+                        },
+                        "P2": {
+                            "accuracy": 0.9115812699345971
+                        }
+                    },
+                    "loss": 0.22197159691367144
+                },
+                {
+                    "round": 3,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9266628101420276
+                        },
+                        "P2": {
+                            "accuracy": 0.9272001947228834
+                        }
+                    },
+                    "loss": 0.2087366988454436
+                },
+                {
+                    "round": 4,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9578089882312777
+                        },
+                        "P2": {
+                            "accuracy": 0.9584664940713836
+                        }
+                    },
+                    "loss": 0.12336537017544257
+                },
+                {
+                    "round": 5,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9642417977726989
+                        },
+                        "P2": {
+                            "accuracy": 0.964374563375028
+                        }
+                    },
+                    "loss": 0.10803096829144988
+                },
+                {
+                    "round": 6,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9666758338153989
+                        },
+                        "P2": {
+                            "accuracy": 0.967039358678919
+                        }
+                    },
+                    "loss": 0.10037321008554988
+                },
+                {
+                    "round": 7,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9707441512010545
+                        },
+                        "P2": {
+                            "accuracy": 0.9703932706806134
+                        }
+                    },
+                    "loss": 0.09342783861823718
+                },
+                {
+                    "round": 8,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9713479185830749
+                        },
+                        "P2": {
+                            "accuracy": 0.9716956380177464
+                        }
+                    },
+                    "loss": 0.08874195715424553
+                },
+                {
+                    "round": 9,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9709780715480153
+                        },
+                        "P2": {
+                            "accuracy": 0.9707251846864361
+                        }
+                    },
+                    "loss": 0.09028313576671805
+                },
+                {
+                    "round": 10,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9727862126083067
+                        },
+                        "P2": {
+                            "accuracy": 0.972637641577129
+                        }
+                    },
+                    "loss": 0.08935668156482279
+                },
+                {
+                    "round": 11,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9733646913041691
+                        },
+                        "P2": {
+                            "accuracy": 0.9731750261579848
+                        }
+                    },
+                    "loss": 0.08528247429660754
+                },
+                {
+                    "round": 12,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9717304099612135
+                        },
+                        "P2": {
+                            "accuracy": 0.9721539954543587
+                        }
+                    },
+                    "loss": 0.08592684212755594
+                },
+                {
+                    "round": 13,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9742814061773938
+                        },
+                        "P2": {
+                            "accuracy": 0.9740032306296567
+                        }
+                    },
+                    "loss": 0.0826335412105033
+                },
+                {
+                    "round": 14,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9747113138420784
+                        },
+                        "P2": {
+                            "accuracy": 0.9749989726471249
+                        }
+                    },
+                    "loss": 0.08011865938793639
+                },
+                {
+                    "round": 15,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9748883346451839
+                        },
+                        "P2": {
+                            "accuracy": 0.9750527111052104
+                        }
+                    },
+                    "loss": 0.07830462936073855
+                },
+                {
+                    "round": 16,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9749705228751971
+                        },
+                        "P2": {
+                            "accuracy": 0.9748029853294009
+                        }
+                    },
+                    "loss": 0.07924045826245135
+                },
+                {
+                    "round": 17,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9752897925379409
+                        },
+                        "P2": {
+                            "accuracy": 0.9750527111052104
+                        }
+                    },
+                    "loss": 0.07748997227882538
+                },
+                {
+                    "round": 18,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9766332539900805
+                        },
+                        "P2": {
+                            "accuracy": 0.9764372666723566
+                        }
+                    },
+                    "loss": 0.074090492392854
+                },
+                {
+                    "round": 19,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9766427372473897
+                        },
+                        "P2": {
+                            "accuracy": 0.9766838313623963
+                        }
+                    },
+                    "loss": 0.07376026198897861
+                },
+                {
+                    "round": 20,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9775025525767591
+                        },
+                        "P2": {
+                            "accuracy": 0.9776258349217789
+                        }
+                    },
+                    "loss": 0.07256718461430393
+                }
+            ],
+            "final_evaluation": {
+                "P1": {
+                    "accuracy": 0.9775025525767591
+                },
+                "P2": {
+                    "accuracy": 0.9776258349217789
+                }
+            }
+        },
+        {
+            "features_p1": 12,
+            "features_p2": 6,
+            "rounds": [
+                {
+                    "round": 1,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.6253702421707809
+                        },
+                        "P2": {
+                            "accuracy": 0.625708478348143
+                        }
+                    },
+                    "loss": 1.315414378244707
+                },
+                {
+                    "round": 2,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7056649818079513
+                        },
+                        "P2": {
+                            "accuracy": 0.7065374414803997
+                        }
+                    },
+                    "loss": 0.9441277691943746
+                },
+                {
+                    "round": 3,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7183124859726819
+                        },
+                        "P2": {
+                            "accuracy": 0.7177087185906615
+                        }
+                    },
+                    "loss": 1.4493977726470306
+                },
+                {
+                    "round": 4,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7489181183953064
+                        },
+                        "P2": {
+                            "accuracy": 0.7504575671651699
+                        }
+                    },
+                    "loss": 1.2366478551890472
+                },
+                {
+                    "round": 5,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7678561832418199
+                        },
+                        "P2": {
+                            "accuracy": 0.7692186112085779
+                        }
+                    },
+                    "loss": 1.0668450687984818
+                },
+                {
+                    "round": 6,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7872462833534062
+                        },
+                        "P2": {
+                            "accuracy": 0.7879227557081306
+                        }
+                    },
+                    "loss": 1.3030190961887536
+                },
+                {
+                    "round": 7,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.783939787638258
+                        },
+                        "P2": {
+                            "accuracy": 0.7849197242268775
+                        }
+                    },
+                    "loss": 1.520391230805985
+                },
+                {
+                    "round": 8,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7825678764141908
+                        },
+                        "P2": {
+                            "accuracy": 0.7818692764590781
+                        }
+                    },
+                    "loss": 1.728368288080862
+                },
+                {
+                    "round": 9,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7651376494798433
+                        },
+                        "P2": {
+                            "accuracy": 0.7654126639418107
+                        }
+                    },
+                    "loss": 1.9299998809990373
+                },
+                {
+                    "round": 10,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7670090122555295
+                        },
+                        "P2": {
+                            "accuracy": 0.7668541190528123
+                        }
+                    },
+                    "loss": 1.9454890390960533
+                },
+                {
+                    "round": 11,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7575099495174603
+                        },
+                        "P2": {
+                            "accuracy": 0.7575700101470854
+                        }
+                    },
+                    "loss": 2.002108228727452
+                },
+                {
+                    "round": 12,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7576016210047827
+                        },
+                        "P2": {
+                            "accuracy": 0.7575636879755459
+                        }
+                    },
+                    "loss": 2.0416654945384334
+                },
+                {
+                    "round": 13,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7486715537052667
+                        },
+                        "P2": {
+                            "accuracy": 0.7483902170717598
+                        }
+                    },
+                    "loss": 2.1125450618444526
+                },
+                {
+                    "round": 14,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7462659674344944
+                        },
+                        "P2": {
+                            "accuracy": 0.7458550262844281
+                        }
+                    },
+                    "loss": 2.151257287481842
+                },
+                {
+                    "round": 15,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7312792598001562
+                        },
+                        "P2": {
+                            "accuracy": 0.7308398688781623
+                        }
+                    },
+                    "loss": 2.2303324518755416
+                },
+                {
+                    "round": 16,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7455389177074542
+                        },
+                        "P2": {
+                            "accuracy": 0.7451501041577762
+                        }
+                    },
+                    "loss": 2.1612723631766233
+                },
+                {
+                    "round": 17,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7396150429749611
+                        },
+                        "P2": {
+                            "accuracy": 0.740174555156205
+                        }
+                    },
+                    "loss": 2.144291593081357
+                },
+                {
+                    "round": 18,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.737048241329932
+                        },
+                        "P2": {
+                            "accuracy": 0.7365140178348459
+                        }
+                    },
+                    "loss": 2.1780971436728165
+                },
+                {
+                    "round": 19,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7297745829737599
+                        },
+                        "P2": {
+                            "accuracy": 0.7294331857106279
+                        }
+                    },
+                    "loss": 2.2667055024394713
+                },
+                {
+                    "round": 20,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.72393289647128
+                        },
+                        "P2": {
+                            "accuracy": 0.7230541146272922
+                        }
+                    },
+                    "loss": 2.258151943243823
+                }
+            ],
+            "final_evaluation": {
+                "P1": {
+                    "accuracy": 0.72393289647128
+                },
+                "P2": {
+                    "accuracy": 0.7230541146272922
+                }
+            }
+        },
+        {
+            "features_p1": 14,
+            "features_p2": 12,
+            "rounds": [
+                {
+                    "round": 1,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.5933990206956286
+                        },
+                        "P2": {
+                            "accuracy": 0.5931998722921349
+                        }
+                    },
+                    "loss": 2.16532417509741
+                },
+                {
+                    "round": 2,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9147391946185676
+                        },
+                        "P2": {
+                            "accuracy": 0.9140595611780734
+                        }
+                    },
+                    "loss": 0.2288839604500621
+                },
+                {
+                    "round": 3,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9318438297186318
+                        },
+                        "P2": {
+                            "accuracy": 0.931951306634803
+                        }
+                    },
+                    "loss": 0.18506428851628476
+                },
+                {
+                    "round": 4,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9453764378988895
+                        },
+                        "P2": {
+                            "accuracy": 0.9458379564212716
+                        }
+                    },
+                    "loss": 0.15981010860284264
+                },
+                {
+                    "round": 5,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9509589153682507
+                        },
+                        "P2": {
+                            "accuracy": 0.9511169696567376
+                        }
+                    },
+                    "loss": 0.14294987255074446
+                },
+                {
+                    "round": 6,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9659171732306613
+                        },
+                        "P2": {
+                            "accuracy": 0.9656674474548518
+                        }
+                    },
+                    "loss": 0.10121223256127566
+                },
+                {
+                    "round": 7,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.967355467255893
+                        },
+                        "P2": {
+                            "accuracy": 0.9674629441720642
+                        }
+                    },
+                    "loss": 0.09607638765132494
+                },
+                {
+                    "round": 8,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9713763683550026
+                        },
+                        "P2": {
+                            "accuracy": 0.9718252425343057
+                        }
+                    },
+                    "loss": 0.08870321172018292
+                },
+                {
+                    "round": 9,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9720781293958849
+                        },
+                        "P2": {
+                            "accuracy": 0.9724037212301682
+                        }
+                    },
+                    "loss": 0.0874031360561034
+                },
+                {
+                    "round": 10,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9735164234211167
+                        },
+                        "P2": {
+                            "accuracy": 0.9737945989688538
+                        }
+                    },
+                    "loss": 0.08311361683499442
+                },
+                {
+                    "round": 11,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9739905862865778
+                        },
+                        "P2": {
+                            "accuracy": 0.9742719229200846
+                        }
+                    },
+                    "loss": 0.08188589016792386
+                },
+                {
+                    "round": 12,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9745690649824401
+                        },
+                        "P2": {
+                            "accuracy": 0.9748124685867101
+                        }
+                    },
+                    "loss": 0.08171383721503794
+                },
+                {
+                    "round": 13,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.974875690302105
+                        },
+                        "P2": {
+                            "accuracy": 0.974546937382052
+                        }
+                    },
+                    "loss": 0.08006990660723406
+                },
+                {
+                    "round": 14,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.974120190803137
+                        },
+                        "P2": {
+                            "accuracy": 0.9746291256120653
+                        }
+                    },
+                    "loss": 0.08101946080682203
+                },
+                {
+                    "round": 15,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9749515563605787
+                        },
+                        "P2": {
+                            "accuracy": 0.974534293038973
+                        }
+                    },
+                    "loss": 0.08059395560286457
+                },
+                {
+                    "round": 16,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9765889987893042
+                        },
+                        "P2": {
+                            "accuracy": 0.9765036494735212
+                        }
+                    },
+                    "loss": 0.07793560679429316
+                },
+                {
+                    "round": 17,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9763740449569618
+                        },
+                        "P2": {
+                            "accuracy": 0.9761843798107774
+                        }
+                    },
+                    "loss": 0.07568829511985498
+                },
+                {
+                    "round": 18,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.978390817678056
+                        },
+                        "P2": {
+                            "accuracy": 0.9785678384811615
+                        }
+                    },
+                    "loss": 0.0726598153602103
+                },
+                {
+                    "round": 19,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9780589036722334
+                        },
+                        "P2": {
+                            "accuracy": 0.9779545878418319
+                        }
+                    },
+                    "loss": 0.07285440695007907
+                },
+                {
+                    "round": 20,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.9784382339646022
+                        },
+                        "P2": {
+                            "accuracy": 0.9786057715103984
+                        }
+                    },
+                    "loss": 0.07301332768614927
+                }
+            ],
+            "final_evaluation": {
+                "P1": {
+                    "accuracy": 0.9784382339646022
+                },
+                "P2": {
+                    "accuracy": 0.9786057715103984
+                }
+            }
+        },
+        {
+            "features_p1": 14,
+            "features_p2": 4,
+            "rounds": [
+                {
+                    "round": 1,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.5064881285423918
+                        },
+                        "P2": {
+                            "accuracy": 0.5062004697373453
+                        }
+                    },
+                    "loss": 1.5318569482626652
+                },
+                {
+                    "round": 2,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.69886864740301
+                        },
+                        "P2": {
+                            "accuracy": 0.6983565515083121
+                        }
+                    },
+                    "loss": 0.9688399333784109
+                },
+                {
+                    "round": 3,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.770350279914145
+                        },
+                        "P2": {
+                            "accuracy": 0.7685863940546299
+                        }
+                    },
+                    "loss": 0.8651710733964221
+                },
+                {
+                    "round": 4,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7662914457857986
+                        },
+                        "P2": {
+                            "accuracy": 0.7660322367526798
+                        }
+                    },
+                    "loss": 0.9482478341720637
+                },
+                {
+                    "round": 5,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7963660157991067
+                        },
+                        "P2": {
+                            "accuracy": 0.7962300891110079
+                        }
+                    },
+                    "loss": 0.8060407235398648
+                },
+                {
+                    "round": 6,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8388921026594215
+                        },
+                        "P2": {
+                            "accuracy": 0.8385633497393685
+                        }
+                    },
+                    "loss": 0.695081291461068
+                },
+                {
+                    "round": 7,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8395369641564484
+                        },
+                        "P2": {
+                            "accuracy": 0.8396254745580012
+                        }
+                    },
+                    "loss": 0.629574505919681
+                },
+                {
+                    "round": 8,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8530727334224759
+                        },
+                        "P2": {
+                            "accuracy": 0.8521022800911657
+                        }
+                    },
+                    "loss": 0.5953713920823386
+                },
+                {
+                    "round": 9,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8617499138604128
+                        },
+                        "P2": {
+                            "accuracy": 0.8613863889968927
+                        }
+                    },
+                    "loss": 0.5676795188940362
+                },
+                {
+                    "round": 10,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8437254028013542
+                        },
+                        "P2": {
+                            "accuracy": 0.8439087457759992
+                        }
+                    },
+                    "loss": 0.5314765823070672
+                },
+                {
+                    "round": 11,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8646517905970342
+                        },
+                        "P2": {
+                            "accuracy": 0.8646834014547317
+                        }
+                    },
+                    "loss": 0.5214298639301825
+                },
+                {
+                    "round": 12,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.864155500131185
+                        },
+                        "P2": {
+                            "accuracy": 0.8633557454314408
+                        }
+                    },
+                    "loss": 0.5221510393828347
+                },
+                {
+                    "round": 13,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8649647380882386
+                        },
+                        "P2": {
+                            "accuracy": 0.8650722150044097
+                        }
+                    },
+                    "loss": 0.5208156432920289
+                },
+                {
+                    "round": 14,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8494280015299656
+                        },
+                        "P2": {
+                            "accuracy": 0.8496492775338473
+                        }
+                    },
+                    "loss": 0.5447397486677448
+                },
+                {
+                    "round": 15,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.850663986065934
+                        },
+                        "P2": {
+                            "accuracy": 0.850809396011342
+                        }
+                    },
+                    "loss": 0.5444827038240182
+                },
+                {
+                    "round": 16,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.842024738657234
+                        },
+                        "P2": {
+                            "accuracy": 0.8428339766142875
+                        }
+                    },
+                    "loss": 0.5633709322432099
+                },
+                {
+                    "round": 17,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8375359968642029
+                        },
+                        "P2": {
+                            "accuracy": 0.8365276105036558
+                        }
+                    },
+                    "loss": 0.6269054617551925
+                },
+                {
+                    "round": 18,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8242499533739849
+                        },
+                        "P2": {
+                            "accuracy": 0.823067707296102
+                        }
+                    },
+                    "loss": 0.6646227497233735
+                },
+                {
+                    "round": 19,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8302907882799584
+                        },
+                        "P2": {
+                            "accuracy": 0.8312043420674133
+                        }
+                    },
+                    "loss": 0.6697857763895517
+                },
+                {
+                    "round": 20,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8149247503532513
+                        },
+                        "P2": {
+                            "accuracy": 0.8136350273591973
+                        }
+                    },
+                    "loss": 0.7174032780200147
+                }
+            ],
+            "final_evaluation": {
+                "P1": {
+                    "accuracy": 0.8149247503532513
+                },
+                "P2": {
+                    "accuracy": 0.8136350273591973
+                }
+            }
+        },
+        {
+            "features_p1": 12,
+            "features_p2": 12,
+            "rounds": [
+                {
+                    "round": 1,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8616803699734785
+                        },
+                        "P2": {
+                            "accuracy": 0.8609059039598922
+                        }
+                    },
+                    "loss": 0.3704982198003233
+                },
+                {
+                    "round": 2,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8858563539404515
+                        },
+                        "P2": {
+                            "accuracy": 0.8851166598703323
+                        }
+                    },
+                    "loss": 0.33183501314215097
+                },
+                {
+                    "round": 3,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8861977512035835
+                        },
+                        "P2": {
+                            "accuracy": 0.8847025576344963
+                        }
+                    },
+                    "loss": 0.3656762526717194
+                },
+                {
+                    "round": 4,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8994553449218737
+                        },
+                        "P2": {
+                            "accuracy": 0.9001729113916048
+                        }
+                    },
+                    "loss": 0.3339675299485717
+                },
+                {
+                    "round": 5,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8937843570509598
+                        },
+                        "P2": {
+                            "accuracy": 0.8928518367488865
+                        }
+                    },
+                    "loss": 0.36289631695302754
+                },
+                {
+                    "round": 6,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8895358577764291
+                        },
+                        "P2": {
+                            "accuracy": 0.8908982857431871
+                        }
+                    },
+                    "loss": 0.366359303509485
+                },
+                {
+                    "round": 7,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8868426127006104
+                        },
+                        "P2": {
+                            "accuracy": 0.8853000028449772
+                        }
+                    },
+                    "loss": 0.37699312156723347
+                },
+                {
+                    "round": 8,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.866346132569615
+                        },
+                        "P2": {
+                            "accuracy": 0.8651891751778901
+                        }
+                    },
+                    "loss": 0.4088730295113375
+                },
+                {
+                    "round": 9,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8645790856243303
+                        },
+                        "P2": {
+                            "accuracy": 0.8634158060610658
+                        }
+                    },
+                    "loss": 0.4360549142674624
+                },
+                {
+                    "round": 10,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8560315097029527
+                        },
+                        "P2": {
+                            "accuracy": 0.8570398960634998
+                        }
+                    },
+                    "loss": 0.46535043121228137
+                },
+                {
+                    "round": 11,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8634094838895263
+                        },
+                        "P2": {
+                            "accuracy": 0.864155500131185
+                        }
+                    },
+                    "loss": 0.43649301782829086
+                },
+                {
+                    "round": 12,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8625528296459268
+                        },
+                        "P2": {
+                            "accuracy": 0.8613547781391953
+                        }
+                    },
+                    "loss": 0.45063816998334755
+                },
+                {
+                    "round": 13,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8742488469939654
+                        },
+                        "P2": {
+                            "accuracy": 0.8756523690757302
+                        }
+                    },
+                    "loss": 0.41075539188670496
+                },
+                {
+                    "round": 14,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8786901725004505
+                        },
+                        "P2": {
+                            "accuracy": 0.8794772828571158
+                        }
+                    },
+                    "loss": 0.4351412112490066
+                },
+                {
+                    "round": 15,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8847436517495029
+                        },
+                        "P2": {
+                            "accuracy": 0.8838490644766664
+                        }
+                    },
+                    "loss": 0.3985354211482801
+                },
+                {
+                    "round": 16,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8836151441297057
+                        },
+                        "P2": {
+                            "accuracy": 0.8844180599152197
+                        }
+                    },
+                    "loss": 0.3920734600558829
+                },
+                {
+                    "round": 17,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.885072404669556
+                        },
+                        "P2": {
+                            "accuracy": 0.8838838364201336
+                        }
+                    },
+                    "loss": 0.43065152385401695
+                },
+                {
+                    "round": 18,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8926115942303863
+                        },
+                        "P2": {
+                            "accuracy": 0.8914862476963588
+                        }
+                    },
+                    "loss": 0.381649661266688
+                },
+                {
+                    "round": 19,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8926337218307744
+                        },
+                        "P2": {
+                            "accuracy": 0.8917833897587143
+                        }
+                    },
+                    "loss": 0.3830620804711164
+                },
+                {
+                    "round": 20,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.8934208321874397
+                        },
+                        "P2": {
+                            "accuracy": 0.8924345734272808
+                        }
+                    },
+                    "loss": 0.3877199340467025
+                }
+            ],
+            "final_evaluation": {
+                "P1": {
+                    "accuracy": 0.8934208321874397
+                },
+                "P2": {
+                    "accuracy": 0.8924345734272808
+                }
+            }
+        },
+        {
+            "features_p1": 12,
+            "features_p2": 4,
+            "rounds": [
+                {
+                    "round": 1,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.6113413435246738
+                        },
+                        "P2": {
+                            "accuracy": 0.6110758123200157
+                        }
+                    },
+                    "loss": 1.2761390522652845
+                },
+                {
+                    "round": 2,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.626925496369493
+                        },
+                        "P2": {
+                            "accuracy": 0.6285534555409092
+                        }
+                    },
+                    "loss": 2.2545348143982653
+                },
+                {
+                    "round": 3,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.6695053216878933
+                        },
+                        "P2": {
+                            "accuracy": 0.6711490862881583
+                        }
+                    },
+                    "loss": 2.446640773450287
+                },
+                {
+                    "round": 4,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.6781635356112118
+                        },
+                        "P2": {
+                            "accuracy": 0.6785049328743437
+                        }
+                    },
+                    "loss": 2.3835490757304103
+                },
+                {
+                    "round": 5,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.680180308332306
+                        },
+                        "P2": {
+                            "accuracy": 0.679826266726095
+                        }
+                    },
+                    "loss": 2.2349019662558454
+                },
+                {
+                    "round": 6,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.6812108222932413
+                        },
+                        "P2": {
+                            "accuracy": 0.6812455942367084
+                        }
+                    },
+                    "loss": 2.2266321043848607
+                },
+                {
+                    "round": 7,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.6934821572513727
+                        },
+                        "P2": {
+                            "accuracy": 0.6931786930174777
+                        }
+                    },
+                    "loss": 2.1650939767511144
+                },
+                {
+                    "round": 8,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.6884244200197884
+                        },
+                        "P2": {
+                            "accuracy": 0.688294815503229
+                        }
+                    },
+                    "loss": 2.1471086701914714
+                },
+                {
+                    "round": 9,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.6793299762602458
+                        },
+                        "P2": {
+                            "accuracy": 0.6792699156306208
+                        }
+                    },
+                    "loss": 2.198686450912729
+                },
+                {
+                    "round": 10,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.678112958238896
+                        },
+                        "P2": {
+                            "accuracy": 0.6780528976092708
+                        }
+                    },
+                    "loss": 2.366452604532242
+                },
+                {
+                    "round": 11,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.674717952122195
+                        },
+                        "P2": {
+                            "accuracy": 0.6746578914925698
+                        }
+                    },
+                    "loss": 2.500313149976113
+                },
+                {
+                    "round": 12,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.6687529832746952
+                        },
+                        "P2": {
+                            "accuracy": 0.6685159018419646
+                        }
+                    },
+                    "loss": 2.5218865952927705
+                },
+                {
+                    "round": 13,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.6702418546722428
+                        },
+                        "P2": {
+                            "accuracy": 0.670507385876901
+                        }
+                    },
+                    "loss": 2.5168706751081933
+                },
+                {
+                    "round": 14,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.6672925616490752
+                        },
+                        "P2": {
+                            "accuracy": 0.6668658150701603
+                        }
+                    },
+                    "loss": 2.5546737178726104
+                },
+                {
+                    "round": 15,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.6689869036216559
+                        },
+                        "P2": {
+                            "accuracy": 0.6691860520251496
+                        }
+                    },
+                    "loss": 2.5823210540037707
+                },
+                {
+                    "round": 16,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.6716358934966983
+                        },
+                        "P2": {
+                            "accuracy": 0.6713924898924283
+                        }
+                    },
+                    "loss": 2.5649307818185165
+                },
+                {
+                    "round": 17,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7047735556208846
+                        },
+                        "P2": {
+                            "accuracy": 0.7046123402466279
+                        }
+                    },
+                    "loss": 2.484311248926283
+                },
+                {
+                    "round": 18,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7165454390273971
+                        },
+                        "P2": {
+                            "accuracy": 0.7164664118831536
+                        }
+                    },
+                    "loss": 2.4408109168790304
+                },
+                {
+                    "round": 19,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7160775983334756
+                        },
+                        "P2": {
+                            "accuracy": 0.7156065965537843
+                        }
+                    },
+                    "loss": 2.5601754055439843
+                },
+                {
+                    "round": 20,
+                    "global_evaluation": {
+                        "P1": {
+                            "accuracy": 0.7201427546333614
+                        },
+                        "P2": {
+                            "accuracy": 0.719333516676308
+                        }
+                    },
+                    "loss": 2.5431698397718203
+                }
+            ],
+            "final_evaluation": {
+                "P1": {
+                    "accuracy": 0.7201427546333614
+                },
+                "P2": {
+                    "accuracy": 0.719333516676308
+                }
+            }
+        }
+    ]
+}

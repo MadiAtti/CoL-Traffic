@@ -1,3 +1,6 @@
 *.parquet
 /outputs
 *.log
+__pycache__/
+*.pyc
+*.pyo

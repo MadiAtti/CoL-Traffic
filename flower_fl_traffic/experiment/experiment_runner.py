@@ -84,8 +84,9 @@ def _run_single_scenario(args):
         client_resources={"num_cpus": 1, "num_gpus": 0.0},
         ray_init_args={
             "logging_level": logging.ERROR,
-            "log_to_driver": True,
+            "log_to_driver": False,
             "num_cpus": 2,
+            "_temp_dir": "/dev/shm/ray_tmp",
         }
     )
 

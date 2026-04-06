@@ -4,7 +4,7 @@ num_clients: 2 # Total number of clients in the federated learning simulation
 
 config: # Configuration for the training process, including hyperparameters and settings
   lr: 0.001
-  seed: 0 ## Random seed for reproducibility, change it for different runs
+  seed: 1 ## Random seed for reproducibility, change it for different runs
   federated_rounds: 20
   num_epochs: 2         
   batch_size: 256

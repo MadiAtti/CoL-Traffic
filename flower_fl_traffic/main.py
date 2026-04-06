@@ -1,5 +1,6 @@
 import os
 import multiprocessing as mp
+from time import time
 import hydra
 from omegaconf import DictConfig, OmegaConf
 import torch
@@ -12,6 +13,7 @@ from utils.logger_silencer import silence_log
 
 @hydra.main(config_path="conf", config_name="base", version_base=None)
 def main(config: DictConfig):
+    start_time = time.time()
     
     ## Set random seed for reproducibility
     set_seed(config.config.seed)
@@ -94,6 +96,15 @@ def main(config: DictConfig):
             train_loaders=train_loaders, 
             test_loaders=test_loaders, 
             subdir=subdir, mode="sup")
+        
+        end_time = time.time()
+        duration_seconds = end_time - start_time
+        
+        # Formázás óra:perc:másodperc alakba
+        hours, rem = divmod(duration_seconds, 3600)
+        minutes, seconds = divmod(rem, 60)
+
+        print(f"⏱️ Total Execution Time: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
 
 if __name__ == "__main__":
     # Ensure the 'spawn' start method is used for multiprocessing.

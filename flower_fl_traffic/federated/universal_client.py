@@ -44,7 +44,7 @@ class UniversalTrafficClient(fl.client.NumPyClient):
         exp = config.get("client1_features") if self.cid == "0" else config.get("client2_features")
         
         # 3. Egyetlen lényegre törő sor:
-        print(f"   - [Client {self.cid}] Non-zero columns: {num_active} (Expected: {exp if exp is not None else 'Full'})", flush=True)
+        #print(f"   - [Client {self.cid}] Non-zero columns: {num_active} (Expected: {exp if exp is not None else 'Full'})", flush=True)
         # DP handling: Determine the noise level for this client based on the config parameters
 
         sample_data = test_batch_x[:5, :14].numpy() 
@@ -66,13 +66,13 @@ class UniversalTrafficClient(fl.client.NumPyClient):
 
         # Train model based on the specified noise level: if noise > 0, use DP training; otherwise, use standard training
         if noise > 0:
-            print(f"--- [PID:{pid}] {client_label} training with DP (noise: {noise}) ---")
+            #print(f"--- [PID:{pid}] {client_label} training with DP (noise: {noise}) ---")
             self.model = train_dp(
                 self.model, self.trainloader, optimizer, epochs, 
                 noise, self.cfg.config.max_grad_norm, self.device
             )
         else:
-            print(f"--- [PID:{pid}] {client_label} training standard ---")
+            #print(f"--- [PID:{pid}] {client_label} training standard ---")
             self.model = train_standard(
                 self.model, self.trainloader, optimizer, epochs, self.device
             )

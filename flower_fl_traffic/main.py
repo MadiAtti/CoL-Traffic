@@ -1,6 +1,6 @@
 import os
 import multiprocessing as mp
-from time import time
+from time import time as get_time
 import hydra
 from omegaconf import DictConfig, OmegaConf
 import torch
@@ -13,8 +13,8 @@ from utils.logger_silencer import silence_log
 
 @hydra.main(config_path="conf", config_name="base", version_base=None)
 def main(config: DictConfig):
-    start_time = time.time()
-    
+    start_time = get_time()
+
     ## Set random seed for reproducibility
     set_seed(config.config.seed)
 
@@ -97,7 +97,7 @@ def main(config: DictConfig):
             test_loaders=test_loaders, 
             subdir=subdir, mode="sup")
         
-        end_time = time.time()
+        end_time = get_time()
         duration_seconds = end_time - start_time
         
         # Formázás óra:perc:másodperc alakba

@@ -27,7 +27,7 @@ def setup_directories(cfg):
                 if directory:
                     os.makedirs(directory, exist_ok=True)
 
-    print("Folder structure initialized successfully.")
+    #print("Folder structure initialized successfully.")
 
 def prepare_data_and_loaders(cfg):
     '''

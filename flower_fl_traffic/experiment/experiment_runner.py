@@ -86,7 +86,6 @@ def _run_single_scenario(args):
             "logging_level": logging.ERROR,
             "log_to_driver": True,
             "num_cpus": 2,
-            "_temp_dir": "/dev/shm/ray_tmp",
         }
     )
 

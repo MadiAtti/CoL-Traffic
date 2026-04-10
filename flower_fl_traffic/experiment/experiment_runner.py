@@ -85,7 +85,8 @@ def _run_single_scenario(args):
         ray_init_args={
             "logging_level": logging.ERROR,
             "log_to_driver": True,
-            "num_cpus": 2,
+            "num_cpus": 2, # Ezt tartsd meg, hogy korlátozd a Ray-t
+            "runtime_env": {"env_vars": {"OMP_NUM_THREADS": "1"}} # Ez segít a Lightningnak
         }
     )
 

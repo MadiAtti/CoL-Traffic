@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 def load_local(path, seed):
     with open(path + str(seed) + ".json", "r") as file:
         data_dict = json.load(file)
-    p1 = data_dict['models']['M1']['evaluation']['P1']
-    p2 = data_dict['models']['M2']['evaluation']['P2']
+    p1 = data_dict['models']['M1']['evaluation']['p1']
+    p2 = data_dict['models']['M2']['evaluation']['p2']
     return p1, p2
 
 
@@ -76,7 +76,7 @@ def plot(mx, ttl, params):
 experiments = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  # SET HERE seed parameters
 supp = [14, 12, 10, 8, 6, 4, 2]  # CHANGE HERE privacy-SUP parameters
 noise = [0.00, 0.33, 0.67, 1.00, 1.33, 1.67, 2.00]  # CHANGE HERE privacy-NOISE parameters
-for j, setting in enumerate(['3_suppression/', '3_suppression/P1/', '3_suppression/P2/', '4_noise/', '4_noise/P1/', '4_noise/P2/']):
+for j, setting in enumerate(['2_suppression/', '2_suppression/P1/', '2_suppression/P2/', '3_noise/', '3_noise/P1/', '3_noise/P2/']):
     if j < 3:
         method = 'Suppression'
         tick = supp

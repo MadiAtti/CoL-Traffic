@@ -42,6 +42,10 @@ def prepare_data_and_loaders(cfg):
     X = StandardScaler().fit_transform(df[ds_cfg.feature_columns].values.astype(np.float32))
     y = LabelEncoder().fit_transform(df[ds_cfg.target_column].values).astype(np.int32)
 
+    # Reduce the initial dataset size to half for faster experimentation (optional, can be removed for full dataset)
+    dataset_ratio = 0.5
+    X, _, y, _ = train_test_split(X, y, test_size=dataset_ratio, stratify=y, random_state=seed)
+
     # Hierarchical splits and saving
     # Base -> P1, P2
     X1, X2, y1, y2 = train_test_split(X, y, test_size=ds_cfg.initial_split_ratio, stratify=y, random_state=seed)

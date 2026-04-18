@@ -18,6 +18,8 @@ def silence_log():
     os.environ["TORCH_LOGS"] = "-all"
     os.environ["TORCH_COMPILE_DEBUG"] = "0"
 
+    os.environ["TORCH_COMPILE_DISABLE"] = "1"
+
     # CPU threading limits (Keep these, they are good)
     os.environ["OMP_NUM_THREADS"] = "1"
     os.environ["MKL_NUM_THREADS"] = "1"
@@ -25,6 +27,7 @@ def silence_log():
     # --- 2. Python Warnings ---
     warnings.filterwarnings("ignore") 
     logging.captureWarnings(True) # Captures warnings into the logging system
+    warnings.filterwarnings("ignore", category=UserWarning, module="torchvision.io.image")
     
     # --- 3. Logging Levels ---
     # Set all noise-makers to ERROR only

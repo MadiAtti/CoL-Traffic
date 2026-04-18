@@ -9,7 +9,7 @@ config: # Configuration for the training process, including hyperparameters and 
   num_epochs: 2         
   batch_size: 256
   max_grad_norm: 1.0     
-  noise_levels: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
+  noise_levels: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
   sup_levels: [14, 13, 12, 11, 10, 9, 8, 7]
 
 dataset: # Configuration related to the dataset, including paths and feature/target columns

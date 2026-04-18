@@ -76,7 +76,6 @@ class UniversalTrafficClient(fl.client.NumPyClient):
             self.model = train_standard(
                 self.model, self.trainloader, optimizer, epochs, self.device
             )
-
         return self.get_parameters(config={}), len(self.trainloader.dataset), {}
     
     # Evaluation method that evaluates the model on the test set and returns the loss and accuracy

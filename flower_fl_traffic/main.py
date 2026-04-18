@@ -1,3 +1,6 @@
+# --- CRITICAL: Import silencer FIRST to set environment variables ---
+from utils.logger_silencer import silence_log
+
 import os
 import multiprocessing as mp
 from time import time as get_time
@@ -8,18 +11,19 @@ from data.dataset import prepare_data_and_loaders, setup_directories
 from experiment.experiment_runner import run_experiment
 from experiment.local_baseline import run_local_experiment
 from utils.seed import set_seed
-from utils.logger_silencer import silence_log
 
 
 @hydra.main(config_path="conf", config_name="base", version_base=None)
 def main(config: DictConfig):
+    ## Execute runtime silencing
+    silence_log()
+
     start_time = get_time()
 
     ## Set random seed for reproducibility
     set_seed(config.config.seed)
 
     ## Load configuration and setup directories
-    silence_log()
     OmegaConf.set_struct(config, False)
     setup_directories(config)
 

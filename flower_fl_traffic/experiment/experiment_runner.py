@@ -85,8 +85,8 @@ def _run_single_scenario(args):
         ray_init_args={
             "logging_level": logging.ERROR,
             "log_to_driver": True,
-            "num_cpus": 2, # Ezt tartsd meg, hogy korlátozd a Ray-t
-            "runtime_env": {"env_vars": {"OMP_NUM_THREADS": "1"}} # Ez segít a Lightningnak
+            "num_cpus": 2, 
+            "runtime_env": {"env_vars": {"OMP_NUM_THREADS": "1"}} 
         }
     )
 
@@ -139,7 +139,7 @@ def run_experiment(config, train_loaders, test_loaders, subdir, mode):
     # Determine the number of parallel processes
     # Since each scenario uses 2 clients (2 CPUs), 4 processes use 8 CPUs.
     # Adjust this number based on your available RAM.
-    num_parallel_scenarios = 4
+    num_parallel_scenarios = 3
 
     print(f"\n{'#'*60}")
     print(f"🔥 Starting Parallel Runner | Mode: {mode.upper()} | Processes: {num_parallel_scenarios}")

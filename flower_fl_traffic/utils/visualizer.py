@@ -44,6 +44,7 @@ def process_and_plot(seed):
             if not loc_data: continue
             
             b_p1, b_p2 = get_accuracy_from_local(loc_data, sub_path)
+            print(f"Local Baseline ({sc_name}): P1 Accuracy = {b_p1:.4f}, P2 Accuracy = {b_p2:.4f}")
             
             fed_path = f"{method_path}{sub_path}{seed}.json"
             fed_data = load_json(fed_path)
@@ -79,8 +80,8 @@ def process_and_plot(seed):
                 p2_acc = exp['final_evaluation']["P2"]['accuracy']
 
                 # Accuracy Drop (Local - Fed): a pozitív szám jelzi a romlást
-                m1_diff[idx1][idx2] = p1_acc - b_p1
-                m2_diff[idx1][idx2] = p2_acc - b_p2
+                m1_diff[idx1][idx2] = p1_acc
+                m2_diff[idx1][idx2] = p2_acc
 
             # --- VIZUALIZÁCIÓ ---
             # A None-t lecseréljük 0.0-ra a tengelyen
@@ -102,4 +103,4 @@ def process_and_plot(seed):
                 print(f"Kész: plots/seed{seed}/{method_name}_{sc_name}_{p_tag}.png")
 
 if __name__ == "__main__":
-    process_and_plot(0)
+    process_and_plot(3)

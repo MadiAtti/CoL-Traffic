@@ -14,38 +14,64 @@ def train_standard(model, loader, optimizer, epochs, device):
             optimizer.step()
     return model
 
-def train_dp(model, loader, optimizer, epochs, noise, max_grad_norm, device):
-    """Differential privacy training loop for federated learning."""
+import torch
+from opacus import PrivacyEngine
+from opacus.validators import ModuleValidator
 
-    # Only wrap the model and optimizer with PrivacyEngine if they haven't been wrapped already 
-    # (e.g., in case of multiple calls to this function)
-    if not hasattr(model, "grad_sample_module"):
-        privacy_engine = PrivacyEngine()
-        # poisson_sampling=False, mert Flower-ben fix batch-ekkel dolgozunk
-        model, optimizer, loader = privacy_engine.make_private(
-            module=model, 
-            optimizer=optimizer, 
-            data_loader=loader,
-            noise_multiplier=noise, 
-            max_grad_norm=max_grad_norm,
-            poisson_sampling=False
-        )
+def train_dp(model, loader, optimizer, epochs, noise, max_grad_norm, device):
+    """
+    Differential Privacy (DP) training loop for Federated Learning clients.
     
-    # Standard training loop with the private model and optimizer
+    This function wraps a standard PyTorch model with Opacus to ensure 
+    DP guarantees (per-sample gradient clipping and noise addition).
+    """
+
+    # 1. DP COMPATIBILITY CHECK
+    # Opacus cannot handle standard BatchNorm as it leaks privacy between samples.
+    # ModuleValidator.fix() replaces BatchNorm with GroupNorm automatically.
+    if not ModuleValidator.is_valid(model):
+        model = ModuleValidator.fix(model)
+    
+    model.to(device)
+
+    # 2. PRIVACY ENGINE INITIALIZATION
+    # We initialize the engine only if the model isn't already "private".
+    # In FL, we usually re-wrap every round because the optimizer is re-initialized.
+    privacy_engine = PrivacyEngine()
+    
+    # poisson_sampling=False: Essential for Federated Learning as Flower 
+    # provides fixed-size batches/iterators.
+    model, optimizer, loader = privacy_engine.make_private(
+        module=model,
+        optimizer=optimizer,
+        data_loader=loader,
+        noise_multiplier=noise,
+        max_grad_norm=max_grad_norm,
+        poisson_sampling=False,
+    )
+    
     model.train()
     criterion = torch.nn.CrossEntropyLoss()
-    for _ in range(epochs):
+
+    # 3. TRAINING LOOP
+    for epoch in range(epochs):
         for inputs, labels in loader:
             inputs, labels = inputs.to(device), labels.to(device)
+            
             optimizer.zero_grad()
             
+            # Forward pass
             outputs = model(inputs)
             loss = criterion(outputs, labels)
+            
+            # Backward pass: Opacus hooks calculate per-sample gradients here
             loss.backward()
+            
+            # Optimizer step: Gradients are clipped and noise is added here
             optimizer.step()
 
-    # After training, we return the original model (not the wrapped version) to ensure compatibility with Flower's expectations
-    if hasattr(model, "original_module"):
-        return model.original_module
-    
-    return model
+    # 4. UNWRAPPING
+    # Opacus wraps the model in a 'GradSampleModule'. 
+    # We return the underlying '_module' so the weights can be extracted 
+    # by the Flower server without serialization/metadata errors.
+    return model._module if hasattr(model, "_module") else model

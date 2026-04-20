@@ -80,8 +80,8 @@ def process_and_plot(seed):
                 p2_acc = exp['final_evaluation']["P2"]['accuracy']
 
                 # Accuracy Drop (Local - Fed): a pozitív szám jelzi a romlást
-                m1_diff[idx1][idx2] = p1_acc
-                m2_diff[idx1][idx2] = p2_acc
+                m1_diff[idx1][idx2] = p1_acc - b_p1
+                m2_diff[idx1][idx2] = p2_acc - b_p2
 
             # --- VIZUALIZÁCIÓ ---
             # A None-t lecseréljük 0.0-ra a tengelyen
@@ -90,7 +90,7 @@ def process_and_plot(seed):
             for p_tag, matrix in [("P1", m1_diff), ("P2", m2_diff)]:
                 plt.figure(figsize=(10, 8))
                 # YlOrRd skála: a sötétebb piros jelzi a nagyobb teljesítményvesztést
-                sns.heatmap(matrix, annot=True, fmt=".3f", cmap="YlOrRd", 
+                sns.heatmap(matrix, annot=True, fmt=".3f", cmap="RdYlGn", center=0, 
                             xticklabels=display_params, yticklabels=display_params)
                 
                 plt.title(f"{method_name} ({sc_name}) - {p_tag} Accuracy Drop (Seed {seed})")

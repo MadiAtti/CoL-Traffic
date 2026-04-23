@@ -22,8 +22,8 @@ Each of the 6 pairs produced TWICE: once for Suppression, once for DP.
 Note: run from project directory.
 
 Quick run (full data, 3 seed, 3x3 grids, 50 rounds):
-    PYTHONPATH=/home/pejo_balazs/COL-Drug/mina python src/main.py \
-    --data_path /home/pejo_balazs/COL-Drug/mina/data/ \
+    PYTHONPATH=/home/student/Matan/Federated_Learning/CoL-Traffic/drug_discovery python src/main.py \
+    --data_path /home/student/Matan/Federated_Learning/CoL-Traffic/drug_discovery/data/ \
     --n_samples 50000 \
     --seed_range 3 \
     --rounds 50 \
@@ -32,16 +32,19 @@ Quick run (full data, 3 seed, 3x3 grids, 50 rounds):
     --plots src/plots_50k/
 
 Full run:
-    PYTHONPATH=/home/pejo_balazs/COL-Drug/mina python src/main.py --seed_range 10 --rounds 200
+    PYTHONPATH=/home/student/Matan/Federated_Learning/CoL-Traffic/drug_discovery python src/main.py --seed_range 10 --rounds 200
 """
 
 import argparse
 import os
 import csv
 import copy
+import shutil
 import numpy as np
 import torch
 from collections import OrderedDict
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from types import SimpleNamespace
 
 import matplotlib
 matplotlib.use("Agg")
@@ -65,7 +68,7 @@ DP_NOISE_LEVELS_QUICK = [0.00, 0.50, 2.00]
 SUP_LEVELS_FULL  = [round(0.1 * i, 1) for i in range(11)]
 SUP_LEVELS_QUICK = [0.0, 0.45, 0.90]
 
-DATA_PATH    = "../data/"
+DATA_PATH    = "data/"
 DATA_ROOT    = "experiment_data/"
 RESULTS_ROOT = "results/"
 PLOTS_ROOT   = "plots/"
@@ -83,6 +86,7 @@ def parse_args():
     p.add_argument("--results", type=str, default=RESULTS_ROOT, help="Directory for CSV result files.")
     p.add_argument("--plots", type=str, default=PLOTS_ROOT, help="Directory for heatmap PNG files.")
     p.add_argument("--clip_batches", type=int, default=20, help="Number of batches to use for auto clip estimation.")
+    p.add_argument("--parallel_jobs", type=int, default=1, help="Run this many grid cells in parallel (CPU-only recommended).")
     return p.parse_args()
 
 # --- Utility Functions ---
@@ -246,10 +250,8 @@ def evaluate_global_model(model, test_dataset, conf, loss_fn, device):
                 
     return total_loss / max(samples, 1)
 
-def run_fl_experiment(data_dir, group, privacy_mode, privacy_params, base_conf, dp_clip, args, loss_fn, device):
-    """
-    Spawns a Flower simulation and returns final losses for the given clients.
-    """
+def run_fl_experiment(data_dir, group, privacy_mode, privacy_params, base_conf, dp_clip, args, loss_fn, device, seed):
+    """Executes a Flower simulation and returns final losses for the given clients."""
     path_suffix = os.path.join(data_dir, "data_2_split/")
     head_dir = args.results 
     
@@ -260,27 +262,49 @@ def run_fl_experiment(data_dir, group, privacy_mode, privacy_params, base_conf, 
         if os.path.exists(hp): os.remove(hp)
         if os.path.exists(op): os.remove(op)
 
-    def client_fn(cid: str) -> fl.client.Client:
-        # Flower always gives cid from "0" to "num_clients - 1"
-        flower_id = int(cid) 
-        
-        # Map Flower's internal ID to your actual client (0 or 1)
-        k = group[flower_id]
+    # FIX 1: Pre-load datasets to ensure suppression consistency across rounds!
+    set_seed(seed)
+    client_datasets = {}
+    for flower_id, k in enumerate(group):
         p_val = privacy_params[flower_id]
-        
-        train_ds, test_ds = get_client_datasets(path_suffix, k, p_val, privacy_mode, base_conf)
-        trunk = sc.Trunk(base_conf)
-        model = sc.TrunkAndHead(conf=base_conf, trunk=trunk)
-        
-        # Pass k so it loads/saves the correct head_0.pt or head_1.pt
-        return DrugDiscoveryClient(
-            model, train_ds, test_ds, base_conf, loss_fn, privacy_mode, p_val, dp_clip, k, head_dir
-        ).to_client()
+        client_datasets[k] = get_client_datasets(path_suffix, k, p_val, privacy_mode, base_conf)
+
+    # FIX 2: Ensure all clients start from the EXACT SAME initial weights as the Oracle
+    set_seed(seed)
+    initial_model = sc.TrunkAndHead(conf=base_conf, trunk=sc.Trunk(base_conf))
+    
+    # Extract trunk parameters to give to the Flower Server
+    initial_trunk_params = fl.common.ndarrays_to_parameters(
+        [val.cpu().numpy() for _, val in initial_model.trunk.state_dict().items()]
+    )
+    # Extract head parameters to inject into clients
+    initial_head_state = {k: v for k, v in initial_model.state_dict().items() if 'trunk' not in k}
+
+    def client_fn(cid: str) -> fl.client.Client:
+            flower_id = int(cid) 
+            k = group[flower_id]
+            p_val = privacy_params[flower_id]
+            
+            # Pull fixed dataset from closure
+            train_ds, test_ds = client_datasets[k]
+            
+            trunk = sc.Trunk(base_conf)
+            model = sc.TrunkAndHead(conf=base_conf, trunk=trunk)
+            
+            # Force deterministic Head initialization on Round 1
+            hp = os.path.join(head_dir, f"head_{k}.pt")
+            if not os.path.exists(hp):
+                model.load_state_dict(initial_head_state, strict=False)
+            
+            return DrugDiscoveryClient(
+                model, train_ds, test_ds, base_conf, loss_fn, privacy_mode, p_val, dp_clip, k, head_dir
+            ).to_client()
 
     strategy = SaveModelStrategy(
         target_rounds=args.rounds,
         fraction_fit=1.0, fraction_evaluate=1.0,
         min_fit_clients=len(group), min_evaluate_clients=len(group), min_available_clients=len(group),
+        initial_parameters=initial_trunk_params  # FIX 3: Push deterministic trunk to server
     )
 
     fl.simulation.start_simulation(
@@ -290,43 +314,142 @@ def run_fl_experiment(data_dir, group, privacy_mode, privacy_params, base_conf, 
         strategy=strategy,
         client_resources={"num_cpus": 1, "num_gpus": 0.0 if device.type == 'cpu' else 1.0},
     )
-    
+        
     # Calculate performance using the global trunk + personalized local head
     final_losses = []
     for k in group:
-        # 1. Instantiate a fresh model in the main process
         _, test_ds = get_client_datasets(path_suffix, k, 0.0, 'suppression', base_conf)
         trunk = sc.Trunk(base_conf)
         model = sc.TrunkAndHead(conf=base_conf, trunk=trunk)
         
-        # 2. Load the personalized Head that the worker saved to disk
         hp = os.path.join(head_dir, f"head_{k}.pt")
         if os.path.exists(hp):
             model.load_state_dict(torch.load(hp), strict=False)
             
-        # 3. Load the final aggregated Trunk from the server
         if strategy.final_parameters is not None:
             params_dict = zip(model.trunk.state_dict().keys(), strategy.final_parameters)
             state_dict = OrderedDict({k: torch.tensor(v) for k, v in params_dict})
             model.trunk.load_state_dict(state_dict, strict=True)
             
-        # 4. Evaluate and append
         loss = evaluate_global_model(model, test_ds, base_conf, loss_fn, device)
         final_losses.append(loss)
         
     return final_losses
 
-def run_local(client_idx, data_dir, base_conf, dp_clip, args, loss_fn, device):
+def _grid_cell_task(task):
+    """Worker function for one (c0, c1) grid cell."""
+    args_ns = SimpleNamespace(rounds=task["rounds"], results=task["results"])
+    loss_fn = torch.nn.BCEWithLogitsLoss(reduction="none")
+    device = torch.device(task["device"])
+
+    set_seed(task["seed"])
+    j0, j1 = run_fl_experiment(
+        task["data_dir"],
+        [0, 1],
+        task["privacy_mode"],
+        [task["p0"], task["p1"]],
+        task["base_conf"],
+        task["dp_clip"],
+        args_ns,
+        loss_fn,
+        device,
+        task["seed"],
+        run_tag=task["run_tag"],
+        cleanup_tmp=True,
+    )
+    return task["i"], task["j"], j0, j1
+
+def evaluate_privacy_grid(
+    data_dir,
+    privacy_mode,
+    levels,
+    oracle0,
+    local0,
+    oracle1,
+    local1,
+    base_conf,
+    dp_clip,
+    args,
+    device,
+    seed,
+    tag_prefix,
+):
+    """Computes one full privacy grid, optionally in parallel across cells."""
+    n = len(levels)
+    grid_c0 = np.zeros((n, n))
+    grid_c1 = np.zeros((n, n))
+
+    def run_sequential():
+        for i, p0 in enumerate(levels):
+            for j, p1 in enumerate(levels):
+                run_tag = f"{tag_prefix}_{privacy_mode}_s{seed}_i{i}_j{j}_pid{os.getpid()}"
+                set_seed(seed)
+                j0, j1 = run_fl_experiment(
+                    data_dir,
+                    [0, 1],
+                    privacy_mode,
+                    [p0, p1],
+                    base_conf,
+                    dp_clip,
+                    args,
+                    torch.nn.BCEWithLogitsLoss(reduction="none"),
+                    device,
+                    seed,
+                    run_tag=run_tag,
+                    cleanup_tmp=True,
+                )
+                grid_c0[i, j] = norm_improvement(oracle0, local0, j0)
+                grid_c1[i, j] = norm_improvement(oracle1, local1, j1)
+
+    if args.parallel_jobs <= 1:
+        run_sequential()
+        return grid_c0, grid_c1
+
+    tasks = []
+    for i, p0 in enumerate(levels):
+        for j, p1 in enumerate(levels):
+            tasks.append({
+                "i": i,
+                "j": j,
+                "p0": p0,
+                "p1": p1,
+                "seed": seed,
+                "data_dir": data_dir,
+                "privacy_mode": privacy_mode,
+                "base_conf": base_conf,
+                "dp_clip": dp_clip,
+                "rounds": args.rounds,
+                "results": args.results,
+                "device": device.type,
+                "run_tag": f"{tag_prefix}_{privacy_mode}_s{seed}_i{i}_j{j}",
+            })
+
+    print(f"      Parallel {privacy_mode} grid with {args.parallel_jobs} workers ...")
+    try:
+        with ProcessPoolExecutor(max_workers=args.parallel_jobs) as ex:
+            futures = [ex.submit(_grid_cell_task, t) for t in tasks]
+            for fut in as_completed(futures):
+                i, j, j0, j1 = fut.result()
+                grid_c0[i, j] = norm_improvement(oracle0, local0, j0)
+                grid_c1[i, j] = norm_improvement(oracle1, local1, j1)
+    except Exception as e:
+        print(f"      Parallel execution failed ({type(e).__name__}: {e}). Falling back to sequential.")
+        run_sequential()
+
+    return grid_c0, grid_c1
+
+def run_local(client_idx, data_dir, base_conf, dp_clip, args, loss_fn, device, seed):
     """Evaluates untouched (Oracle) model, then trains a local model via 1-client FL instance."""
     path_suffix = os.path.join(data_dir, "data_2_split/")
     _, test_ds = get_client_datasets(path_suffix, client_idx, 0.0, 'suppression', base_conf)
     
     # Untrained model for Oracle
+    set_seed(seed)
     untrained_model = sc.TrunkAndHead(conf=base_conf, trunk=sc.Trunk(base_conf))
     oracle_loss = evaluate_global_model(untrained_model, test_ds, base_conf, loss_fn, device)
     
     # Standard local training wrapped in Flower engine (1 round equivalent local passes)
-    losses = run_fl_experiment(data_dir, [client_idx], 'suppression', [0.0], base_conf, dp_clip, args, loss_fn, device)
+    losses = run_fl_experiment(data_dir, [client_idx], 'suppression', [0.0], base_conf, dp_clip, args, loss_fn, device, seed)
     return oracle_loss, losses[0]
 
 # --- Output Orchestration ---
@@ -396,22 +519,29 @@ def run_all(splits, base_conf, seed_range, dp_noise_levels, sup_levels, dp_clip,
         for sname, (data_dir, lbl0, lbl1) in scenarios.items():
             print(f"\n  [{sname}]  {lbl0} vs {lbl1}")
             set_seed(seed)
-            oracle0, local0 = run_local(0, data_dir, base_conf, dp_clip, args, loss_fn, device)
+            oracle0, local0 = run_local(0, data_dir, base_conf, dp_clip, args, loss_fn, device, seed)
             set_seed(seed)
-            oracle1, local1 = run_local(1, data_dir, base_conf, dp_clip, args, loss_fn, device)
+            oracle1, local1 = run_local(1, data_dir, base_conf, dp_clip, args, loss_fn, device, seed)
 
             print(f"      Baselines — c0: oracle={oracle0:.6f} local={local0:.6f} | c1: oracle={oracle1:.6f} local={local1:.6f}")
 
             # DP Grid
             print("    DP grid ...")
-            n = len(dp_noise_levels)
-            grid_c0_dp, grid_c1_dp = np.zeros((n, n)), np.zeros((n, n))
-            for i, n0 in enumerate(dp_noise_levels):
-                for j, n1 in enumerate(dp_noise_levels):
-                    set_seed(seed)
-                    j0, j1 = run_fl_experiment(data_dir, [0, 1], 'dp', [n0, n1], base_conf, dp_clip, args, loss_fn, device)
-                    grid_c0_dp[i, j] = norm_improvement(oracle0, local0, j0)
-                    grid_c1_dp[i, j] = norm_improvement(oracle1, local1, j1)
+            grid_c0_dp, grid_c1_dp = evaluate_privacy_grid(
+                data_dir=data_dir,
+                privacy_mode="dp",
+                levels=dp_noise_levels,
+                oracle0=oracle0,
+                local0=local0,
+                oracle1=oracle1,
+                local1=local1,
+                base_conf=base_conf,
+                dp_clip=dp_clip,
+                args=args,
+                device=device,
+                seed=seed,
+                tag_prefix=f"{sname}_dp",
+            )
             
             accum[sname]["dp"][0].append(grid_c0_dp)
             accum[sname]["dp"][1].append(grid_c1_dp)
@@ -420,14 +550,21 @@ def run_all(splits, base_conf, seed_range, dp_noise_levels, sup_levels, dp_clip,
 
             # Suppression Grid
             print("    Suppression grid ...")
-            m = len(sup_levels)
-            grid_c0_sup, grid_c1_sup = np.zeros((m, m)), np.zeros((m, m))
-            for i, h0 in enumerate(sup_levels):
-                for j, h1 in enumerate(sup_levels):
-                    set_seed(seed)
-                    j0, j1 = run_fl_experiment(data_dir, [0, 1], 'suppression', [h0, h1], base_conf, dp_clip, args, loss_fn, device)
-                    grid_c0_sup[i, j] = norm_improvement(oracle0, local0, j0)
-                    grid_c1_sup[i, j] = norm_improvement(oracle1, local1, j1)
+            grid_c0_sup, grid_c1_sup = evaluate_privacy_grid(
+                data_dir=data_dir,
+                privacy_mode="suppression",
+                levels=sup_levels,
+                oracle0=oracle0,
+                local0=local0,
+                oracle1=oracle1,
+                local1=local1,
+                base_conf=base_conf,
+                dp_clip=dp_clip,
+                args=args,
+                device=device,
+                seed=seed,
+                tag_prefix=f"{sname}_sup",
+            )
 
             accum[sname]["sup"][0].append(grid_c0_sup)
             accum[sname]["sup"][1].append(grid_c1_sup)
@@ -459,6 +596,11 @@ if __name__ == "__main__":
     args = parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     loss_fn = torch.nn.BCEWithLogitsLoss(reduction="none")
+
+    args.parallel_jobs = max(1, int(args.parallel_jobs))
+    if device.type == "cuda" and args.parallel_jobs > 1:
+        print("parallel_jobs > 1 with CUDA can cause OOM/contention. Forcing parallel_jobs=1.")
+        args.parallel_jobs = 1
 
     use_quick = args.quick or (args.n_samples is not None)
     dp_noise_levels = DP_NOISE_LEVELS_QUICK if use_quick else DP_NOISE_LEVELS_FULL
@@ -492,6 +634,7 @@ if __name__ == "__main__":
     total_runs = args.seed_range * 3 * (dp_cells + sup_cells + 4)
     print(f"\nConfiguration:\n  seeds        : {args.seed_range}\n  rounds       : {args.rounds}\n  overlap      : {args.overlap}")
     print(f"  batch_size   : {base_conf.batch_size}\n  n_train      : {n_train:,}\n  dp_clip      : {dp_clip:.6f}  (auto-estimated)")
+    print(f"  parallel_jobs: {args.parallel_jobs}")
     print(f"  DP  grid     : {len(dp_noise_levels)}×{len(dp_noise_levels)} = {dp_cells} cells")
     print(f"  SUP grid     : {len(sup_levels)}×{len(sup_levels)} = {sup_cells} cells")
     print(f"  Total Flower FL runs : ~{total_runs:,}")

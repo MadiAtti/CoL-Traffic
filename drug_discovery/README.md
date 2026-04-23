@@ -24,4 +24,5 @@ This project transitions from a serialized, manual training loop to a fully dece
 ## Quickstart
 To run a quick simulation with reduced parameters (3x3 grids, 50 rounds):
 ```bash
-python src/main.py --quick --n_samples 50000 --seed_range 1 --rounds 50
+python src/main.py --quick --n_samples 50000 --seed_range 3 --rounds 50
+```

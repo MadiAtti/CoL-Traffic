@@ -103,4 +103,4 @@ def process_and_plot(seed):
                 print(f"Kész: plots/seed{seed}/{method_name}_{sc_name}_{p_tag}.png")
 
 if __name__ == "__main__":
-    process_and_plot(3)
+    process_and_plot(1)

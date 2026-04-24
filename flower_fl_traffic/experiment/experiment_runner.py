@@ -20,7 +20,7 @@ def _run_single_scenario(args):
     silence_log()
 
     (val1, val2, config, raw_train_loaders, test_loaders, subdir, 
-     mode, base_dir, metric_name, param_keys) = args
+     mode, base_dir, metric_name, param_keys, lock) = args
 
     active_loaders = []
 
@@ -90,11 +90,12 @@ def _run_single_scenario(args):
         }
     )
 
-    # Save the history and results
-    save_federated_history(
-        history, config, val1, val2, subdir, 
-        base_dir=base_dir, metric_name=metric_name
-    )
+    # Save the history and results with lock to prevent0 file write conflicts
+    with lock:
+        save_federated_history(
+            history, config, val1, val2, subdir, 
+            base_dir=base_dir, metric_name=metric_name
+        )
 
     # Extract final results for console logging
     res_1 = history.metrics_distributed["client1_accuracy"][-1][1]
@@ -128,12 +129,16 @@ def run_experiment(config, train_loaders, test_loaders, subdir, mode):
     # Generate all combinations of noise/suppression levels for Client1 and Client2
     scenarios = list(product(levels, levels))
 
+    # Create a multiprocessing manager and lock for safe file writing
+    manager = mp.Manager()
+    lock = manager.Lock()
+
     # Prepare tasks for the multiprocessing pool
     tasks = []
     for val1, val2 in scenarios:
         tasks.append((
             val1, val2, config, train_loaders, test_loaders, subdir, 
-            mode, base_dir, metric_name, param_keys
+            mode, base_dir, metric_name, param_keys, lock
         ))
 
     # Determine the number of parallel processes

@@ -20,29 +20,25 @@ def _run_single_scenario(args):
     silence_log()
 
     (val1, val2, config, raw_train_loaders, test_loaders, subdir, 
-     mode, base_dir, metric_name, param_keys, lock) = args
+    mode, base_dir, metric_name, param_keys, lock) = args
 
     active_loaders = []
 
-    if mode == "sup":
-        total_f = config.dataset.input_dim  # Ez a 14
+    if mode == "sup": # Suppression mode requires modification of the data loaders to reflect the feature suppression
+        total_f = config.dataset.input_dim  
         active_loaders = []
         
         for i, limit in enumerate([val1, val2]):
             limit = int(limit)
             
-            # 1. KINYERÉS ÉS MÁSOLÁS (Hogy ne legyen shared memory ütközés)
-            # A régi kódod alapján: X_p1_train, y_p1_train kinyerése
+            # We need to create new datasets for each client with only the active features based on the suppression level.
             X_orig = raw_train_loaders[i].dataset.X.cpu().numpy().copy()
             y_orig = raw_train_loaders[i].dataset.y.cpu().numpy().copy()
             
-            # 2. FIZIKAI VÁGÁS (Ahogy a régi kódod create_suppressed_dataset-je csinálta)
-            # Csak az első 'limit' számú oszlopot tartjuk meg
             feature_indices = list(range(limit))
             X_cut = X_orig[:, feature_indices]
             
-            # 3. CUSTOM DATASET INICIALIZÁLÁS
-            # Átadjuk a vágott X-et (X_cut), és megmondjuk, hova pakolja a 14-es vázban
+            # Create a new dataset and dataloader for this client with the reduced feature set
             new_ds = CustomDataset(
                 X=X_cut, 
                 y=y_orig, 
@@ -50,13 +46,13 @@ def _run_single_scenario(args):
                 total_features=total_f
             )
             
+            # We create a new DataLoader for this client with the modified dataset
             active_loaders.append(DataLoader(
                 new_ds, 
                 batch_size=config.config.batch_size, 
                 shuffle=True
             ))
-    else:
-        # Ha nem suppression, akkor az eredeti loadereket használjuk
+    else: # DP mode doesn't require modification of the data loaders, so we use the original ones
         active_loaders = raw_train_loaders
 
     print(f"\n🚀 Starting Parallel Simulation ({mode.upper()}) | Client1: {val1} | Client2: {val2}")

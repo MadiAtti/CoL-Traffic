@@ -1,5 +1,6 @@
 import torch
 from opacus import PrivacyEngine
+from opacus.validators import ModuleValidator
 
 def train_standard(model, loader, optimizer, epochs, device):
     """Standard training loop for federated learning without differential privacy."""
@@ -13,10 +14,6 @@ def train_standard(model, loader, optimizer, epochs, device):
             loss.backward()
             optimizer.step()
     return model
-
-import torch
-from opacus import PrivacyEngine
-from opacus.validators import ModuleValidator
 
 def train_dp(model, loader, optimizer, epochs, noise, max_grad_norm, device):
     """

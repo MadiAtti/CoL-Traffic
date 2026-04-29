@@ -36,20 +36,14 @@ class UniversalTrafficClient(fl.client.NumPyClient):
     def fit(self, parameters, config):
         self.set_parameters(parameters)
         
-        # 1. Adatellenőrzés (vágás validálása)
+        # active features count for debugging: Determine the number of non-zero columns in the first batch of the training data
         test_batch_x, _ = next(iter(self.trainloader))
         num_active = torch.any(test_batch_x != 0, dim=0).sum().item()
         
-        # 2. Várt érték kinyerése (None, ha DP mód van)
+        # Expected active features based on the configuration for this client: if client ID is "0", use client1_features; otherwise, use client2_features
         exp = config.get("client1_features") if self.cid == "0" else config.get("client2_features")
         
-        # 3. Egyetlen lényegre törő sor:
-        #print(f"   - [Client {self.cid}] Non-zero columns: {num_active} (Expected: {exp if exp is not None else 'Full'})", flush=True)
-        # DP handling: Determine the noise level for this client based on the config parameters
-
-        sample_data = test_batch_x[:5, :14].numpy() 
-        # print(f"    First 5 rows (first 14 cols):\n{sample_data}", flush=True)
-
+        # DP handling: Determine the noise level for this client based on the config parameter
         noise = config.get("client1_noise") if self.cid == "0" else config.get("client2_noise")
         
         # Ensure noise is a float and handle the case where it might be None or "None"
@@ -61,18 +55,14 @@ class UniversalTrafficClient(fl.client.NumPyClient):
         epochs = self.cfg.config.num_epochs
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.cfg.config.lr)
 
-        client_label = f"Client {self.cid}"
-        pid = os.getpid()
 
         # Train model based on the specified noise level: if noise > 0, use DP training; otherwise, use standard training
         if noise > 0:
-            #print(f"--- [PID:{pid}] {client_label} training with DP (noise: {noise}) ---")
             self.model = train_dp(
                 self.model, self.trainloader, optimizer, epochs, 
                 noise, self.cfg.config.max_grad_norm, self.device
             )
         else:
-            #print(f"--- [PID:{pid}] {client_label} training standard ---")
             self.model = train_standard(
                 self.model, self.trainloader, optimizer, epochs, self.device
             )

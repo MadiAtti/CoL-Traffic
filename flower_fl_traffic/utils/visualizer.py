@@ -44,7 +44,6 @@ def process_and_plot(seed):
             if not loc_data: continue
             
             b_p1, b_p2 = get_accuracy_from_local(loc_data, sub_path)
-            print(f"Local Baseline ({sc_name}): P1 Accuracy = {b_p1:.4f}, P2 Accuracy = {b_p2:.4f}")
             
             fed_path = f"{method_path}{sub_path}{seed}.json"
             fed_data = load_json(fed_path)
@@ -103,4 +102,9 @@ def process_and_plot(seed):
                 print(f"Kész: plots/seed{seed}/{method_name}_{sc_name}_{p_tag}.png")
 
 if __name__ == "__main__":
-    process_and_plot(2)
+    for seed in range(0, 10):
+        local = f"1_local_baseline/P1/{seed}.json"
+        if not os.path.exists(local):
+            print(f"Missing results for seed {seed}, skipping...")
+            continue
+        process_and_plot(seed)

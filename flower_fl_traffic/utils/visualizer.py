@@ -32,23 +32,41 @@ def get_accuracy_from_local(data, sub_path=""):
             
         return p1_acc, p2_acc
 
+# save the matrices for later use (e.g. finding NE) and for reproducibility
+def save_matricies(m1_diff, m2_diff, params, method_name, sc_name, seed):
+    os.makedirs(f'games/seed{seed}', exist_ok=True)
+
+    # 3D array: (param1, param2, [P1_diff, P2_diff])
+    bimatrix = np.zeros((params.__len__(), params.__len__(), 2))
+    bimatrix[:, :, 0] = m1_diff
+    bimatrix[:, :, 1] = m2_diff
+
+    # save as .npy for easy loading later
+    np.save(f'games/seed{seed}/{method_name}_{sc_name}_bimatrix.npy', bimatrix)
+    print(f"Matricies saved for {method_name} ({sc_name}) - Seed {seed}")
+
+# main function to process data and create heatmaps for both P1 and P2 accuracy drops
 def process_and_plot(seed):
-    # Ezt a listát nem szabad felülírni bent!
+    # all combinations of folders and methods to process
     folders = [("", "Full_FL"), ("P1/", "P1_Subnet"), ("P2/", "P2_Subnet")]
     methods = [("2_suppression/", "Suppression"), ("3_noise/", "Noise")]
 
+    # Iterate through each method and folder combination
     for method_path, method_name in methods:
         for sub_path, sc_name in folders:
             loc_path = f"1_local_baseline/{sub_path}{seed}.json"
             loc_data = load_json(loc_path)
             if not loc_data: continue
             
+            # Get local accuracies for P1 and P2 based on the sub_path (scenario)
             b_p1, b_p2 = get_accuracy_from_local(loc_data, sub_path)
             
+            # Load federated results for the same seed and scenario
             fed_path = f"{method_path}{sub_path}{seed}.json"
             fed_data = load_json(fed_path)
             if not fed_data: continue
             
+            # Extract the relevant parameters and experiment results from the federated data
             config_data = fed_data['parameters']['config']
             if method_name == "Noise":
                 params = config_data['noise_levels']
@@ -56,14 +74,14 @@ def process_and_plot(seed):
             else:                
                 params = config_data['sup_levels']
                 k1, k2 = 'features_p1', 'features_p2'
-
             experiments = fed_data['experiments']
             size = len(params)
             
+            # matricies to hold the accuracy drops for P1 and P2 across all parameter combinations
             m1_diff = np.zeros((size, size))
             m2_diff = np.zeros((size, size))
 
-            # Feltöltés az experimentek alapján
+            # Iterate through all experiments and fill the matricies with the accuracy drops compared to the local baseline
             for exp in experiments:
                 val1 = exp[k1]
                 val2 = exp[k2]
@@ -74,18 +92,21 @@ def process_and_plot(seed):
                 except ValueError:
                     continue
                 
-                # A federáltban nagybetűs P1/P2
+                # Extract the final evaluation accuracies for P1 and P2 from the experiment results
                 p1_acc = exp['final_evaluation']["P1"]['accuracy']
                 p2_acc = exp['final_evaluation']["P2"]['accuracy']
 
-                # Accuracy Drop (Local - Fed): a pozitív szám jelzi a romlást
+                # Accuracy Drop (Federated - Local)
+                # Positive: federated is better, Negative: federated is worse
                 m1_diff[idx1][idx2] = p1_acc - b_p1
                 m2_diff[idx1][idx2] = p2_acc - b_p2
 
-            # --- VIZUALIZÁCIÓ ---
-            # A None-t lecseréljük 0.0-ra a tengelyen
+            # save the matricies for later use (e.g. finding NE) and for reproducibility
+            save_matricies(m1_diff, m2_diff, params, method_name, sc_name, seed)
+
             display_params = [0.0 if x is None else x for x in params]
             
+            # Create heatmaps for both P1 and P2 accuracy drops
             for p_tag, matrix in [("P1", m1_diff), ("P2", m2_diff)]:
                 plt.figure(figsize=(10, 8))
                 # YlOrRd skála: a sötétebb piros jelzi a nagyobb teljesítményvesztést
@@ -99,9 +120,10 @@ def process_and_plot(seed):
                 os.makedirs(f'plots/seed{seed}', exist_ok=True)
                 plt.savefig(f"plots/seed{seed}/{method_name}_{sc_name}_{p_tag}.png")
                 plt.close()
-                print(f"Kész: plots/seed{seed}/{method_name}_{sc_name}_{p_tag}.png")
+                print(f"Saved: plots/seed{seed}/{method_name}_{sc_name}_{p_tag}.png")
 
 if __name__ == "__main__":
+    # Loop through seeds and process the data to create heatmaps for both P1 and P2 accuracy drops
     for seed in range(0, 10):
         local = f"1_local_baseline/P1/{seed}.json"
         if not os.path.exists(local):

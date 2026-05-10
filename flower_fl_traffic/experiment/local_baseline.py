@@ -119,7 +119,8 @@ def run_local_experiment(config, train_loaders, test_loaders, subdir, client_ids
     }
 
     # Save to JSON
-    target_path = os.path.join("1_local_baseline", subdir)
+    mode = config.dataset.mode
+    target_path = os.path.join(f"results/{mode}/1_local_baseline", subdir)
     os.makedirs(target_path, exist_ok=True)
     file_path = os.path.join(target_path, f"{config.config.seed}.json")
 

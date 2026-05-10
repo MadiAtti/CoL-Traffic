@@ -62,11 +62,13 @@ def compare_NE_points(NE_points):
         print(f"{method.upper()} NE points: \n\t- P1: {p1_pts}, \n\t- P2: {p2_pts}, \n\t- Full: {full_pts}")
 
 if __name__ == "__main__":
+    mode = "half"  # Change this to "full", "half" or "quarter" if needed
+    base_path = "results/" + mode + "/"
     # Loop through seeds and process the data to create heatmaps for both P1 and P2 accuracy drops
     for seed in range(0, 10):
         print("-" * 50)
         print(f"Processing seed {seed}...")
-        games_path = f"games/seed{seed}"
+        games_path = f"{base_path}games/seed{seed}"
         if not os.path.exists(games_path):
             print(f"Missing games for seed {seed}, skipping...")
             continue

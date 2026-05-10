@@ -1,4 +1,5 @@
 # --- CRITICAL: Import silencer FIRST to set environment variables ---
+from flower_fl_traffic.data import splitter
 from utils.logger_silencer import silence_log
 
 import os
@@ -11,7 +12,7 @@ from data.dataset import prepare_data_and_loaders, setup_directories
 from experiment.experiment_runner import run_experiment
 from experiment.local_baseline import run_local_experiment
 from utils.seed import set_seed
-
+from data.splitter import dataset_splitter
 
 @hydra.main(config_path="conf", config_name="base", version_base=None)
 def main(config: DictConfig):
@@ -27,6 +28,7 @@ def main(config: DictConfig):
     OmegaConf.set_struct(config, False)
     setup_directories(config)
 
+    dataset_splitter(config)
 
     ## Prepare dataset and update config with dataset info (input_dim, num_classes)
     loaders = prepare_data_and_loaders(config)               

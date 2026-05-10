@@ -13,14 +13,15 @@ config: # Configuration for the training process, including hyperparameters and 
   sup_levels: [14, 13, 12, 11, 10, 9, 8, 7]
 
 dataset: # Configuration related to the dataset, including paths and feature/target columns
+  mode: "quarter" # Mode for dataset splitting, can be "full", "half" or "quarter"
   input_path: "dataset/dataset.parquet"
   paths:
-    p1: "dataset/p1.parquet"
-    p2: "dataset/p2.parquet"
-    p11: "dataset/p11.parquet"
-    p12: "dataset/p12.parquet"
-    p21: "dataset/p21.parquet"
-    p22: "dataset/p22.parquet"
+    p1: "/p1.parquet"
+    p2: "/p2.parquet"
+    p11: "/p11.parquet"
+    p12: "/p12.parquet"
+    p21: "/p21.parquet"
+    p22: "/p22.parquet"
   feature_columns: 
     - protocol
     - bidirectional_min_ps

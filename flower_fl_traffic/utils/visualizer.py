@@ -1,5 +1,4 @@
 import json
-from itertools import product
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -34,7 +33,7 @@ def get_accuracy_from_local(data, sub_path=""):
 
 # save the matrices for later use (e.g. finding NE) and for reproducibility
 def save_matricies(m1_diff, m2_diff, params, method_name, sc_name, seed):
-    os.makedirs(f'games/seed{seed}', exist_ok=True)
+    os.makedirs(f'{base_path}games/seed{seed}', exist_ok=True)
 
     # 3D array: (param1, param2, [P1_diff, P2_diff])
     bimatrix = np.zeros((params.__len__(), params.__len__(), 2))
@@ -42,7 +41,7 @@ def save_matricies(m1_diff, m2_diff, params, method_name, sc_name, seed):
     bimatrix[:, :, 1] = m2_diff
 
     # save as .npy for easy loading later
-    np.save(f'games/seed{seed}/{method_name}_{sc_name}_bimatrix.npy', bimatrix)
+    np.save(f'{base_path}games/seed{seed}/{method_name}_{sc_name}_bimatrix.npy', bimatrix)
     print(f"Matricies saved for {method_name} ({sc_name}) - Seed {seed}")
 
 # main function to process data and create heatmaps for both P1 and P2 accuracy drops
@@ -54,7 +53,7 @@ def process_and_plot(seed):
     # Iterate through each method and folder combination
     for method_path, method_name in methods:
         for sub_path, sc_name in folders:
-            loc_path = f"1_local_baseline/{sub_path}{seed}.json"
+            loc_path = f"{base_path}1_local_baseline/{sub_path}{seed}.json"
             loc_data = load_json(loc_path)
             if not loc_data: continue
             
@@ -62,7 +61,7 @@ def process_and_plot(seed):
             b_p1, b_p2 = get_accuracy_from_local(loc_data, sub_path)
             
             # Load federated results for the same seed and scenario
-            fed_path = f"{method_path}{sub_path}{seed}.json"
+            fed_path = f"{base_path}{method_path}{sub_path}{seed}.json"
             fed_data = load_json(fed_path)
             if not fed_data: continue
             
@@ -117,16 +116,97 @@ def process_and_plot(seed):
                 plt.xlabel("Client 2 Params")
                 plt.ylabel("Client 1 Params")
                 
-                os.makedirs(f'plots/seed{seed}', exist_ok=True)
-                plt.savefig(f"plots/seed{seed}/{method_name}_{sc_name}_{p_tag}.png")
+                os.makedirs(f'{base_path}plots/seed{seed}', exist_ok=True)
+                plt.savefig(f"{base_path}plots/seed{seed}/{method_name}_{sc_name}_{p_tag}.png")
                 plt.close()
-                print(f"Saved: plots/seed{seed}/{method_name}_{sc_name}_{p_tag}.png")
+                print(f"Saved: {base_path}plots/seed{seed}/{method_name}_{sc_name}_{p_tag}.png")
+
+def average_plot_SD():
+    for method in ["Suppression", "Noise"]:
+        for sc_name in ["P1_subnet", "P2_subnet"]:
+            all_diff = []
+            count = 0
+            for seed in range(0, 10):
+                bimatrix_path = f'{base_path}games/seed{seed}/{method}_{sc_name}_bimatrix.npy'
+                if not os.path.exists(bimatrix_path):
+                    print(f"Missing bimatrix for {method} ({sc_name}) - Seed {seed}, skipping...")
+                    print(f"Expected path: {bimatrix_path}")
+                    continue
+                
+                bimatrix = np.load(bimatrix_path)
+
+                all_diff.append(bimatrix[:, :, 0])
+                all_diff.append(bimatrix[:, :, 1].transpose())  
+            
+            if all_diff:
+                diff = np.mean(all_diff, axis=0)
+                
+                # Plot the standard deviation heatmaps for P1 and P2 accuracy drops
+                plt.figure(figsize=(10, 8))
+                sns.heatmap(diff, annot=True, fmt=".3f", cmap="RdYlGn", center=0)
+                
+                plt.title(f"{method} ({sc_name}) - Standard Deviation of Accuracy Drop")
+                plt.xlabel("Client 2 Params")
+                plt.ylabel("Client 1 Params")
+                
+                os.makedirs(f'{base_path}plots/average', exist_ok=True)
+                plt.savefig(f"{base_path}plots/average/{method}_{sc_name}.png")
+                plt.close()
+                print(f"Saved: {base_path}plots/average/{method}_{sc_name}.png")
+
+
+def average_plot_Full():
+    # This function can be implemented to average the accuracy drops across seeds and create summary heatmaps
+    # It would involve loading the saved bimatrices, averaging them, and then plotting similar heatmaps as in process_and_plot
+    for method in ["Suppression", "Noise"]:
+        avg_m1_diff = []
+        avg_m2_diff = []
+        count = 0
+        
+        for seed in range(0, 10):
+            bimatrix_path = f'{base_path}games/seed{seed}/{method}_Full_FL_bimatrix.npy'
+            if not os.path.exists(bimatrix_path):
+                print(f"Missing bimatrix for {method} (Full_FL) - Seed {seed}, skipping...")
+                print(f"Expected path: {bimatrix_path}")
+                continue
+            
+            bimatrix = np.load(bimatrix_path)
+            m1_diff = bimatrix[:, :, 0]
+            m2_diff = bimatrix[:, :, 1]
+            
+            avg_m1_diff.append(m1_diff)
+            avg_m2_diff.append(m2_diff)
+        
+        if avg_m1_diff and avg_m2_diff:
+            avg_m1_diff = np.mean(avg_m1_diff, axis=0)
+            avg_m2_diff = np.mean(avg_m2_diff, axis=0)
+            
+            # Plot the average heatmaps for P1 and P2 accuracy drops
+            for p_tag, matrix in [("P1", avg_m1_diff), ("P2", avg_m2_diff)]:
+                plt.figure(figsize=(10, 8))
+                sns.heatmap(matrix, annot=True, fmt=".3f", cmap="RdYlGn", center=0)
+                
+                plt.title(f"Average {method} (Full_FL) - {p_tag} Accuracy Drop")
+                plt.xlabel("Client 2 Params")
+                plt.ylabel("Client 1 Params")
+                
+                os.makedirs(f'{base_path}plots/average', exist_ok=True)
+                plt.savefig(f"{base_path}plots/average/{method}_Full_FL_{p_tag}_avg.png")
+                plt.close()
+                print(f"Saved: {base_path}plots/average/{method}_Full_FL_{p_tag}_avg.png")
 
 if __name__ == "__main__":
+
+    mode = "half"  # "full", "half" or "quarter" based on your dataset configuration
+    base_path = f"results/{mode}/"
+
     # Loop through seeds and process the data to create heatmaps for both P1 and P2 accuracy drops
     for seed in range(0, 10):
-        local = f"1_local_baseline/P1/{seed}.json"
+        local = f"{base_path}1_local_baseline/P1/{seed}.json"
         if not os.path.exists(local):
             print(f"Missing results for seed {seed}, skipping...")
             continue
         process_and_plot(seed)
+
+    average_plot_Full()
+    average_plot_SD()

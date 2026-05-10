@@ -108,13 +108,14 @@ def run_experiment(config, train_loaders, test_loaders, subdir, mode):
     Universal experiment runner that parallelizes scenarios using multiprocessing.
     """
     # Setup directories and parameters based on mode
+    ds_mode = config.dataset.mode
     if mode == "dp": # Differentially Private mode
-        base_dir = "3_noise"
+        base_dir = f"results/{ds_mode}/3_noise"
         metric_name = "noise"
         levels = config.config.noise_levels
         param_keys = ["client1_noise", "client2_noise"]
     else:  # Suppression mode
-        base_dir = "2_suppression"
+        base_dir = f"results/{ds_mode}/2_suppression"
         metric_name = "features"
         levels = config.config.sup_levels
         param_keys = ["client1_features", "client2_features"]

@@ -1,5 +1,3 @@
-
-
 def player_specific_metrics(metrics):
     '''
     Custom metric aggregation function for Flower that extracts and returns the accuracy for each client 

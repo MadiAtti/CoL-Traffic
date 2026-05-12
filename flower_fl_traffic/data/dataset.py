@@ -2,7 +2,7 @@ import os, numpy as np, pandas as pd
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
-from custom_dataset import CustomDataset
+from data.custom_dataset import CustomDataset
 
 def setup_directories(cfg):
     '''

@@ -1,5 +1,4 @@
 # --- CRITICAL: Import silencer FIRST to set environment variables ---
-from flower_fl_traffic.data import splitter
 from utils.logger_silencer import silence_log
 
 import os

@@ -33,6 +33,7 @@ def setup_directories(cfg):
             os.makedirs(os.path.join('results', base, method, 'P2'), exist_ok=True)
             os.makedirs(os.path.join('results', base, "plots"), exist_ok=True)
             os.makedirs(os.path.join('results', base, "games"), exist_ok=True)
+            os.makedirs(os.path.join('results', base, "games/average"), exist_ok=True)
             
     if hasattr(cfg.dataset, 'paths'):
         for key in cfg.dataset.paths.keys():

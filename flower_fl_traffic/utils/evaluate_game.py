@@ -1,22 +1,73 @@
+import itertools
+import os
+from matplotlib import pyplot as plt
+import numpy as np
+import seaborn as sns
+
 import os
 import numpy as np
+from omegaconf import OmegaConf
 
-def load_games(games):
-    results = []
-    for game_file in os.listdir(games):
-        if game_file.endswith("_bimatrix.npy"):
-            
-            # Load the bimatrix containing the accuracy drops for P1 and P2 across all parameter combinations
-            bimatrix_path = os.path.join(games, game_file)
-            bimatrix = np.load(bimatrix_path)
-            # print(f"Loaded bimatrix from {bimatrix_path} with shape {bimatrix.shape}")
+def load_games(games_path):
+    results = {}
+    
+    # Paraméterek, amik mentén végigiterálunk
+    methods = ["Noise", "Suppression"]
+    scenarios = [("Full_FL", "Real"), ("subnet", "Simulated")]
+    players = ["P1", "P2"]
 
-            # Determine method and scenario from filename and add to results
-            method = "Suppression" if "Suppression" in game_file else "Noise"
-            sc_name = "Full" if "Full" in game_file else ("P1" if "P1" in game_file else "P2")
-            results.append((bimatrix, method, sc_name))
+    for method in methods:
+        if method not in results:
+            results[method] = {}
+        
+        for sc_name, sc_type in scenarios:
+            # A metóduson belül elkülönítjük a Real és Simulated eseteket
+            if sc_type not in results[method]:
+                results[method][sc_type] = {}
 
+            for player in players:
+                if player not in results[method][sc_type]:
+                    results[method][sc_type][player] = {}
+
+                bimatrix_path = f"{games_path}/{method}_{player}_{sc_name}_bimatrix.npy"
+                
+                if os.path.exists(bimatrix_path):
+                    bimatrix = np.load(bimatrix_path)
+                    results[method][sc_type][player] = bimatrix
+                else:
+                    print(f"Warning: Bimatrix file not found for {method} ({sc_name}, {player}) at {bimatrix_path}")
     return results
+
+def get_utility_matrix(weight, matrix, method, player):
+    real_matrix = matrix[method]['Real'][player]
+    simulated_matrix = matrix[method]['Simulated'][player]
+
+    utility_matricies = []
+
+    cfg = OmegaConf.load("conf/base.yaml") 
+    params = []
+
+    if method == "Noise":
+        params = cfg.config.noise_levels
+    else:  # method == "Suppression"
+        params = cfg.config.sup_levels
+
+    p1_grid, p2_grid = np.meshgrid(params, params, indexing='ij')
+
+    if player == "P1":
+        x = p1_grid
+    else:  # player == "P2"
+        x = p2_grid
+
+
+    if method == "Noise":
+        utility_matricies.append({"real": real_matrix - weight * (1-x)})
+        utility_matricies.append({"simulated": simulated_matrix - weight * (1-x)})
+    else:      # method == "Suppression"
+        utility_matricies.append({"real": real_matrix - weight * x/14})
+        utility_matricies.append({"simulated": simulated_matrix - weight * x/14})
+
+    return utility_matricies
 
 def search_NE(bimatrix, method, sc_name):
     # A Nash Equilibrium is a strategy profile where no player can unilaterally deviate to improve their payoff
@@ -61,26 +112,56 @@ def compare_NE_points(NE_points):
         
         print(f"{method.upper()} NE points: \n\t- P1: {p1_pts}, \n\t- P2: {p2_pts}, \n\t- Full: {full_pts}")
 
+def plot_heatmap(matrix, title, path):
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(matrix, annot=True, fmt=".3f", cmap="RdYlGn", center=0)
+
+    plt.title(title)            
+    plt.savefig(path)
+    plt.close()
+
 if __name__ == "__main__":
     mode = "half"  # Change this to "full", "half" or "quarter" if needed
-    base_path = "results/" + mode + "/"
-    # Loop through seeds and process the data to create heatmaps for both P1 and P2 accuracy drops
-    for seed in range(0, 10):
-        print("-" * 50)
-        print(f"Processing seed {seed}...")
-        games_path = f"{base_path}games/seed{seed}"
-        if not os.path.exists(games_path):
-            print(f"Missing games for seed {seed}, skipping...")
-            continue
+    games_path = "results/" + mode + "/games/average"
 
-        # Load the bimatrix files for the current seed and print their shapes to verify they are loaded correctly
-        games = load_games(games_path)
+    path = f"results/{mode}/utilities"
+    os.makedirs(path, exist_ok=True)
 
-        # Search for Nash Equilibrium points in each bimatrix
-        NE_points = []
-        for bimatrix, method, sc_name in games:
-            NE_points.append((search_NE(bimatrix, method, sc_name), method, sc_name))
+    players = [
+        {"name": "Defender", "weight": 1.0},
+        {"name": "Strategist", "weight": 0.5},
+        {"name": "Analyst", "weight": 0.0}
+    ]
+    
+    games = list(itertools.product(players, repeat=2))
 
-        # Compare P1 and P2 Nesh Equilibrium points with Full Nesh Equilibrium points to see if they align or differ significantly
-        compare_NE_points(NE_points)
-        print("-" * 50)
+    bimatrix_results = load_games(games_path)
+
+    for method in ['Noise', 'Suppression']: # Iterate over methods
+        for player in players: # Iterate over player types
+            os.makedirs(path + f"/{method}", exist_ok=True)
+
+            print (f"\nProcessing utility matrices for {method} - {player['name']}, {player['weight']}...")
+            # get the utility matrix for this game
+            p1_utility_matricies = get_utility_matrix(player['weight'], bimatrix_results, method, 'P1')
+            p2_utility_matricies = get_utility_matrix(player['weight'], bimatrix_results, method, 'P2')
+
+            # save the utility matrices to path/method/P1_playername.npy and path/method/P2_playername.npy
+            np.save(f"{path}/{method}/P1_{player['name']}_real.npy", p1_utility_matricies[0])
+            np.save(f"{path}/{method}/P1_{player['name']}_simulated.npy", p1_utility_matricies[0])
+
+            np.save(f"{path}/{method}/P2_{player['name']}_real.npy", p2_utility_matricies[1])
+            np.save(f"{path}/{method}/P2_{player['name']}_simulated.npy", p2_utility_matricies[1])
+
+            plot_heatmap(p1_utility_matricies[0]['real'], f"{method} - P1 {player['name']} Real Utility", f"{path}/{method}/P1_{player['name']}_real.png")
+            plot_heatmap(p1_utility_matricies[1]['simulated'], f"{method} - P1 {player['name']} Simulated Utility", f"{path}/{method}/P1_{player['name']}_simulated.png")
+            plot_heatmap(p2_utility_matricies[0]['real'], f"{method} - P2 {player['name']} Real Utility", f"{path}/{method}/P2_{player['name']}_real.png")
+            plot_heatmap(p2_utility_matricies[1]['simulated'], f"{method} - P2 {player['name']} Simulated Utility", f"{path}/{method}/P2_{player['name']}_simulated.png")
+            
+
+
+
+
+        # for game in games:
+        #     print(f"\nAnalyzing game between {game[0]['name']} and {game[1]['name']}...")
+

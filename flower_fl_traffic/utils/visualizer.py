@@ -138,8 +138,13 @@ def average_plot_SD():
                 all_diff.append(bimatrix[:, :, 0])
                 all_diff.append(bimatrix[:, :, 1].transpose())  
             
+
             if all_diff:
                 diff = np.mean(all_diff, axis=0)
+                # save as .npy for easy loading later
+                os.makedirs(f'{base_path}games/average', exist_ok=True)
+                np.save(f'{base_path}games/average/{method}_{sc_name}_bimatrix.npy', diff)
+                print(f"Matricies saved for {method} ({sc_name}) - Seed {seed}")
                 
                 # Plot the standard deviation heatmaps for P1 and P2 accuracy drops
                 plt.figure(figsize=(10, 8))
@@ -181,6 +186,11 @@ def average_plot_Full():
             avg_m1_diff = np.mean(avg_m1_diff, axis=0)
             avg_m2_diff = np.mean(avg_m2_diff, axis=0)
             
+            os.makedirs(f'{base_path}games/average', exist_ok=True)
+            np.save(f'{base_path}games/average/{method}_P1_Full_FL_bimatrix.npy', avg_m1_diff)
+            np.save(f'{base_path}games/average/{method}_P2_Full_FL_bimatrix.npy', avg_m2_diff)
+            print(f"Matricies saved for {method} - Seed {seed}")
+            
             # Plot the average heatmaps for P1 and P2 accuracy drops
             for p_tag, matrix in [("P1", avg_m1_diff), ("P2", avg_m2_diff)]:
                 plt.figure(figsize=(10, 8))
@@ -200,13 +210,13 @@ if __name__ == "__main__":
     mode = "half"  # "full", "half" or "quarter" based on your dataset configuration
     base_path = f"results/{mode}/"
 
-    # Loop through seeds and process the data to create heatmaps for both P1 and P2 accuracy drops
-    for seed in range(0, 10):
-        local = f"{base_path}1_local_baseline/P1/{seed}.json"
-        if not os.path.exists(local):
-            print(f"Missing results for seed {seed}, skipping...")
-            continue
-        process_and_plot(seed)
+    # # Loop through seeds and process the data to create heatmaps for both P1 and P2 accuracy drops
+    # for seed in range(0, 10):
+    #     local = f"{base_path}1_local_baseline/P1/{seed}.json"
+    #     if not os.path.exists(local):
+    #         print(f"Missing results for seed {seed}, skipping...")
+    #         continue
+    #     process_and_plot(seed)
 
     average_plot_Full()
     average_plot_SD()

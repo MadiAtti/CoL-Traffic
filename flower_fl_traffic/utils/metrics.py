@@ -1,12 +1,14 @@
 def player_specific_metrics(metrics):
     '''
-    Custom metric aggregation function for Flower that extracts and returns the accuracy for each client 
-    separately from the evaluation results provided by the clients during the federated learning process.       
+    Custom metric aggregation function for Flower that extracts and returns
+    the accuracy and loss for each client separately from the evaluation results.
     '''
-    client1_acc = metrics[0][1]["accuracy"] if len(metrics) > 0 else 0
-    client2_acc = metrics[1][1]["accuracy"] if len(metrics) > 1 else 0
+    client1_metrics = metrics[0][1] if len(metrics) > 0 else {}
+    client2_metrics = metrics[1][1] if len(metrics) > 1 else {}
 
     return {
-        "client1_accuracy": client1_acc,
-        "client2_accuracy": client2_acc
+        "client1_accuracy": client1_metrics.get("accuracy", 0),
+        "client2_accuracy": client2_metrics.get("accuracy", 0),
+        "client1_loss": client1_metrics.get("loss", 0),
+        "client2_loss": client2_metrics.get("loss", 0)
     }

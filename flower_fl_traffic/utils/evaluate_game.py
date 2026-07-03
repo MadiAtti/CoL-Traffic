@@ -129,7 +129,9 @@ if __name__ == "__main__":
 
     players = [
         {"name": "Defender", "weight": 1.0},
-        {"name": "Strategist", "weight": 0.5},
+        {"name": "Strategist1", "weight": 0.2},
+        {"name": "Strategist2", "weight": 0.3},
+        {"name": "Strategist3", "weight": 0.5},
         {"name": "Analyst", "weight": 0.0}
     ]
     
@@ -158,10 +160,13 @@ if __name__ == "__main__":
             plot_heatmap(p2_utility_matricies[0]['real'], f"{method} - P2 {player['name']} Real Utility", f"{path}/{method}/P2_{player['name']}_real.png")
             plot_heatmap(p2_utility_matricies[1]['simulated'], f"{method} - P2 {player['name']} Simulated Utility", f"{path}/{method}/P2_{player['name']}_simulated.png")
             
+        # # calculate the difference between real and simulated utility matrices for both players
+        # p1_diff_matrix = p1_utility_matricies[0]['real'] - p1_utility_matricies[1]['simulated']
+        # p2_diff_matrix = p2_utility_matricies[0]['real'] - p2_utility_matricies[1]['simulated']
 
+        # np.save(f"{path}/{method}/P1_diff.npy", p1_diff_matrix)
+        # np.save(f"{path}/{method}/P2_diff.npy", p2_diff_matrix)
 
-
-
-        # for game in games:
-        #     print(f"\nAnalyzing game between {game[0]['name']} and {game[1]['name']}...")
+        # plot_heatmap(p1_diff_matrix, f"{method} - P1 Real vs Simulated Utility Difference", f"{path}/{method}/P1_diff.png")
+        # plot_heatmap(p2_diff_matrix, f"{method} - P2 Real vs Simulated Utility Difference", f"{path}/{method}/P2_diff.png")
 

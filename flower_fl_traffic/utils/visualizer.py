@@ -114,13 +114,9 @@ def process_and_plot(seed):
                 p2_metric = exp["final_evaluation"]["P2"][analyze]
 
                 if analyze == "accuracy":
-                    # Positive: federated is better than local.
-                    # Negative: federated is worse than local.
                     m1_diff[idx1][idx2] = (p1_metric - b_p1) / (1 - b_p1)
                     m2_diff[idx1][idx2] = (p2_metric - b_p2) / (1 - b_p2)
                 else:
-                    # Positive: federated loss is higher than local loss.
-                    # Negative: federated loss is lower than local loss.
                     m1_diff[idx1][idx2] = (p1_metric - b_p1) / b_p1
                     m2_diff[idx1][idx2] = (p2_metric - b_p2) / b_p2
 
@@ -130,7 +126,6 @@ def process_and_plot(seed):
 
             for p_tag, matrix in [("P1", m1_diff), ("P2", m2_diff)]:
                 plt.figure(figsize=(10, 8))
-
                 sns.heatmap(
                     matrix,
                     annot=True,
@@ -140,196 +135,151 @@ def process_and_plot(seed):
                     xticklabels=display_params,
                     yticklabels=display_params,
                 )
-
                 plt.title(f"{method_name} ({sc_name}) - {p_tag} {title_metric} (Seed {seed})")
                 plt.xlabel("Client 2 Params")
                 plt.ylabel("Client 1 Params")
 
                 os.makedirs(f"{output_base_path}plots/seed{seed}", exist_ok=True)
                 save_path = f"{output_base_path}plots/seed{seed}/{method_name}_{sc_name}_{p_tag}.png"
-
                 plt.savefig(save_path)
                 plt.close()
-
                 print(f"Saved: {save_path}")
 
 
-def average_plot_SD():
-    title_metric = get_title_metric_name()
-
-    for method in ["Suppression", "Noise"]:
-        for sc_name in ["P1_Subnet", "P2_Subnet"]:
-            all_diff = []
-
-            for seed in range(0, 10):
-                bimatrix_path = f"{output_base_path}games/seed{seed}/{method}_{sc_name}_bimatrix.npy"
-
-                if not os.path.exists(bimatrix_path):
-                    print(f"Missing bimatrix for {method} ({sc_name}) - Seed {seed}, skipping...")
-                    print(f"Expected path: {bimatrix_path}")
-                    continue
-
-                bimatrix = np.load(bimatrix_path)
-
-                all_diff.append(bimatrix[:, :, 0])
-                all_diff.append(bimatrix[:, :, 1].transpose())
-
-            if all_diff:
-                diff = np.mean(all_diff, axis=0)
-
-                os.makedirs(f"{output_base_path}games/average", exist_ok=True)
-                save_matrix_path = f"{output_base_path}games/average/{method}_{sc_name}_bimatrix.npy"
-                np.save(save_matrix_path, diff)
-
-                print(f"Average SD matrix saved: {save_matrix_path}")
-
-                plt.figure(figsize=(10, 8))
-                sns.heatmap(diff, annot=True, fmt=".3f", cmap="RdYlGn", center=0)
-
-                plt.title(f"Average {method} ({sc_name}) - {title_metric}")
-                plt.xlabel("Client 2 Params")
-                plt.ylabel("Client 1 Params")
-
-                os.makedirs(f"{output_base_path}plots/average", exist_ok=True)
-                save_plot_path = f"{output_base_path}plots/average/{method}_{sc_name}.png"
-
-                plt.savefig(save_plot_path)
-                plt.close()
-
-                print(f"Saved: {save_plot_path}")
-
-
 def average_plot_Full():
+    """
+    Full FL esetén P1 és P2 mátrixai ugyanabban a koordinátarendszerben vannak:
+      sor    = P1 privacy paramétere
+      oszlop = P2 privacy paramétere
+
+    P2 mátrixát transzponálni kell mielőtt átlagoljuk P1-gyel,
+    mert P2 szemszögéből a saját paramétere az oszlop, de
+    P1 koordinátarendszerében ez a sor kellene legyen.
+    """
     title_metric = get_title_metric_name()
 
     for method in ["Suppression", "Noise"]:
-        avg_m1_diff = []
-        avg_m2_diff = []
+        all_P1, all_P2 = [], []
 
         for seed in range(0, 10):
-            bimatrix_path = f"{output_base_path}games/seed{seed}/{method}_Full_FL_bimatrix.npy"
+            path = f"{output_base_path}games/seed{seed}/{method}_Full_FL_bimatrix.npy"
 
-            if not os.path.exists(bimatrix_path):
+            if not os.path.exists(path):
                 print(f"Missing bimatrix for {method} (Full_FL) - Seed {seed}, skipping...")
-                print(f"Expected path: {bimatrix_path}")
                 continue
 
-            bimatrix = np.load(bimatrix_path)
+            bm = np.load(path)
+            all_P1.append(bm[:, :, 0])
+            all_P2.append(bm[:, :, 1])
 
-            avg_m1_diff.append(bimatrix[:, :, 0])
-            avg_m2_diff.append(bimatrix[:, :, 1])
-
-        if avg_m1_diff and avg_m2_diff:
-            avg_m1_diff = np.mean(avg_m1_diff, axis=0)
-            avg_m2_diff = np.mean(avg_m2_diff, axis=0)
-
-            os.makedirs(f"{output_base_path}games/average", exist_ok=True)
-
-            p1_save_path = f"{output_base_path}games/average/{method}_P1_Full_FL_bimatrix.npy"
-            p2_save_path = f"{output_base_path}games/average/{method}_P2_Full_FL_bimatrix.npy"
-
-            np.save(p1_save_path, avg_m1_diff)
-            np.save(p2_save_path, avg_m2_diff)
-
-            print(f"Average Full FL matrix saved: {p1_save_path}")
-            print(f"Average Full FL matrix saved: {p2_save_path}")
-
-            for p_tag, matrix in [("P1", avg_m1_diff), ("P2", avg_m2_diff)]:
-                plt.figure(figsize=(10, 8))
-                sns.heatmap(matrix, annot=True, fmt=".3f", cmap="RdYlGn", center=0)
-
-                plt.title(f"Average {method} (Full_FL) - {p_tag} {title_metric}")
-                plt.xlabel("Client 2 Params")
-                plt.ylabel("Client 1 Params")
-
-                os.makedirs(f"{output_base_path}plots/average", exist_ok=True)
-                save_plot_path = f"{output_base_path}plots/average/{method}_Full_FL_{p_tag}_avg.png"
-
-                plt.savefig(save_plot_path)
-                plt.close()
-
-                print(f"Saved: {save_plot_path}")
-
-
-def get_diff_matrices():
-    for method in ["Suppression", "Noise"]:
-        p1_real_path = f"{output_base_path}games/average/{method}_P1_Full_FL_bimatrix.npy"
-        p1_simulated_path = f"{output_base_path}games/average/{method}_P1_Subnet_bimatrix.npy"
-
-        p2_real_path = f"{output_base_path}games/average/{method}_P2_Full_FL_bimatrix.npy"
-        p2_simulated_path = f"{output_base_path}games/average/{method}_P2_Subnet_bimatrix.npy"
-
-        required_paths = [
-            p1_real_path,
-            p1_simulated_path,
-            p2_real_path,
-            p2_simulated_path,
-        ]
-
-        missing_paths = [path for path in required_paths if not os.path.exists(path)]
-
-        if missing_paths:
-            print(f"Skipping diff matrices for {method}, missing files:")
-            for path in missing_paths:
-                print(f"  {path}")
+        if not all_P1 or not all_P2:
             continue
 
-        p1_real = np.load(p1_real_path)
-        p1_simulated = np.load(p1_simulated_path)
+        P1 = np.mean(all_P1, axis=0)
+        P2 = np.mean(all_P2, axis=0)
 
-        p2_real = np.load(p2_real_path)
-        p2_simulated = np.load(p2_simulated_path)
+        # P2.T hogy P1 koordinátarendszerébe kerüljön, majd átlagolás
+        final_real = (P1 + P2.T) / 2
 
-        p1_diff = (p1_real - p1_simulated)
-        p2_diff = (p2_real - p2_simulated)
+        os.makedirs(f"{output_base_path}games/average", exist_ok=True)
+        np.save(f"{output_base_path}games/average/{method}_Final_Real.npy", final_real)
+        print(f"Average Full FL final matrix saved for {method}")
+        print(f"  range: [{final_real.min():.4f}, {final_real.max():.4f}]")
 
-        os.makedirs(f"{output_base_path}games/diff", exist_ok=True)
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(final_real, annot=True, fmt=".3f", cmap="RdYlGn", center=0)
+        plt.title(f"Average {method} (Full_FL) - {title_metric}")
+        plt.xlabel("Client 2 Params")
+        plt.ylabel("Client 1 Params")
 
-        p1_diff_path = f"{output_base_path}games/diff/{method}_P1_diff.npy"
-        p2_diff_path = f"{output_base_path}games/diff/{method}_P2_diff.npy"
+        os.makedirs(f"{output_base_path}plots/average", exist_ok=True)
+        save_plot_path = f"{output_base_path}games/average/{method}_Final_Real.png"
+        plt.savefig(save_plot_path)
+        plt.close()
+        print(f"Saved: {save_plot_path}")
 
-        np.save(p1_diff_path, p1_diff)
-        np.save(p2_diff_path, p2_diff)
 
-        os.makedirs(f"{output_base_path}plots/diff", exist_ok=True)
+def average_plot_SD():
+    """
+    SD esetén a logika:
+      P1_Subnet futtatás -> bimatrix[:,:,0] = P11, bimatrix[:,:,1] = P12
+      P2_Subnet futtatás -> bimatrix[:,:,0] = P21, bimatrix[:,:,1] = P22
 
-        p1_plot_path = f"{output_base_path}plots/diff/{method}_P1_diff.png"
-        p2_plot_path = f"{output_base_path}plots/diff/{method}_P2_diff.png"
+      P1_pred = (P11 + P12.T) / 2
+      P2_pred = (P22 + P21.T) / 2
+      final_pred = (P1_pred + P2_pred.T) / 2
+    """
+    title_metric = get_title_metric_name()
 
-        plot_heatmap(
-            p1_diff,
-            f"{method} - P1 Real vs Simulated {analyze} Difference",
-            p1_plot_path,
-        )
+    for method in ["Suppression", "Noise"]:
+        all_P11, all_P12 = [], []
+        all_P21, all_P22 = [], []
 
-        plot_heatmap(
-            p2_diff,
-            f"{method} - P2 Real vs Simulated {analyze} Difference",
-            p2_plot_path,
-        )
+        for seed in range(0, 10):
+            p1_path = f"{output_base_path}games/seed{seed}/{method}_P1_Subnet_bimatrix.npy"
+            p2_path = f"{output_base_path}games/seed{seed}/{method}_P2_Subnet_bimatrix.npy"
 
-        print(f"Difference matrices saved for {method}")
-        print(f"Saved: {p1_diff_path}")
-        print(f"Saved: {p2_diff_path}")
-        print(f"Saved: {p1_plot_path}")
-        print(f"Saved: {p2_plot_path}")
+            if os.path.exists(p1_path):
+                bm = np.load(p1_path)
+                all_P11.append(bm[:, :, 0])
+                all_P12.append(bm[:, :, 1])
+            else:
+                print(f"Missing: {p1_path}")
+
+            if os.path.exists(p2_path):
+                bm = np.load(p2_path)
+                all_P21.append(bm[:, :, 0])
+                all_P22.append(bm[:, :, 1])
+            else:
+                print(f"Missing: {p2_path}")
+
+        if not all_P11 or not all_P12 or not all_P21 or not all_P22:
+            print(f"Insufficient data for {method}, skipping...")
+            continue
+
+        P11 = np.mean(all_P11, axis=0)
+        P12 = np.mean(all_P12, axis=0)
+        P21 = np.mean(all_P21, axis=0)
+        P22 = np.mean(all_P22, axis=0)
+
+        P1_pred = (P11 + P12.T) / 2
+        P2_pred = (P22 + P21.T) / 2
+        final_pred = (P1_pred + P2_pred.T) / 2
+
+        os.makedirs(f"{output_base_path}games/average", exist_ok=True)
+        np.save(f"{output_base_path}games/average/{method}_Final_Pred.npy", final_pred)
+        print(f"Average SD final matrix saved for {method}")
+        print(f"  P1_pred range: [{P1_pred.min():.4f}, {P1_pred.max():.4f}]")
+        print(f"  P2_pred range: [{P2_pred.min():.4f}, {P2_pred.max():.4f}]")
+        print(f"  final_pred range: [{final_pred.min():.4f}, {final_pred.max():.4f}]")
+
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(final_pred, annot=True, fmt=".3f", cmap="RdYlGn", center=0)
+        plt.title(f"Average {method} (SD) - {title_metric}")
+        plt.xlabel("Client 2 Params")
+        plt.ylabel("Client 1 Params")
+
+        os.makedirs(f"{output_base_path}plots/average", exist_ok=True)
+        save_plot_path = f"{output_base_path}games/average/{method}_Final_Pred.png"
+        plt.savefig(save_plot_path)
+        plt.close()
+        print(f"Saved: {save_plot_path}")
 
 
 if __name__ == "__main__":
-    mode = "quarter"  # "full", "half", or "quarter"
+    mode = "half"  # "full", "half", or "quarter"
 
     input_base_path = f"results/{mode}/"
     output_base_path = f"results/{mode}/{analyze}/"
 
-    # for seed in range(0, 10):
-    #     local = f"{input_base_path}1_local_baseline/P1/{seed}.json"
+    for seed in range(0, 10):
+        local = f"{input_base_path}1_local_baseline/P1/{seed}.json"
 
-    #     if not os.path.exists(local):
-    #         print(f"Missing results for seed {seed}, skipping...")
-    #         continue
+        if not os.path.exists(local):
+            print(f"Missing results for seed {seed}, skipping...")
+            continue
 
-    #     process_and_plot(seed)
+        process_and_plot(seed)
 
-    # average_plot_Full()
-    # average_plot_SD()
-    get_diff_matrices()
+    average_plot_Full()
+    average_plot_SD()

@@ -112,7 +112,12 @@ def run_experiment(config, train_loaders, test_loaders, subdir, mode):
     if mode == "dp": # Differentially Private mode
         base_dir = f"results/{ds_mode}/3_noise"
         metric_name = "noise"
-        levels = config.config.noise_levels
+        if ds_mode == "full":
+            levels = config.config.full_noise_levels
+        elif ds_mode == "half":
+            levels = config.config.half_noise_levels
+        else:
+            raise ValueError(f"Unsupported dataset mode: {ds_mode}")
         param_keys = ["client1_noise", "client2_noise"]
     else:  # Suppression mode
         base_dir = f"results/{ds_mode}/2_suppression"

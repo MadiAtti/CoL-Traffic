@@ -1,25 +1,23 @@
-import pandas as pd
+import matplotlib.pyplot as plt
 
-dataset = pd.read_parquet("dataset/dataset.parquet")
-# dataset_full = pd.read_parquet("dataset/full/p1.parquet")
-# dataset_half = pd.read_parquet("dataset/half/p1.parquet")
-# dataset_quarter = pd.read_parquet("dataset/quarter/p1.parquet")
+for method in ["Noise", "Suppression"]:
+    real = matrices["full"][method]["real"].ravel()
+    pred = matrices["full"][method]["pred"].ravel()
 
-print(dataset.shape[0])
-# print(dataset_full.shape[0])
-# print(dataset_half.shape[0])
-# print(dataset_quarter.shape[0])
+    corr = np.corrcoef(pred, real)[0, 1]
+    print(f"\n{method}")
+    print(f"  korreláció: {corr:.4f}")
+    print(f"  pred negatív: {(pred < 0).mean():.1%}")
+    print(f"  real negatív: {(real < 0).mean():.1%}")
 
-# Nézd meg a statisztikákat a különböző split-ekre
-# print("Full Dataset statisztikák:\n", dataset_full.describe())
-
-# # Adatsűrűség kiszámítása (nem nulla értékek aránya)
-# density = dataset_full.astype(bool).sum().sum() / dataset_full.size
-# print(f"Dataset sűrűsége: {density:.4f}")
-
-# # Minimum és maximum értékek (látni fogod a -3 és +3 közötti tartományt)
-# print("Min értékek:\n", dataset_full.min())
-# print("Max értékek:\n", dataset_full.max())
-
-# az összes label kilistázása
-print("Unique labels in the dataset:", dataset['application_name'].unique())
+    plt.figure(figsize=(6, 6))
+    plt.scatter(pred, real, alpha=0.5, s=20)
+    plt.axline((0, 0), slope=1, color='r', linestyle='--', label='y=x')
+    plt.xlabel("pred")
+    plt.ylabel("real")
+    plt.title(f"{method} – pred vs real")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f"scatter_{method}.png")
+    plt.close()
+    print(f"  scatter mentve: scatter_{method}.png")

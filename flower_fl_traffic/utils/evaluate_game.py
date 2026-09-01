@@ -121,7 +121,7 @@ def plot_heatmap(matrix, title, path):
     plt.close()
 
 if __name__ == "__main__":
-    mode = "half"  # Change this to "full", "half" or "quarter" if needed
+    mode = "full"  # Change this to "full", "half" or "quarter" if needed
     games_path = "results/" + mode + "/games/average"
 
     path = f"results/{mode}/utilities"
@@ -160,13 +160,13 @@ if __name__ == "__main__":
             plot_heatmap(p2_utility_matricies[0]['real'], f"{method} - P2 {player['name']} Real Utility", f"{path}/{method}/P2_{player['name']}_real.png")
             plot_heatmap(p2_utility_matricies[1]['simulated'], f"{method} - P2 {player['name']} Simulated Utility", f"{path}/{method}/P2_{player['name']}_simulated.png")
             
-        # # calculate the difference between real and simulated utility matrices for both players
-        # p1_diff_matrix = p1_utility_matricies[0]['real'] - p1_utility_matricies[1]['simulated']
-        # p2_diff_matrix = p2_utility_matricies[0]['real'] - p2_utility_matricies[1]['simulated']
+        # calculate the difference between real and simulated utility matrices for both players
+        p1_diff_matrix = p1_utility_matricies[0]['real'] - p1_utility_matricies[1]['simulated']
+        p2_diff_matrix = p2_utility_matricies[0]['real'] - p2_utility_matricies[1]['simulated']
 
-        # np.save(f"{path}/{method}/P1_diff.npy", p1_diff_matrix)
-        # np.save(f"{path}/{method}/P2_diff.npy", p2_diff_matrix)
+        np.save(f"{path}/{method}/P1_diff.npy", p1_diff_matrix)
+        np.save(f"{path}/{method}/P2_diff.npy", p2_diff_matrix)
 
-        # plot_heatmap(p1_diff_matrix, f"{method} - P1 Real vs Simulated Utility Difference", f"{path}/{method}/P1_diff.png")
-        # plot_heatmap(p2_diff_matrix, f"{method} - P2 Real vs Simulated Utility Difference", f"{path}/{method}/P2_diff.png")
+        plot_heatmap(p1_diff_matrix, f"{method} - P1 Real vs Simulated Utility Difference", f"{path}/{method}/P1_diff.png")
+        plot_heatmap(p2_diff_matrix, f"{method} - P2 Real vs Simulated Utility Difference", f"{path}/{method}/P2_diff.png")
 

@@ -17,12 +17,12 @@ dataset: # Configuration related to the dataset, including paths and feature/tar
   mode: "half" # Mode for dataset splitting, can be "full", "half" or "quarter"
   input_path: "dataset/dataset.parquet"
   paths:
-    p1: "/p1.parquet"
-    p2: "/p2.parquet"
-    p11: "/p11.parquet"
-    p12: "/p12.parquet"
-    p21: "/p21.parquet"
-    p22: "/p22.parquet"
+    p1: "dataset/p1.parquet"
+    p2: "dataset/p2.parquet"
+    p11: "dataset/p11.parquet"
+    p12: "dataset/p12.parquet"
+    p21: "dataset/p21.parquet"
+    p22: "dataset/p22.parquet"
   feature_columns: 
     - protocol
     - bidirectional_min_ps

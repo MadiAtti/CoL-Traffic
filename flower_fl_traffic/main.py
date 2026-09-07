@@ -13,8 +13,7 @@ from experiment.local_baseline import run_local_experiment
 from utils.seed import set_seed
 from data.splitter import dataset_splitter
 
-@hydra.main(config_path="conf", config_name="base", version_base=None)
-def main(config: DictConfig):
+def run_pipeline(config: DictConfig):
     ## Execute runtime silencing
     silence_log()
 
@@ -132,4 +131,4 @@ if __name__ == "__main__":
 
         os.environ["RAY_GCS_SERVER_PORT"] = "0"
         
-        main()
+        run_pipeline(config)

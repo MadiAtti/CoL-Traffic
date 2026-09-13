@@ -101,12 +101,12 @@ def run_pipeline(config: DictConfig):
     #         test_loaders=test_loaders, 
     #         subdir=subdir, mode="sup")
         
-    #     end_time = get_time()
-    #     duration_seconds = end_time - start_time
+        end_time = get_time()
+        duration_seconds = end_time - start_time
         
-    #     # Formázás óra:perc:másodperc alakba
-    #     hours, rem = divmod(duration_seconds, 3600)
-    #     minutes, seconds = divmod(rem, 60)
+        # Formázás óra:perc:másodperc alakba
+        hours, rem = divmod(duration_seconds, 3600)
+        minutes, seconds = divmod(rem, 60)
 
     #     print(f"⏱️ Total Execution Time: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
 

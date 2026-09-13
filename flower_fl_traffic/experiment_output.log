@@ -4242,3 +4242,595 @@ ERROR flwr 2026-09-10 13:01:03,697 | ray_client_proxy.py:161 | Traceback (most r
 ValueError: 'object_refs' must either be an ObjectRef or a list of ObjectRefs.
 
 ERROR flwr 2026-09-10 13:01:03,697 | ray_client_proxy.py:162 | 'object_refs' must either be an ObjectRef or a list of ObjectRefs.
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.0 | Client2: 0.2
+✅ Scenario Finished | C1: 0.0, C2: 0.2 | Acc: 97.53%, 97.54%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.0 | Client2: 0.25
+✅ Scenario Finished | C1: 0.0, C2: 0.25 | Acc: 97.08%, 97.17%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.0 | Client2: 0.3
+✅ Scenario Finished | C1: 0.0, C2: 0.3 | Acc: 96.89%, 96.93%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.05 | Client2: 0.0
+✅ Scenario Finished | C1: 0.05, C2: 0.0 | Acc: 97.30%, 97.33%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.1 | Client2: 0.3
+✅ Scenario Finished | C1: 0.1, C2: 0.3 | Acc: 95.70%, 95.73%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.15 | Client2: 0.0
+✅ Scenario Finished | C1: 0.15, C2: 0.0 | Acc: 96.93%, 96.92%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.15 | Client2: 0.05
+✅ Scenario Finished | C1: 0.15, C2: 0.05 | Acc: 97.13%, 97.15%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.15 | Client2: 0.1
+✅ Scenario Finished | C1: 0.15, C2: 0.1 | Acc: 97.29%, 97.32%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.25
+✅ Scenario Finished | C1: 0.25, C2: 0.25 | Acc: 95.63%, 95.62%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.3
+✅ Scenario Finished | C1: 0.25, C2: 0.3 | Acc: 95.28%, 95.25%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.3 | Client2: 0.0
+✅ Scenario Finished | C1: 0.3, C2: 0.0 | Acc: 96.36%, 96.40%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.3 | Client2: 0.05
+✅ Scenario Finished | C1: 0.3, C2: 0.05 | Acc: 97.14%, 97.18%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.0 | Client2: 0.0
+✅ Scenario Finished | C1: 0.0, C2: 0.0 | Acc: 97.48%, 97.46%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.0 | Client2: 0.05
+✅ Scenario Finished | C1: 0.0, C2: 0.05 | Acc: 97.72%, 97.73%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.0 | Client2: 0.1
+✅ Scenario Finished | C1: 0.0, C2: 0.1 | Acc: 97.80%, 97.74%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.0 | Client2: 0.15
+✅ Scenario Finished | C1: 0.0, C2: 0.15 | Acc: 97.08%, 97.11%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.1 | Client2: 0.1
+✅ Scenario Finished | C1: 0.1, C2: 0.1 | Acc: 96.30%, 96.28%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.1 | Client2: 0.15
+✅ Scenario Finished | C1: 0.1, C2: 0.15 | Acc: 97.36%, 97.28%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.1 | Client2: 0.2
+✅ Scenario Finished | C1: 0.1, C2: 0.2 | Acc: 97.17%, 97.17%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.1 | Client2: 0.25
+✅ Scenario Finished | C1: 0.1, C2: 0.25 | Acc: 96.58%, 96.56%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.05
+✅ Scenario Finished | C1: 0.25, C2: 0.05 | Acc: 95.89%, 95.86%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.1
+✅ Scenario Finished | C1: 0.25, C2: 0.1 | Acc: 95.13%, 95.12%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.15
+✅ Scenario Finished | C1: 0.25, C2: 0.15 | Acc: 97.02%, 96.95%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.2
+✅ Scenario Finished | C1: 0.25, C2: 0.2 | Acc: 95.33%, 95.31%
+*** SIGTERM received at time=1789053646 on cpu 14 ***
+*** SIGTERM received at time=1789053646 on cpu 9 ***
+*** SIGTERM received at time=1789053646 on cpu 11 ***
+*** SIGTERM received at time=1789053646 on cpu 2 ***
+PC: @     0x7ddfdb325e7b  (unknown)  munmap
+    @     0x7ddfdb245330  (unknown)  (unknown)
+PC: @     0x794517b1c6dd  (unknown)  write
+    @     0x794517a45330  (unknown)  (unknown)
+    @     0x5fc301c46a7c  (unknown)  _Py_write
+[2026-09-10 15:20:46,535 E 1602636 1602636] logging.cc:361: *** SIGTERM received at time=1789053646 on cpu 2 ***
+[2026-09-10 15:20:46,536 E 1602636 1602636] logging.cc:361: PC: @     0x794517b1c6dd  (unknown)  write
+[2026-09-10 15:20:46,536 E 1602636 1602636] logging.cc:361:     @     0x794517a45330  (unknown)  (unknown)
+[2026-09-10 15:20:46,536 E 1602636 1602636] logging.cc:361:     @     0x5fc301c46a7c  (unknown)  _Py_write
+PC: @     0x7cd757c98e51  (unknown)  (unknown)
+    @     0x7cd757c45330  857443408  (unknown)
+    @     0x7cd757ca5098         96  (unknown)
+    @     0x6206dbf5832c  (unknown)  PyThread_acquire_lock_timed
+    @ ... and at least 1 more frames
+[2026-09-10 15:20:46,542 E 1602634 1602634] logging.cc:361: *** SIGTERM received at time=1789053646 on cpu 9 ***
+[2026-09-10 15:20:46,542 E 1602634 1602634] logging.cc:361: PC: @     0x7cd757c98e51  (unknown)  (unknown)
+[2026-09-10 15:20:46,542 E 1602634 1602634] logging.cc:361:     @     0x7cd757c45330  857443408  (unknown)
+[2026-09-10 15:20:46,542 E 1602634 1602634] logging.cc:361:     @     0x7cd757ca5098         96  (unknown)
+[2026-09-10 15:20:46,542 E 1602634 1602634] logging.cc:361:     @     0x6206dbf5832c  (unknown)  PyThread_acquire_lock_timed
+[2026-09-10 15:20:46,542 E 1602634 1602634] logging.cc:361:     @ ... and at least 1 more frames
+    @     0x7ddfc26665c7  (unknown)  at::MapAllocator::~MapAllocator()
+    @ ... and at least 5 more frames
+[2026-09-10 15:20:46,546 E 1602635 1602635] logging.cc:361: *** SIGTERM received at time=1789053646 on cpu 14 ***
+[2026-09-10 15:20:46,546 E 1602635 1602635] logging.cc:361: PC: @     0x7ddfdb325e7b  (unknown)  munmap
+PC: @     0x717c7aaa512f  (unknown)  sem_trywait
+[2026-09-10 15:20:46,546 E 1602635 1602635] logging.cc:361:     @     0x7ddfdb245330  (unknown)  (unknown)
+[2026-09-10 15:20:46,546 E 1602635 1602635] logging.cc:361:     @     0x7ddfc26665c7  (unknown)  at::MapAllocator::~MapAllocator()
+[2026-09-10 15:20:46,546 E 1602635 1602635] logging.cc:361:     @ ... and at least 5 more frames
+    @     0x717c7aa45330  (unknown)  (unknown)
+    @ ... and at least 1 more frames
+[2026-09-10 15:20:46,547 E 1602637 1602637] logging.cc:361: *** SIGTERM received at time=1789053646 on cpu 11 ***
+[2026-09-10 15:20:46,547 E 1602637 1602637] logging.cc:361: PC: @     0x717c7aaa512f  (unknown)  sem_trywait
+[2026-09-10 15:20:46,547 E 1602637 1602637] logging.cc:361:     @     0x717c7aa45330  (unknown)  (unknown)
+[2026-09-10 15:20:46,547 E 1602637 1602637] logging.cc:361:     @ ... and at least 1 more frames
+
+✨ All DP scenarios for  completed.
+
+################################################################################
+START EXPERIMENT: P11-P12 (DP)🚀
+################################################################################
+
+
+############################################################
+🔥 Starting Parallel Runner | Mode: DP | Processes: 4
+############################################################
+
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.0 | Client2: 0.2
+✅ Scenario Finished | C1: 0.0, C2: 0.2 | Acc: 95.75%, 95.71%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.0 | Client2: 0.25
+✅ Scenario Finished | C1: 0.0, C2: 0.25 | Acc: 96.52%, 96.59%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.0 | Client2: 0.3
+✅ Scenario Finished | C1: 0.0, C2: 0.3 | Acc: 96.88%, 96.83%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.05 | Client2: 0.0
+✅ Scenario Finished | C1: 0.05, C2: 0.0 | Acc: 95.40%, 95.34%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.1 | Client2: 0.3
+✅ Scenario Finished | C1: 0.1, C2: 0.3 | Acc: 95.13%, 95.14%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.15 | Client2: 0.0
+✅ Scenario Finished | C1: 0.15, C2: 0.0 | Acc: 94.78%, 94.79%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.15 | Client2: 0.05
+✅ Scenario Finished | C1: 0.15, C2: 0.05 | Acc: 95.11%, 95.14%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.15 | Client2: 0.1
+✅ Scenario Finished | C1: 0.15, C2: 0.1 | Acc: 94.88%, 94.88%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.05
+✅ Scenario Finished | C1: 0.25, C2: 0.05 | Acc: 96.46%, 96.46%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.1
+✅ Scenario Finished | C1: 0.25, C2: 0.1 | Acc: 94.66%, 94.65%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.15
+✅ Scenario Finished | C1: 0.25, C2: 0.15 | Acc: 94.70%, 94.75%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.2
+✅ Scenario Finished | C1: 0.25, C2: 0.2 | Acc: 96.07%, 96.09%
+*** SIGTERM received at time=1789059741 on cpu 7 ***
+*** SIGTERM received at time=1789059741 on cpu 6 ***
+*** SIGTERM received at time=1789059741 on cpu 5 ***
+*** SIGTERM received at time=1789059741 on cpu 11 ***
+PC: @     0x78fb07525e7b  (unknown)  munmap
+PC: @     0x7b5a12aa512f  (unknown)  sem_trywait
+    @     0x78fb07445330  529033120  (unknown)
+PC: @     0x7477ee2ab8e6  (unknown)  (unknown)
+    @     0x7b5a12a45330  (unknown)  (unknown)
+    @ ... and at least 1 more frames
+[2026-09-10 17:02:21,075 E 1626051 1626051] logging.cc:361: *** SIGTERM received at time=1789059741 on cpu 7 ***
+    @     0x7477ee245330  (unknown)  (unknown)
+[2026-09-10 17:02:21,075 E 1626051 1626051] logging.cc:361: PC: @     0x7b5a12aa512f  (unknown)  sem_trywait
+    @     0x7477ee2ad7f4         64  __libc_malloc
+[2026-09-10 17:02:21,075 E 1626051 1626051] logging.cc:361:     @     0x7b5a12a45330  (unknown)  (unknown)
+[2026-09-10 17:02:21,075 E 1626051 1626051] logging.cc:361:     @ ... and at least 1 more frames
+    @     0x5827cd19b9d8  (unknown)  PyObject_Malloc
+    @     0x5827cd40ad80  (unknown)  (unknown)
+[2026-09-10 17:02:21,079 E 1626054 1626054] logging.cc:361: *** SIGTERM received at time=1789059741 on cpu 5 ***
+[2026-09-10 17:02:21,083 E 1626054 1626054] logging.cc:361: PC: @     0x7477ee2ab8e6  (unknown)  (unknown)
+[2026-09-10 17:02:21,083 E 1626054 1626054] logging.cc:361:     @     0x7477ee245330  (unknown)  (unknown)
+[2026-09-10 17:02:21,083 E 1626054 1626054] logging.cc:361:     @     0x7477ee2ad7f4         64  __libc_malloc
+[2026-09-10 17:02:21,083 E 1626054 1626054] logging.cc:361:     @     0x5827cd19b9d8  (unknown)  PyObject_Malloc
+[2026-09-10 17:02:21,087 E 1626054 1626054] logging.cc:361:     @     0x5827cd40ad80  (unknown)  (unknown)
+    @     0x78faee8665c7  (unknown)  at::MapAllocator::~MapAllocator()
+    @ ... and at least 5 more frames
+[2026-09-10 17:02:21,089 E 1626053 1626053] logging.cc:361: *** SIGTERM received at time=1789059741 on cpu 6 ***
+[2026-09-10 17:02:21,089 E 1626053 1626053] logging.cc:361: PC: @     0x78fb07525e7b  (unknown)  munmap
+[2026-09-10 17:02:21,089 E 1626053 1626053] logging.cc:361:     @     0x78fb07445330  529033120  (unknown)
+[2026-09-10 17:02:21,089 E 1626053 1626053] logging.cc:361:     @     0x78faee8665c7  (unknown)  at::MapAllocator::~MapAllocator()
+[2026-09-10 17:02:21,089 E 1626053 1626053] logging.cc:361:     @ ... and at least 5 more frames
+PC: @     0x64061a89f94d  (unknown)  PyObject_GetIter
+    @     0x762b4de45330  (unknown)  (unknown)
+    @     0x64061aad9840  (unknown)  (unknown)
+[2026-09-10 17:02:21,097 E 1626052 1626052] logging.cc:361: *** SIGTERM received at time=1789059741 on cpu 11 ***
+[2026-09-10 17:02:21,097 E 1626052 1626052] logging.cc:361: PC: @     0x64061a89f94d  (unknown)  PyObject_GetIter
+[2026-09-10 17:02:21,101 E 1626052 1626052] logging.cc:361:     @     0x762b4de45330  (unknown)  (unknown)
+[2026-09-10 17:02:21,104 E 1626052 1626052] logging.cc:361:     @     0x64061aad9840  (unknown)  (unknown)
+
+✨ All DP scenarios for P1 completed.
+
+################################################################################
+START EXPERIMENT: P21-P22 (DP)🚀
+################################################################################
+
+
+############################################################
+🔥 Starting Parallel Runner | Mode: DP | Processes: 4
+############################################################
+
+*** SIGTERM received at time=1789065833 on cpu 13 ***
+*** SIGTERM received at time=1789065833 on cpu 3 ***
+*** SIGTERM received at time=1789065833 on cpu 8 ***
+*** SIGTERM received at time=1789065833 on cpu 15 ***
+PC: @     0x70ed4d725e7b  (unknown)  munmap
+    @     0x70ed4d645330  (unknown)  (unknown)
+PC: @     0x704d6b298e51  (unknown)  (unknown)
+    @     0x704d6b245330  838751520  (unknown)
+    @     0x704d6b2a5098         96  (unknown)
+    @     0x5da387f1a32c  (unknown)  PyThread_acquire_lock_timed
+    @ ... and at least 1 more frames
+[2026-09-10 18:43:53,565 E 1646197 1646197] logging.cc:361: *** SIGTERM received at time=1789065833 on cpu 13 ***
+[2026-09-10 18:43:53,565 E 1646197 1646197] logging.cc:361: PC: @     0x704d6b298e51  (unknown)  (unknown)
+[2026-09-10 18:43:53,565 E 1646197 1646197] logging.cc:361:     @     0x704d6b245330  838751520  (unknown)
+[2026-09-10 18:43:53,566 E 1646197 1646197] logging.cc:361:     @     0x704d6b2a5098         96  (unknown)
+[2026-09-10 18:43:53,566 E 1646197 1646197] logging.cc:361:     @     0x5da387f1a32c  (unknown)  PyThread_acquire_lock_timed
+[2026-09-10 18:43:53,566 E 1646197 1646197] logging.cc:361:     @ ... and at least 1 more frames
+PC: @     0x73b906098e51  (unknown)  (unknown)
+    @     0x73b906045330  (unknown)  (unknown)
+    @     0x73b9060a5098         96  (unknown)
+PC: @     0x703c736a9d3d  (unknown)  (unknown)
+    @     0x703c73645330  1395923056  (unknown)
+    @     0x703c736abb70        144  (unknown)
+    @     0x703c736ad7f4         64  __libc_malloc
+    @     0x5a73d65e932c  (unknown)  PyThread_acquire_lock_timed
+    @ ... and at least 1 more frames
+[2026-09-10 18:43:53,570 E 1646194 1646194] logging.cc:361: *** SIGTERM received at time=1789065833 on cpu 3 ***
+[2026-09-10 18:43:53,570 E 1646194 1646194] logging.cc:361: PC: @     0x73b906098e51  (unknown)  (unknown)
+[2026-09-10 18:43:53,570 E 1646194 1646194] logging.cc:361:     @     0x73b906045330  (unknown)  (unknown)
+[2026-09-10 18:43:53,570 E 1646194 1646194] logging.cc:361:     @     0x73b9060a5098         96  (unknown)
+[2026-09-10 18:43:53,570 E 1646194 1646194] logging.cc:361:     @     0x5a73d65e932c  (unknown)  PyThread_acquire_lock_timed
+[2026-09-10 18:43:53,571 E 1646194 1646194] logging.cc:361:     @ ... and at least 1 more frames
+    @     0x55f10b9f89d8  (unknown)  PyObject_Malloc
+    @     0x70ed34a665c7  (unknown)  at::MapAllocator::~MapAllocator()
+    @ ... and at least 5 more frames
+[2026-09-10 18:43:53,576 E 1646196 1646196] logging.cc:361: *** SIGTERM received at time=1789065833 on cpu 15 ***
+[2026-09-10 18:43:53,576 E 1646196 1646196] logging.cc:361: PC: @     0x70ed4d725e7b  (unknown)  munmap
+[2026-09-10 18:43:53,576 E 1646196 1646196] logging.cc:361:     @     0x70ed4d645330  (unknown)  (unknown)
+[2026-09-10 18:43:53,576 E 1646196 1646196] logging.cc:361:     @     0x70ed34a665c7  (unknown)  at::MapAllocator::~MapAllocator()
+[2026-09-10 18:43:53,576 E 1646196 1646196] logging.cc:361:     @ ... and at least 5 more frames
+    @     0x55f10bc67d80  (unknown)  (unknown)
+[2026-09-10 18:43:53,577 E 1646195 1646195] logging.cc:361: *** SIGTERM received at time=1789065833 on cpu 8 ***
+[2026-09-10 18:43:53,582 E 1646195 1646195] logging.cc:361: PC: @     0x703c736a9d3d  (unknown)  (unknown)
+[2026-09-10 18:43:53,582 E 1646195 1646195] logging.cc:361:     @     0x703c73645330  1395923056  (unknown)
+[2026-09-10 18:43:53,582 E 1646195 1646195] logging.cc:361:     @     0x703c736abb70        144  (unknown)
+[2026-09-10 18:43:53,582 E 1646195 1646195] logging.cc:361:     @     0x703c736ad7f4         64  __libc_malloc
+[2026-09-10 18:43:53,582 E 1646195 1646195] logging.cc:361:     @     0x55f10b9f89d8  (unknown)  PyObject_Malloc
+[2026-09-10 18:43:53,587 E 1646195 1646195] logging.cc:361:     @     0x55f10bc67d80  (unknown)  (unknown)
+
+✨ All DP scenarios for P2 completed.
+
+################################################################################
+RUNNING MAIN FUNCTION ITERATION 10
+################################################################################
+
+Checking for existing dataset splits at:
+ - dataset/half/p1.parquet
+ - dataset/half/p2.parquet
+Dataset splits already exist. Skipping splitting.
+
+################################################################################
+🚀 START EXPERIMENT: P1-P2 (BASELINE)🚀
+################################################################################
+
+
+--- Starting Lightning Local Baseline (Subdir: ) ---
+🚀 [PID:1666308] Starting training for M2...
+Exception ignored in atexit callback: <function _log_traced_frames at 0x78516c167b50>
+Traceback (most recent call last):
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py", line 701, in _log_traced_frames
+🚀 [PID:1666309] Starting training for M1...
+    log.info(msg)
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/logging/__init__.py", line 1476, in info
+    if self.isEnabledFor(INFO):
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/logging/__init__.py", line 1734, in isEnabledFor
+    _acquireLock()
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/logging/__init__.py", line 226, in _acquireLock
+    _lock.acquire()
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/site-packages/ray/_private/worker.py", line 1723, in sigterm_handler
+    sys.exit(signum)
+SystemExit: 15
+✅ Baseline experiment completed. Data saved to: results/half/1_local_baseline/9.json
+
+################################################################################
+🚀 START EXPERIMENT: P11-P12 (BASELINE)🚀
+################################################################################
+
+
+--- Starting Lightning Local Baseline (Subdir: P1) ---
+🚀 [PID:1666337] Starting training for M1...
+🚀 [PID:1666336] Starting training for M2...
+Exception ignored in atexit callback: <bound method finalize._exitfunc of <class 'weakref.finalize'>>
+Traceback (most recent call last):
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/weakref.py", line 657, in _exitfunc
+Exception ignored in atexit callback: <function dump_compile_times at 0x79c14a969240>
+Traceback (most recent call last):
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/site-packages/torch/_dynamo/utils.py", line 910, in dump_compile_times
+    pending = cls._select_for_exit()
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/weakref.py", line 638, in _select_for_exit
+    L = [(f,i) for (f,i) in cls._registry.items() if i.atexit]
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/weakref.py", line 638, in <listcomp>
+    L = [(f,i) for (f,i) in cls._registry.items() if i.atexit]
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/site-packages/ray/_private/worker.py", line 1723, in sigterm_handler
+    sys.exit(signum)
+SystemExit: 15
+    log.info(compile_times(repr="str", aggregate=True))
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/site-packages/torch/_dynamo/utils.py", line 896, in compile_times
+    out += tabulate(rows, headers=("Function", "Runtimes (s)"))
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/site-packages/torch/_dynamo/utils.py", line 244, in tabulate
+    import tabulate
+  File "<frozen importlib._bootstrap>", line 1022, in _find_and_load
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/site-packages/ray/_private/worker.py", line 1723, in sigterm_handler
+    sys.exit(signum)
+SystemExit: 15
+✅ Baseline experiment completed. Data saved to: results/half/1_local_baseline/P1/9.json
+
+################################################################################
+🚀 START EXPERIMENT: P21-P22 (BASELINE)🚀
+################################################################################
+
+
+--- Starting Lightning Local Baseline (Subdir: P2) ---
+🚀 [PID:1666359] Starting training for M1...
+🚀 [PID:1666358] Starting training for M2...
+Exception ignored in atexit callback: <bound method finalize._exitfunc of <class 'weakref.finalize'>>
+Traceback (most recent call last):
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/weakref.py", line 667, in _exitfunc
+Exception ignored in atexit callback: <function dump_compile_times at 0x794591ce1240>
+Traceback (most recent call last):
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/site-packages/torch/_dynamo/utils.py", line 910, in dump_compile_times
+    f()
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/weakref.py", line 591, in __call__
+    return info.func(*info.args, **(info.kwargs or {}))
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/site-packages/torch/library.py", line 479, in _del_library
+    m.reset()
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/site-packages/ray/_private/worker.py", line 1723, in sigterm_handler
+    log.info(compile_times(repr="str", aggregate=True))
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/site-packages/torch/_dynamo/utils.py", line 896, in compile_times
+    sys.exit(signum)
+SystemExit: 15
+    out += tabulate(rows, headers=("Function", "Runtimes (s)"))
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/site-packages/torch/_dynamo/utils.py", line 244, in tabulate
+    import tabulate
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1002, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 945, in _find_spec
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/site-packages/_distutils_hack/__init__.py", line 88, in find_spec
+    method_name = 'spec_for_{fullname}'.format(**locals())
+  File "/home/crysys/miniconda3/envs/flower-fl-traffic/lib/python3.10/site-packages/ray/_private/worker.py", line 1723, in sigterm_handler
+    sys.exit(signum)
+SystemExit: 15
+✅ Baseline experiment completed. Data saved to: results/half/1_local_baseline/P2/9.json
+
+################################################################################
+START EXPERIMENT: P1-P2 (DP)🚀
+################################################################################
+
+
+############################################################
+🔥 Starting Parallel Runner | Mode: DP | Processes: 4
+############################################################
+
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.05 | Client2: 0.25
+✅ Scenario Finished | C1: 0.05, C2: 0.25 | Acc: 97.03%, 96.90%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.05 | Client2: 0.3
+✅ Scenario Finished | C1: 0.05, C2: 0.3 | Acc: 95.75%, 95.76%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.1 | Client2: 0.0
+✅ Scenario Finished | C1: 0.1, C2: 0.0 | Acc: 95.74%, 95.81%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.1 | Client2: 0.05
+✅ Scenario Finished | C1: 0.1, C2: 0.05 | Acc: 96.15%, 96.14%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.2 | Client2: 0.0
+✅ Scenario Finished | C1: 0.2, C2: 0.0 | Acc: 97.42%, 97.31%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.2 | Client2: 0.05
+✅ Scenario Finished | C1: 0.2, C2: 0.05 | Acc: 97.33%, 97.25%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.2 | Client2: 0.1
+✅ Scenario Finished | C1: 0.2, C2: 0.1 | Acc: 95.86%, 95.94%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.2 | Client2: 0.15
+✅ Scenario Finished | C1: 0.2, C2: 0.15 | Acc: 96.07%, 96.11%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.05
+✅ Scenario Finished | C1: 0.25, C2: 0.05 | Acc: 95.77%, 95.88%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.1
+✅ Scenario Finished | C1: 0.25, C2: 0.1 | Acc: 97.01%, 96.95%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.15
+✅ Scenario Finished | C1: 0.25, C2: 0.15 | Acc: 97.18%, 97.24%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.2
+✅ Scenario Finished | C1: 0.25, C2: 0.2 | Acc: 95.94%, 96.01%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.05 | Client2: 0.05
+✅ Scenario Finished | C1: 0.05, C2: 0.05 | Acc: 95.85%, 95.91%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.05 | Client2: 0.1
+✅ Scenario Finished | C1: 0.05, C2: 0.1 | Acc: 97.53%, 97.56%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.05 | Client2: 0.15
+✅ Scenario Finished | C1: 0.05, C2: 0.15 | Acc: 97.04%, 96.96%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.05 | Client2: 0.2
+✅ Scenario Finished | C1: 0.05, C2: 0.2 | Acc: 97.45%, 97.49%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.1 | Client2: 0.3
+✅ Scenario Finished | C1: 0.1, C2: 0.3 | Acc: 95.66%, 95.67%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.15 | Client2: 0.0
+✅ Scenario Finished | C1: 0.15, C2: 0.0 | Acc: 97.38%, 97.46%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.15 | Client2: 0.05
+✅ Scenario Finished | C1: 0.15, C2: 0.05 | Acc: 95.78%, 95.70%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.15 | Client2: 0.1
+✅ Scenario Finished | C1: 0.15, C2: 0.1 | Acc: 97.38%, 97.40%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.25
+✅ Scenario Finished | C1: 0.25, C2: 0.25 | Acc: 96.66%, 96.62%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.25 | Client2: 0.3
+✅ Scenario Finished | C1: 0.25, C2: 0.3 | Acc: 95.28%, 95.19%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.3 | Client2: 0.0
+✅ Scenario Finished | C1: 0.3, C2: 0.0 | Acc: 96.29%, 96.22%
+
+🚀 Starting Parallel Simulation (DP) | Client1: 0.3 | Client2: 0.05
+✅ Scenario Finished | C1: 0.3, C2: 0.05 | Acc: 95.77%, 95.84%
+*** SIGTERM received at time=1789078526 on cpu 10 ***
+*** SIGTERM received at time=1789078526 on cpu 7 ***
+*** SIGTERM received at time=1789078526 on cpu 15 ***
+*** SIGTERM received at time=1789078526 on cpu 1 ***
+PC: @     0x767bb1125e7b  (unknown)  munmap
+    @     0x767bb1045330  (unknown)  (unknown)
+PC: @     0x638d7058170c  (unknown)  _PyEval_MakeFrameVector
+    @     0x78fb7f445330  182721984  (unknown)
+PC: @     0x777caec98e51  (unknown)  (unknown)
+    @     0x777caec45330  (unknown)  (unknown)
+    @     0x777caeca5098         96  (unknown)
+    @     0x5dea9a18432c  (unknown)  PyThread_acquire_lock_timed
+    @ ... and at least 1 more frames
+[2026-09-10 22:15:26,645 E 1666393 1666393] logging.cc:361: *** SIGTERM received at time=1789078526 on cpu 7 ***
+[2026-09-10 22:15:26,645 E 1666393 1666393] logging.cc:361: PC: @     0x777caec98e51  (unknown)  (unknown)
+[2026-09-10 22:15:26,646 E 1666393 1666393] logging.cc:361:     @     0x777caec45330  (unknown)  (unknown)
+PC: @     0x5ff766991ad0  (unknown)  PyLong_AsLong
+[2026-09-10 22:15:26,646 E 1666393 1666393] logging.cc:361:     @     0x777caeca5098         96  (unknown)
+[2026-09-10 22:15:26,646 E 1666393 1666393] logging.cc:361:     @     0x5dea9a18432c  (unknown)  PyThread_acquire_lock_timed
+[2026-09-10 22:15:26,646 E 1666393 1666393] logging.cc:361:     @ ... and at least 1 more frames
+    @     0x7fdcec445330  1212685664  (unknown)
+    @     0x638d707ba940  (unknown)  (unknown)
+[2026-09-10 22:15:26,647 E 1666391 1666391] logging.cc:361: *** SIGTERM received at time=1789078526 on cpu 10 ***
+[2026-09-10 22:15:26,647 E 1666391 1666391] logging.cc:361: PC: @     0x638d7058170c  (unknown)  _PyEval_MakeFrameVector
+    @     0x5ff766bbf660  (unknown)  (unknown)
+[2026-09-10 22:15:26,653 E 1666394 1666394] logging.cc:361: *** SIGTERM received at time=1789078526 on cpu 15 ***
+[2026-09-10 22:15:26,653 E 1666394 1666394] logging.cc:361: PC: @     0x5ff766991ad0  (unknown)  PyLong_AsLong
+[2026-09-10 22:15:26,656 E 1666394 1666394] logging.cc:361:     @     0x7fdcec445330  1212685664  (unknown)
+[2026-09-10 22:15:26,660 E 1666394 1666394] logging.cc:361:     @     0x5ff766bbf660  (unknown)  (unknown)
+    @     0x767b984665c7  (unknown)  at::MapAllocator::~MapAllocator()
+    @ ... and at least 5 more frames
+[2026-09-10 22:15:26,661 E 1666392 1666392] logging.cc:361: *** SIGTERM received at time=1789078526 on cpu 1 ***
+[2026-09-10 22:15:26,661 E 1666392 1666392] logging.cc:361: PC: @     0x767bb1125e7b  (unknown)  munmap
+[2026-09-10 22:15:26,661 E 1666392 1666392] logging.cc:361:     @     0x767bb1045330  (unknown)  (unknown)
+[2026-09-10 22:15:26,661 E 1666392 1666392] logging.cc:361:     @     0x767b984665c7  (unknown)  at::MapAllocator::~MapAllocator()
+[2026-09-10 22:15:26,661 E 1666392 1666392] logging.cc:361:     @ ... and at least 5 more frames
+[2026-09-10 22:15:26,666 E 1666391 1666391] logging.cc:361:     @     0x78fb7f445330  182721984  (unknown)
+[2026-09-10 22:15:26,671 E 1666391 1666391] logging.cc:361:     @     0x638d707ba940  (unknown)  (unknown)
+
+✨ All DP scenarios for  completed.
+
+################################################################################
+START EXPERIMENT: P11-P12 (DP)🚀
+################################################################################
+
+
+############################################################
+🔥 Starting Parallel Runner | Mode: DP | Processes: 4
+############################################################
+
+*** SIGTERM received at time=1789084590 on cpu 0 ***
+*** SIGTERM received at time=1789084590 on cpu 10 ***
+*** SIGTERM received at time=1789084590 on cpu 12 ***
+*** SIGTERM received at time=1789084590 on cpu 15 ***
+PC: @     0x7ee909498e51  (unknown)  (unknown)
+PC: @     0x77a02f6ab8e6  (unknown)  (unknown)
+    @     0x7ee909445330  395022304  (unknown)
+    @     0x77a02f645330  (unknown)  (unknown)
+    @     0x7ee9094a5098         96  (unknown)
+    @     0x7ee90968c56f  (unknown)  _multiprocessing_SemLock_acquire_impl
+    @     0x77a02f6ad7f4         64  __libc_malloc
+    @     0x62d4e99e09d8  (unknown)  PyObject_Malloc
+    @     0x58600851b700  (unknown)  (unknown)
+[2026-09-10 23:56:30,316 E 1688895 1688895] logging.cc:361: *** SIGTERM received at time=1789084590 on cpu 10 ***
+PC: @     0x718910e98e51  (unknown)  (unknown)
+    @     0x718910e45330  (unknown)  (unknown)
+    @     0x718910ea5098         96  (unknown)
+    @     0x62d4e9c4fd80  (unknown)  (unknown)
+[2026-09-10 23:56:30,317 E 1688894 1688894] logging.cc:361: *** SIGTERM received at time=1789084590 on cpu 0 ***
+[2026-09-10 23:56:30,319 E 1688895 1688895] logging.cc:361: PC: @     0x7ee909498e51  (unknown)  (unknown)
+[2026-09-10 23:56:30,319 E 1688895 1688895] logging.cc:361:     @     0x7ee909445330  395022304  (unknown)
+[2026-09-10 23:56:30,319 E 1688895 1688895] logging.cc:361:     @     0x7ee9094a5098         96  (unknown)
+[2026-09-10 23:56:30,319 E 1688895 1688895] logging.cc:361:     @     0x7ee90968c56f  (unknown)  _multiprocessing_SemLock_acquire_impl
+    @     0x6508f2bb432c  (unknown)  PyThread_acquire_lock_timed
+    @ ... and at least 1 more frames
+[2026-09-10 23:56:30,320 E 1688893 1688893] logging.cc:361: *** SIGTERM received at time=1789084590 on cpu 12 ***
+[2026-09-10 23:56:30,320 E 1688893 1688893] logging.cc:361: PC: @     0x718910e98e51  (unknown)  (unknown)
+[2026-09-10 23:56:30,320 E 1688893 1688893] logging.cc:361:     @     0x718910e45330  (unknown)  (unknown)
+[2026-09-10 23:56:30,321 E 1688893 1688893] logging.cc:361:     @     0x718910ea5098         96  (unknown)
+[2026-09-10 23:56:30,321 E 1688894 1688894] logging.cc:361: PC: @     0x77a02f6ab8e6  (unknown)  (unknown)
+[2026-09-10 23:56:30,321 E 1688893 1688893] logging.cc:361:     @     0x6508f2bb432c  (unknown)  PyThread_acquire_lock_timed
+[2026-09-10 23:56:30,321 E 1688893 1688893] logging.cc:361:     @ ... and at least 1 more frames
+[2026-09-10 23:56:30,321 E 1688894 1688894] logging.cc:361:     @     0x77a02f645330  (unknown)  (unknown)
+[2026-09-10 23:56:30,321 E 1688894 1688894] logging.cc:361:     @     0x77a02f6ad7f4         64  __libc_malloc
+[2026-09-10 23:56:30,321 E 1688894 1688894] logging.cc:361:     @     0x62d4e99e09d8  (unknown)  PyObject_Malloc
+PC: @     0x63507d31c394  (unknown)  _PyObject_GenericGetAttrWithDict
+    @     0x778904245330  1141262560  (unknown)
+[2026-09-10 23:56:30,323 E 1688895 1688895] logging.cc:361:     @     0x58600851b700  (unknown)  (unknown)
+[2026-09-10 23:56:30,325 E 1688894 1688894] logging.cc:361:     @     0x62d4e9c4fd80  (unknown)  (unknown)
+    @     0x6350a122dd10  (unknown)  (unknown)
+[2026-09-10 23:56:30,335 E 1688892 1688892] logging.cc:361: *** SIGTERM received at time=1789084590 on cpu 15 ***
+[2026-09-10 23:56:30,335 E 1688892 1688892] logging.cc:361: PC: @     0x63507d31c394  (unknown)  _PyObject_GenericGetAttrWithDict
+[2026-09-10 23:56:30,345 E 1688892 1688892] logging.cc:361:     @     0x778904245330  1141262560  (unknown)
+[2026-09-10 23:56:30,352 E 1688892 1688892] logging.cc:361:     @     0x6350a122dd10  (unknown)  (unknown)
+
+✨ All DP scenarios for P1 completed.
+
+################################################################################
+START EXPERIMENT: P21-P22 (DP)🚀
+################################################################################
+
+
+############################################################
+🔥 Starting Parallel Runner | Mode: DP | Processes: 4
+############################################################
+
+*** SIGTERM received at time=1789090781 on cpu 13 ***
+*** SIGTERM received at time=1789090781 on cpu 1 ***
+*** SIGTERM received at time=1789090781 on cpu 9 ***
+*** SIGTERM received at time=1789090781 on cpu 12 ***
+PC: @     0x7d4ec54ab8dc  (unknown)  (unknown)
+PC: @     0x76bdc1325e7b  (unknown)  munmap
+    @     0x7d4ec5445330  (unknown)  (unknown)
+    @     0x76bdc1245330  639621328  (unknown)
+    @     0x7d4ec54ad7f4         64  __libc_malloc
+    @     0x5645a8ad19d8  (unknown)  PyObject_Malloc
+PC: @     0x763431cb8645  (unknown)  _queue_SimpleQueue_put
+    @     0x763431a45330  (unknown)  (unknown)
+[2026-09-11 01:39:41,722 E 1709113 1709113] logging.cc:361: *** SIGTERM received at time=1789090781 on cpu 1 ***
+[2026-09-11 01:39:41,722 E 1709113 1709113] logging.cc:361: PC: @     0x763431cb8645  (unknown)  _queue_SimpleQueue_put
+[2026-09-11 01:39:41,722 E 1709113 1709113] logging.cc:361:     @     0x763431a45330  (unknown)  (unknown)
+PC: @     0x77a96f0a9d3d  (unknown)  (unknown)
+    @     0x77a96f045330  345253024  (unknown)
+    @     0x77a96f0abb70        144  (unknown)
+    @     0x77a96f0ad7f4         64  __libc_malloc
+    @     0x6480f2bee9d8  (unknown)  PyObject_Malloc
+    @     0x5645a8d40d80  (unknown)  (unknown)
+[2026-09-11 01:39:41,726 E 1709112 1709112] logging.cc:361: *** SIGTERM received at time=1789090781 on cpu 13 ***
+[2026-09-11 01:39:41,731 E 1709112 1709112] logging.cc:361: PC: @     0x7d4ec54ab8dc  (unknown)  (unknown)
+[2026-09-11 01:39:41,731 E 1709112 1709112] logging.cc:361:     @     0x7d4ec5445330  (unknown)  (unknown)
+[2026-09-11 01:39:41,731 E 1709112 1709112] logging.cc:361:     @     0x7d4ec54ad7f4         64  __libc_malloc
+[2026-09-11 01:39:41,731 E 1709112 1709112] logging.cc:361:     @     0x5645a8ad19d8  (unknown)  PyObject_Malloc
+    @     0x6480f2e5dd80  (unknown)  (unknown)
+[2026-09-11 01:39:41,732 E 1709115 1709115] logging.cc:361: *** SIGTERM received at time=1789090781 on cpu 9 ***
+[2026-09-11 01:39:41,736 E 1709115 1709115] logging.cc:361: PC: @     0x77a96f0a9d3d  (unknown)  (unknown)
+[2026-09-11 01:39:41,736 E 1709115 1709115] logging.cc:361:     @     0x77a96f045330  345253024  (unknown)
+[2026-09-11 01:39:41,737 E 1709115 1709115] logging.cc:361:     @     0x77a96f0abb70        144  (unknown)
+[2026-09-11 01:39:41,737 E 1709115 1709115] logging.cc:361:     @     0x77a96f0ad7f4         64  __libc_malloc
+[2026-09-11 01:39:41,737 E 1709115 1709115] logging.cc:361:     @     0x6480f2bee9d8  (unknown)  PyObject_Malloc
+[2026-09-11 01:39:41,737 E 1709112 1709112] logging.cc:361:     @     0x5645a8d40d80  (unknown)  (unknown)
+    @     0x76bda86665c7  (unknown)  at::MapAllocator::~MapAllocator()
+    @ ... and at least 5 more frames
+[2026-09-11 01:39:41,740 E 1709114 1709114] logging.cc:361: *** SIGTERM received at time=1789090781 on cpu 12 ***
+[2026-09-11 01:39:41,740 E 1709114 1709114] logging.cc:361: PC: @     0x76bdc1325e7b  (unknown)  munmap
+[2026-09-11 01:39:41,740 E 1709114 1709114] logging.cc:361:     @     0x76bdc1245330  639621328  (unknown)
+[2026-09-11 01:39:41,740 E 1709114 1709114] logging.cc:361:     @     0x76bda86665c7  (unknown)  at::MapAllocator::~MapAllocator()
+[2026-09-11 01:39:41,740 E 1709114 1709114] logging.cc:361:     @ ... and at least 5 more frames
+[2026-09-11 01:39:41,741 E 1709115 1709115] logging.cc:361:     @     0x6480f2e5dd80  (unknown)  (unknown)
+
+✨ All DP scenarios for P2 completed.

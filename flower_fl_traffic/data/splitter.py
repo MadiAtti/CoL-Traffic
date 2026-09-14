@@ -39,6 +39,10 @@ def dataset_splitter(cfg):
         X, _, y, _ = train_test_split(X, y, test_size=0.5, stratify=y, random_state=42)
     elif ds_mode == "quarter": # Reduce to quarter of the dataset
         X, _, y, _ = train_test_split(X, y, test_size=0.75, stratify=y, random_state=42)
+    elif ds_mode == "80percent": # Reduce to 80% of the dataset
+        X, _, y, _ = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+    elif ds_mode == "30percent": # Reduce to 30% of the dataset
+        X, _, y, _ = train_test_split(X, y, test_size=0.7, stratify=y, random_state=42)
 
     # Base -> P1, P2
     X1, X2, y1, y2 = train_test_split(X, y, test_size=ds_cfg.initial_split_ratio, stratify=y, random_state=42)

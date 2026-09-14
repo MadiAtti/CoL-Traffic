@@ -14,7 +14,7 @@ config: # Configuration for the training process, including hyperparameters and 
   sup_levels: [14, 13, 12, 11, 10, 9, 8, 7] #1-x/14 #TODO change this
 
 dataset: # Configuration related to the dataset, including paths and feature/target columns
-  mode: "half" # Mode for dataset splitting, can be "full", "half" or "quarter"
+  mode: "80percent" # Mode for dataset splitting, can be "full", "half" or "quarter"
   input_path: "dataset/dataset.parquet"
   paths:
     p1: "/p1.parquet"

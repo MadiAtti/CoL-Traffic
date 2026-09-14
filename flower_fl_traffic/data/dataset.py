@@ -12,7 +12,9 @@ def setup_directories(cfg):
     mode_dirs = [
         'full',
         'half',
-        'quarter'
+        'quarter',
+        '80percent',
+        '30percent',
     ]
     
     base_results_dirs = [

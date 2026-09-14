@@ -207,6 +207,10 @@ if __name__ == "__main__":
             traceback.print_exc()
             continue
 
+        save_path = f"results/baseline/seed_{seed}_learning_curve.csv"
+        pd.DataFrame({"percentage": pcts, "accuracy": accs}).to_csv(save_path, index=False)
+        print(f"💾 Eredmények elmentve: {save_path}")
+
     if not all_results:
         print("Nem sikerült egyetlen futást sem végrehajtani.")
     else:

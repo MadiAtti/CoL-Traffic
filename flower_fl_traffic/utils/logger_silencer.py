@@ -28,7 +28,12 @@ def silence_log():
     warnings.filterwarnings("ignore") 
     logging.captureWarnings(True) # Captures warnings into the logging system
     warnings.filterwarnings("ignore", category=UserWarning, module="torchvision.io.image")
-    
+
+    # Lightning specifikus loggerek
+    logging.getLogger("lightning.pytorch").setLevel(logging.ERROR)
+    logging.getLogger("lightning.pytorch.trainer").setLevel(logging.ERROR)
+    logging.getLogger("lightning.pytorch.utilities").setLevel(logging.ERROR)
+
     # --- 3. Logging Levels ---
     # Set all noise-makers to ERROR only
     for logger_name in ["flwr", "ray", "torch", "filelock"]:

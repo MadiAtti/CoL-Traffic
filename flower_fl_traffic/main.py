@@ -11,10 +11,9 @@ from data.dataset import prepare_data_and_loaders, setup_directories
 from experiment.experiment_runner import run_experiment
 from experiment.local_baseline import run_local_experiment
 from utils.seed import set_seed
+from data.splitter import dataset_splitter
 
-
-@hydra.main(config_path="conf", config_name="base", version_base=None)
-def main(config: DictConfig):
+def run_pipeline(config: DictConfig):
     ## Execute runtime silencing
     silence_log()
 
@@ -27,6 +26,7 @@ def main(config: DictConfig):
     OmegaConf.set_struct(config, False)
     setup_directories(config)
 
+    dataset_splitter(config)
 
     ## Prepare dataset and update config with dataset info (input_dim, num_classes)
     loaders = prepare_data_and_loaders(config)               
@@ -108,22 +108,27 @@ def main(config: DictConfig):
         hours, rem = divmod(duration_seconds, 3600)
         minutes, seconds = divmod(rem, 60)
 
-        print(f"⏱️ Total Execution Time: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
+    #     print(f"⏱️ Total Execution Time: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
 
 if __name__ == "__main__":
-    # Ensure the 'spawn' start method is used for multiprocessing.
-    # This is the default on macOS but must be explicitly set on Linux 
-    # to avoid deadlocks when using Ray/Flower within parallel processes.
-    try:
-        mp.set_start_method('spawn', force=True)
-    except RuntimeError:
-        pass
 
-    # Set Ray to use an ephemeral port for the GCS server.
-    # This prevents port collision when multiple independent Ray instances 
-    # are launched in parallel on the same machine.
-    os.environ["RAY_GCS_SERVER_PORT"] = "0"
+    start_seed = 0
+    end_seed = 9  # Run the main function multiple times with different seeds
 
-    # Now it is safe to invoke the Hydra-decorated main function.
+    for i in range(start_seed, end_seed + 1):  # Run the main function multiple times if needed
 
-    main()
+        try:
+            mp.set_start_method('spawn', force=True)
+        except RuntimeError:
+            pass
+
+        print(f"\n{'#'*80}")
+        print(f"RUNNING MAIN FUNCTION ITERATION {i+1}")
+        print(f"{'#'*80}\n")
+
+        config = OmegaConf.load("conf/base.yaml")
+        config.config.seed = i
+
+        os.environ["RAY_GCS_SERVER_PORT"] = "0"
+        
+        run_pipeline(config)

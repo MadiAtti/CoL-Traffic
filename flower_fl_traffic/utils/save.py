@@ -32,8 +32,10 @@ def save_federated_history(history, config, val1, val2, subdir, base_dir, metric
         rounds_list.append({
             "round": r + 1,
             "global_evaluation": {
-                "P1": {"accuracy": history.metrics_distributed["client1_accuracy"][r][1]},
-                "P2": {"accuracy": history.metrics_distributed["client2_accuracy"][r][1]}
+                "P1": {"accuracy": history.metrics_distributed["client1_accuracy"][r][1],
+                        "loss": history.metrics_distributed["client1_loss"][r][1]},
+                "P2": {"accuracy": history.metrics_distributed["client2_accuracy"][r][1],
+                        "loss": history.metrics_distributed["client2_loss"][r][1]}
             },
             "loss": history.losses_distributed[r][1]
         })
@@ -44,8 +46,10 @@ def save_federated_history(history, config, val1, val2, subdir, base_dir, metric
         f"{metric_name}_p2": val2,
         "rounds": rounds_list,
         "final_evaluation": {
-            "P1": {"accuracy": history.metrics_distributed["client1_accuracy"][-1][1]},
-            "P2": {"accuracy": history.metrics_distributed["client2_accuracy"][-1][1]}
+            "P1": {"accuracy": history.metrics_distributed["client1_accuracy"][-1][1], 
+                    "loss": history.metrics_distributed["client1_loss"][-1][1]},
+            "P2": {"accuracy": history.metrics_distributed["client2_accuracy"][-1][1], 
+                    "loss": history.metrics_distributed["client2_loss"][-1][1]}
         }
     }
 

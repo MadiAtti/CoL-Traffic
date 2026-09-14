@@ -76,7 +76,7 @@ class UniversalTrafficClient(fl.client.NumPyClient):
         # Use the original evaluation function to compute loss and accuracy on the test set
         loss, accuracy = evaluate_model(self.model, self.testloader, criterion)
         
-        return float(loss), len(self.testloader.dataset), {"accuracy": float(accuracy)}
+        return float(loss), len(self.testloader.dataset), {"accuracy": float(accuracy), "loss": float(loss)}
 
 # Factory function to create a client_fn for Flower that initializes 
 # UniversalTrafficClient instances with the appropriate data loaders and configuration

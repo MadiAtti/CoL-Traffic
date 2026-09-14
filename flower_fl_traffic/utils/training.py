@@ -28,7 +28,6 @@ def train_dp(model, loader, optimizer, epochs, noise, max_grad_norm, device):
     # ModuleValidator.fix() replaces BatchNorm with GroupNorm automatically.
     if not ModuleValidator.is_valid(model):
         model = ModuleValidator.fix(model)
-    
     model.to(device)
 
     # 2. PRIVACY ENGINE INITIALIZATION
@@ -40,7 +39,7 @@ def train_dp(model, loader, optimizer, epochs, noise, max_grad_norm, device):
     # provides fixed-size batches/iterators.
     model, optimizer, loader = privacy_engine.make_private(
         module=model,
-        optimizer=optimizer,
+        optimizer=optimizer,    
         data_loader=loader,
         noise_multiplier=noise,
         max_grad_norm=max_grad_norm,

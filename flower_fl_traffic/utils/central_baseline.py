@@ -43,7 +43,7 @@ LR            = 1e-3
 NUM_EPOCHS    = 40
 TEST_SPLIT    = 0.2
 NUM_CHUNKS    = 20
-NUM_WORKERS   = min(5, cpu_count())
+NUM_WORKERS   = 2
 
 
 def load_dataset(seed: int) -> tuple:
@@ -68,7 +68,9 @@ def train_step(
     seed: int,
 ) -> float:
     set_seed(seed)
-    torch.set_num_threads(2)
+    torch.set_num_threads(1)
+    os.environ["OMP_NUM_THREADS"] = "1"
+    os.environ["MKL_NUM_THREADS"] = "1"
 
     train_loader = DataLoader(
         CustomDataset(X_train.astype(np.float32), y_train.astype(np.int32)),

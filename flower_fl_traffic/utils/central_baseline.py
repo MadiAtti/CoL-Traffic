@@ -1,7 +1,6 @@
 import os
 import sys
 
-# Ha utils/ mappából futtatják, adjuk hozzá a projekt gyökerét a path-hoz
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import torch
@@ -12,17 +11,15 @@ import lightning as L
 from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+from multiprocessing import Pool, cpu_count
 import logging
 
-# Suppress Lightning's verbose output
 logging.getLogger("lightning.pytorch").setLevel(logging.ERROR)
 
-# ── importok a saját modulokból ──────────────────────────────────────────────
 from seed import set_seed
 from data.custom_dataset import CustomDataset
 from models.neural_network import TrafficLightningModule
 
-# ── konstansok ───────────────────────────────────────────────────────────────
 FEATURE_COLUMNS = [
     "protocol",
     "bidirectional_min_ps",
@@ -40,26 +37,18 @@ FEATURE_COLUMNS = [
     "bidirectional_rst_packets",
 ]
 TARGET_COLUMN = "application_name"
-INPUT_DIM     = len(FEATURE_COLUMNS)  # 14
+INPUT_DIM     = len(FEATURE_COLUMNS)
 BATCH_SIZE    = 256
 LR            = 1e-3
-NUM_EPOCHS    = 40   # fix epoch, early stop nincs
+NUM_EPOCHS    = 40
 TEST_SPLIT    = 0.2
-NUM_CHUNKS    = 20   # 5% … 100%
+NUM_CHUNKS    = 20
+NUM_WORKERS   = min(5, cpu_count())
 
 
-# ── adatbetöltés ─────────────────────────────────────────────────────────────
 def load_dataset(seed: int) -> tuple:
-    """
-    Beolvassa a parquet-et, LabelEncoder-rel számmá alakítja a string
-    osztálycímkéket (pl. 'WhatsApp' → 0..N), seed alapján megkeveri,
-    majd 20 egyenlő részre osztja.
-    Visszaadja: (chunk_dict, num_classes)
-    """
     df = pd.read_parquet("dataset/dataset.parquet")
 
-    # String → integer enkódolás (fit a teljes adaton, így minden seed-nél
-    # azonos osztály→szám megfeleltetés garantált)
     le = LabelEncoder()
     df[TARGET_COLUMN] = le.fit_transform(df[TARGET_COLUMN])
     num_classes = len(le.classes_)
@@ -70,7 +59,6 @@ def load_dataset(seed: int) -> tuple:
     return {f"chunk_{i}": chunk for i, chunk in enumerate(chunks)}, num_classes
 
 
-# ── egy lépés tanítása ────────────────────────────────────────────────────────
 def train_step(
     X_train: np.ndarray,
     y_train: np.ndarray,
@@ -79,11 +67,8 @@ def train_step(
     num_classes: int,
     seed: int,
 ) -> float:
-    """
-    Friss modellt tanít a megadott adatokon, majd kiértékeli a teszt halmazon.
-    Early stop nincs – fix NUM_EPOCHS epoch fut le.
-    """
     set_seed(seed)
+    torch.set_num_threads(2)
 
     train_loader = DataLoader(
         CustomDataset(X_train.astype(np.float32), y_train.astype(np.int32)),
@@ -118,12 +103,7 @@ def train_step(
     return float(metrics["val_acc"])
 
 
-# ── egy seed teljes futása ─────────────────────────────────────────────────────
 def train_and_evaluate(dataset_chunks: dict, num_classes: int, seed: int):
-    """
-    Kumulatívan bővíti a tanítókészletet chunk-onként (5% → 100%).
-    Minden lépésben a kumulált adat 80/20 split-jén tanít és értékel.
-    """
     percentages = []
     accuracies  = []
     accumulated = pd.DataFrame()
@@ -132,7 +112,7 @@ def train_and_evaluate(dataset_chunks: dict, num_classes: int, seed: int):
         accumulated = pd.concat(
             [accumulated, dataset_chunks[f"chunk_{i}"]], ignore_index=True
         )
-        current_pct = (i + 1) * 5  # 5, 10, …, 100
+        current_pct = (i + 1) * 5
 
         X_all = accumulated[FEATURE_COLUMNS].values.astype(np.float32)
         y_all = accumulated[TARGET_COLUMN].values.astype(np.int32)
@@ -156,7 +136,29 @@ def train_and_evaluate(dataset_chunks: dict, num_classes: int, seed: int):
     return percentages, accuracies
 
 
-# ── vizualizáció ──────────────────────────────────────────────────────────────
+def run_seed(seed: int):
+    try:
+        print(f"\n{'#'*70}")
+        print(f"  SEED: {seed} 🚀")
+        print(f"{'#'*70}")
+
+        set_seed(seed)
+        chunks, num_classes = load_dataset(seed=seed)
+        pcts, accs = train_and_evaluate(chunks, num_classes, seed=seed)
+
+        save_path = f"results/baseline/seed_{seed}_learning_curve.csv"
+        pd.DataFrame({"percentage": pcts, "accuracy": accs}).to_csv(save_path, index=False)
+        print(f"💾 Eredmények elmentve: {save_path}")
+
+        return seed, pcts, accs
+
+    except Exception as e:
+        import traceback
+        print(f"❌ Hiba seed={seed} esetén: {e}")
+        traceback.print_exc()
+        return seed, None, None
+
+
 def plot_results(avg_accuracies: dict):
     output_dir = "results/baseline"
     os.makedirs(output_dir, exist_ok=True)
@@ -180,36 +182,26 @@ def plot_results(avg_accuracies: dict):
 
     plot_path = os.path.join(output_dir, "averaged_learning_curve.png")
     plt.savefig(plot_path, dpi=300, bbox_inches="tight")
-    plt.close()  # GUI-blokkolás elkerülése
+    plt.close()
     print(f"📊 Diagram elmentve: {plot_path}")
 
 
-# ── belépési pont ─────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     START_SEED = 0
     END_SEED   = 9
-    all_results = {}
 
-    for seed in range(START_SEED, END_SEED + 1):
-        try:
-            print(f"\n{'#'*70}")
-            print(f"  SEED: {seed} 🚀")
-            print(f"{'#'*70}")
+    os.makedirs("results/baseline", exist_ok=True)
 
-            set_seed(seed)
-            chunks, num_classes = load_dataset(seed=seed)
-            pcts, accs = train_and_evaluate(chunks, num_classes, seed=seed)
-            all_results[seed] = (pcts, accs)
+    print(f"🔧 Párhuzamos workerek száma: {NUM_WORKERS}")
 
-        except Exception as e:
-            import traceback
-            print(f"❌ Hiba seed={seed} esetén: {e}")
-            traceback.print_exc()
-            continue
+    with Pool(processes=NUM_WORKERS) as pool:
+        results = pool.map(run_seed, range(START_SEED, END_SEED + 1))
 
-        save_path = f"results/baseline/seed_{seed}_learning_curve.csv"
-        pd.DataFrame({"percentage": pcts, "accuracy": accs}).to_csv(save_path, index=False)
-        print(f"💾 Eredmények elmentve: {save_path}")
+    all_results = {
+        seed: (pcts, accs)
+        for seed, pcts, accs in results
+        if pcts is not None
+    }
 
     if not all_results:
         print("Nem sikerült egyetlen futást sem végrehajtani.")
@@ -223,7 +215,6 @@ if __name__ == "__main__":
 
         avg_accuracies = {pct: sum_acc[pct] / counts[pct] for pct in sorted(sum_acc)}
 
-        os.makedirs("results/baseline", exist_ok=True)
         results_df = pd.DataFrame(
             list(avg_accuracies.items()),
             columns=["percentage", "mean_accuracy"],

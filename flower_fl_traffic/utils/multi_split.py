@@ -42,7 +42,7 @@ from sklearn.preprocessing import LabelEncoder
 # ──────────────────────────────────────────────────────────────────────────────
 
 SEEDS       = list(range(10))          # 0 … 9
-NUM_WORKERS = min(4, len(SEEDS))       # parallel seeds (tune to your CPU)
+NUM_WORKERS = 2       # parallel seeds (tune to your CPU)
 RESULTS_DIR = Path("results/multi-split")
 
 TARGET_COLUMN = "application_name"

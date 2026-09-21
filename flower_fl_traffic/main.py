@@ -1,4 +1,5 @@
 # --- CRITICAL: Import silencer FIRST to set environment variables ---
+from experiment import run_max_privacy_experiment
 from utils.logger_silencer import silence_log
 
 import os
@@ -46,67 +47,81 @@ def run_pipeline(config: DictConfig):
         ("P21-P22", "p21", "p22", "P2") 
     ]
 
-    ## Run local baseline experiments (M1, M2, M11, M12, M21, M22)
+    # ## Run local baseline experiments (M1, M2, M11, M12, M21, M22)
+    # for exp_name, client1_key, client2_key, subdir in experiments:
+    #     print(f"\n{'#'*80}")
+    #     print(f"🚀 START EXPERIMENT: {exp_name} (BASELINE)🚀")
+    #     print(f"{'#'*80}\n")
+
+    #     # setup train and test loaders for the current experiment
+    #     train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
+    #     test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
+        
+    #     # run the local experiment and save results
+    #     run_local_experiment(
+    #         config=config, 
+    #         train_loaders=train_loaders, 
+    #         test_loaders=test_loaders, 
+    #         subdir=subdir,
+    #         client_ids=[client1_key, client2_key]
+    #     )
+
+
+    # ## Run experiments with different noise levels
+    # for exp_name, client1_key, client2_key, subdir in experiments:
+    #     print(f"\n{'#'*80}")
+    #     print(f"START EXPERIMENT: {exp_name} (DP)🚀")
+    #     print(f"{'#'*80}\n")
+
+    #     # setup train and test loaders for the current experiment
+    #     train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
+    #     test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
+
+    #     #run the federated experiment with DP and save results
+    #     run_experiment(
+    #         config=config, 
+    #         train_loaders=train_loaders, 
+    #         test_loaders=test_loaders, 
+    #         subdir=subdir, mode="dp")
+
+
+    # ## Run experiments with different suppression levels
+    # for exp_name, client1_key, client2_key, subdir in experiments:
+    #     print(f"\n{'#'*80}")
+    #     print(f"START EXPERIMENT: {exp_name} (SUP)🚀")
+    #     print(f"{'#'*80}\n")
+
+    #     # setup train and test loaders for the current experiment
+    #     train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
+    #     test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
+
+    #     # run the federated experiment with feature suppression and save results
+    #     run_experiment(
+    #         config=config, 
+    #         train_loaders=train_loaders, 
+    #         test_loaders=test_loaders, 
+    #         subdir=subdir, mode="sup")
+
+    ##Run experiment whit max privacy
     for exp_name, client1_key, client2_key, subdir in experiments:
         print(f"\n{'#'*80}")
-        print(f"🚀 START EXPERIMENT: {exp_name} (BASELINE)🚀")
+        print(f"START EXPERIMENT: {exp_name} (MAX PRIVACY)🚀")
         print(f"{'#'*80}\n")
 
         # setup train and test loaders for the current experiment
         train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
         test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
+
+        run_max_privacy_experiment(config, train_loaders, test_loaders, subdir, mode="dp")
+        run_max_privacy_experiment(config, train_loaders, test_loaders, subdir, mode="sup")
+
         
-        # run the local experiment and save results
-        run_local_experiment(
-            config=config, 
-            train_loaders=train_loaders, 
-            test_loaders=test_loaders, 
-            subdir=subdir,
-            client_ids=[client1_key, client2_key]
-        )
-
-
-    ## Run experiments with different noise levels
-    for exp_name, client1_key, client2_key, subdir in experiments:
-        print(f"\n{'#'*80}")
-        print(f"START EXPERIMENT: {exp_name} (DP)🚀")
-        print(f"{'#'*80}\n")
-
-        # setup train and test loaders for the current experiment
-        train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
-        test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
-
-        #run the federated experiment with DP and save results
-        run_experiment(
-            config=config, 
-            train_loaders=train_loaders, 
-            test_loaders=test_loaders, 
-            subdir=subdir, mode="dp")
-
-
-    ## Run experiments with different suppression levels
-    for exp_name, client1_key, client2_key, subdir in experiments:
-        print(f"\n{'#'*80}")
-        print(f"START EXPERIMENT: {exp_name} (SUP)🚀")
-        print(f"{'#'*80}\n")
-
-        # setup train and test loaders for the current experiment
-        train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
-        test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
-
-        # run the federated experiment with feature suppression and save results
-        run_experiment(
-            config=config, 
-            train_loaders=train_loaders, 
-            test_loaders=test_loaders, 
-            subdir=subdir, mode="sup")
-        
-        end_time = get_time()
-        duration_seconds = end_time - start_time
-        
-        # Formázás óra:perc:másodperc alakba
-        hours, rem = divmod(duration_seconds, 3600)
-        minutes, seconds = divmod(rem, 60)
+    end_time = get_time()
+    duration_seconds = end_time - start_time
+    
+    # Formázás óra:perc:másodperc alakba
+    hours, rem = divmod(duration_seconds, 3600)
+    minutes, seconds = divmod(rem, 60)
 
     #     print(f"⏱️ Total Execution Time: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
 

@@ -59,12 +59,6 @@ class EchoClient(fl.client.NumPyClient):
     def fit(self, parameters, config):
         self.set_parameters(parameters)          # betölti, de nem tanít
 
-        print(
-            f"[EchoClient cid={self.cid}] "
-            "fit() -> szerver sullyok visszaadva valtozatlanul (max privacy).",
-            flush=True,
-        )
-
         return self.get_parameters(config={}), 0, {}
         #                                      ^
         #                          0 sample: a szerver tudja, hogy

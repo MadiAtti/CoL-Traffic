@@ -1,5 +1,5 @@
 # --- CRITICAL: Import silencer FIRST to set environment variables ---
-from experiment import run_max_privacy_experiment
+from experiment.run_max_privacy_experiment import run_max_privacy_experiment
 from utils.logger_silencer import silence_log
 
 import os

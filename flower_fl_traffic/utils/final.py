@@ -1,6 +1,7 @@
 import os
 import warnings
 from matplotlib import pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap, TwoSlopeNorm
 import numpy as np
 import seaborn as sns
 from scipy.optimize import minimize, differential_evolution
@@ -8,6 +9,53 @@ from sklearn.isotonic import IsotonicRegression
 from sklearn.metrics import mean_squared_error
 
 base_path = "results/"
+
+# --- Shared visual style ---
+RWG_CMAP = LinearSegmentedColormap.from_list("RedWhiteGreen", ["#d73027", "#ffffff", "#1a9850"])
+HEATMAP_FONT = {
+    "font.size": 16,
+    "axes.titlesize": 20,
+    "axes.labelsize": 18,
+    "xtick.labelsize": 14,
+    "ytick.labelsize": 14,
+}
+
+
+def _make_norm(matrix: np.ndarray) -> TwoSlopeNorm:
+    v_min = float(np.nanmin(matrix))
+    v_max = float(np.nanmax(matrix))
+    if v_min >= 0:
+        v_min = -1e-2
+    if v_max <= 0:
+        v_max = 1e-2
+    return TwoSlopeNorm(vmin=v_min, vcenter=0.0, vmax=v_max)
+
+
+def save_heatmap(matrix: np.ndarray, title: str, filepath: str,
+                 xlabel: str = "Client 2 Params", ylabel: str = "Client 1 Params",
+                 cbar_label: str = "Relative Accuracy Improvement",
+                 tick_labels=None) -> None:
+    norm = _make_norm(matrix)
+    with plt.rc_context(HEATMAP_FONT):
+        plt.figure(figsize=(12, 9))
+        sns.heatmap(
+            matrix,
+            annot=True,
+            fmt=".3f",
+            cmap=RWG_CMAP,
+            norm=norm,
+            annot_kws={"size": 12},
+            xticklabels=tick_labels if tick_labels is not None else "auto",
+            yticklabels=tick_labels if tick_labels is not None else "auto",
+            cbar_kws={"label": cbar_label},
+        )
+        plt.title(title)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.tight_layout()
+        plt.savefig(filepath, dpi=300, bbox_inches="tight")
+        plt.close()
+    print(f"Heatmap mentve: {filepath}")
 
 
 def monotonize_matrix(matrix):
@@ -38,27 +86,6 @@ def apply_f(phi_tilde, D_n, grid, params):
 
 def rmse(a, b):
     return np.sqrt(mean_squared_error(a.ravel(), b.ravel()))
-
-
-def save_heatmap(matrix, title, filepath):
-    """
-    Heatmap mentése a seaborn stílusnak megfelelően (RdYlGn színskála, annotációk, középre igazított center=0).
-    """
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(
-        matrix,
-        annot=True,
-        fmt=".3f",
-        cmap="RdYlGn",
-        center=0,
-    )
-    plt.title(title)
-    plt.xlabel("Client 2 Params")
-    plt.ylabel("Client 1 Params")
-    plt.tight_layout()
-    plt.savefig(filepath)
-    plt.close()
-    print(f"Heatmap mentve: {filepath}")
 
 
 def get_final_matrices():
@@ -160,19 +187,15 @@ def main():
             grid_full, grid_half
         )
 
-        # Mappák létrehozása
         os.makedirs(f"{base_path}full/transformed/", exist_ok=True)
         os.makedirs(f"{base_path}half/transformed/", exist_ok=True)
 
-        # .npy fájlok mentése
         np.save(f"{base_path}full/transformed/{method}_Transformed.npy", transformed_full)
         np.save(f"{base_path}half/transformed/{method}_Transformed.npy", transformed_half)
         np.save(f"{base_path}full/transformed/{method}_Params.npy", params)
 
-        # Heatmapok mentése az új, Seaborn alapú stílusban (.png)
         save_heatmap(transformed_full, f"Full Transformed – {method} (Relative Accuracy Improvement)", f"{base_path}full/transformed/{method}_Transformed.png")
         save_heatmap(transformed_half, f"Half Transformed – {method} (Relative Accuracy Improvement)", f"{base_path}half/transformed/{method}_Transformed.png")
-        
         save_heatmap(real_full, f"Full Real – {method} (Relative Accuracy Improvement)", f"{base_path}full/transformed/{method}_Real_heatmap.png")
         save_heatmap(real_half, f"Half Real – {method} (Relative Accuracy Improvement)", f"{base_path}half/transformed/{method}_Real_heatmap.png")
 
@@ -193,6 +216,7 @@ def main():
         plt.savefig(f"scatter_{method}.png")
         plt.close()
         print(f"  scatter mentve: scatter_{method}.png")
+
 
 if __name__ == "__main__":
     main()

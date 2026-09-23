@@ -4,18 +4,63 @@ import os
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-
-from evaluate_game import plot_heatmap
+from matplotlib.colors import LinearSegmentedColormap, TwoSlopeNorm
 
 
 analyze = "accuracy"  # "accuracy" or "loss"
 
+# --- Shared visual style ---
+RWG_CMAP = LinearSegmentedColormap.from_list("RedWhiteGreen", ["#d73027", "#ffffff", "#1a9850"])
+HEATMAP_FONT = {
+    "font.size": 16,
+    "axes.titlesize": 20,
+    "axes.labelsize": 18,
+    "xtick.labelsize": 14,
+    "ytick.labelsize": 14,
+}
+
+
+def _make_norm(matrix: np.ndarray) -> TwoSlopeNorm:
+    v_min = float(np.nanmin(matrix))
+    v_max = float(np.nanmax(matrix))
+    if v_min >= 0:
+        v_min = -1e-2
+    if v_max <= 0:
+        v_max = 1e-2
+    return TwoSlopeNorm(vmin=v_min, vcenter=0.0, vmax=v_max)
+
+
+def _save_heatmap(matrix: np.ndarray, title: str, xlabel: str, ylabel: str,
+                  save_path: str, tick_labels=None) -> None:
+    norm = _make_norm(matrix)
+    with plt.rc_context(HEATMAP_FONT):
+        plt.figure(figsize=(12, 9))
+        sns.heatmap(
+            matrix,
+            annot=True,
+            fmt=".3f",
+            cmap=RWG_CMAP,
+            norm=norm,
+            annot_kws={"size": 12},
+            xticklabels=tick_labels if tick_labels is not None else "auto",
+            yticklabels=tick_labels if tick_labels is not None else "auto",
+            cbar_kws={"label": get_title_metric_name()},
+        )
+        plt.title(title)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.tight_layout()
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
+        plt.close()
+    print(f"Saved: {save_path}")
+
+
+# ------------------------------------------------------------------
 
 def load_json(path):
     if not os.path.exists(path):
         print(f"File not found: {path}")
         return None
-
     with open(path, "r") as f:
         return json.load(f)
 
@@ -53,7 +98,6 @@ def save_matrices(m1_diff, m2_diff, params, method_name, sc_name, seed):
 
     save_path = f"{output_base_path}games/seed{seed}/{method_name}_{sc_name}_bimatrix.npy"
     np.save(save_path, bimatrix)
-
     print(f"Matrix saved: {save_path}")
 
 
@@ -63,13 +107,10 @@ def process_and_plot(seed):
         ("P1/", "P1_Subnet"),
         ("P2/", "P2_Subnet"),
     ]
-
     methods = [
         ("2_suppression/", "Suppression"),
         ("3_noise/", "Noise"),
     ]
-
-    title_metric = get_title_metric_name()
 
     for method_path, method_name in methods:
         for sub_path, sc_name in folders:
@@ -88,7 +129,16 @@ def process_and_plot(seed):
             config_data = fed_data["parameters"]["config"]
 
             if method_name == "Noise":
-                params = config_data["noise_levels"]
+                if mode == "full":
+                    level = "full_noise_levels"
+                elif mode == "half":
+                    level = "half_noise_levels"
+                elif mode == "80percent":
+                    level = "80percent_noise_levels"
+                elif mode == "30percent":
+                    level = "30percent_noise_levels"
+                
+                params = config_data[level]
                 k1, k2 = "noise_p1", "noise_p2"
             else:
                 params = config_data["sup_levels"]
@@ -103,7 +153,6 @@ def process_and_plot(seed):
             for exp in experiments:
                 val1 = exp[k1]
                 val2 = exp[k2]
-
                 try:
                     idx1 = params.index(val1)
                     idx2 = params.index(val2)
@@ -123,51 +172,28 @@ def process_and_plot(seed):
             save_matrices(m1_diff, m2_diff, params, method_name, sc_name, seed)
 
             display_params = [0.0 if x is None else x for x in params]
+            os.makedirs(f"{output_base_path}plots/seed{seed}", exist_ok=True)
 
             for p_tag, matrix in [("P1", m1_diff), ("P2", m2_diff)]:
-                plt.figure(figsize=(10, 8))
-                sns.heatmap(
-                    matrix,
-                    annot=True,
-                    fmt=".3f",
-                    cmap="RdYlGn",
-                    center=0,
-                    xticklabels=display_params,
-                    yticklabels=display_params,
+                _save_heatmap(
+                    matrix=matrix,
+                    title=f"{method_name} ({sc_name}) - {p_tag} {get_title_metric_name()} (Seed {seed})",
+                    xlabel="Client 2 Params",
+                    ylabel="Client 1 Params",
+                    save_path=f"{output_base_path}plots/seed{seed}/{method_name}_{sc_name}_{p_tag}.png",
+                    tick_labels=display_params,
                 )
-                plt.title(f"{method_name} ({sc_name}) - {p_tag} {title_metric} (Seed {seed})")
-                plt.xlabel("Client 2 Params")
-                plt.ylabel("Client 1 Params")
-
-                os.makedirs(f"{output_base_path}plots/seed{seed}", exist_ok=True)
-                save_path = f"{output_base_path}plots/seed{seed}/{method_name}_{sc_name}_{p_tag}.png"
-                plt.savefig(save_path)
-                plt.close()
-                print(f"Saved: {save_path}")
 
 
 def average_plot_Full():
-    """
-    Full FL esetén P1 és P2 mátrixai ugyanabban a koordinátarendszerben vannak:
-      sor    = P1 privacy paramétere
-      oszlop = P2 privacy paramétere
-
-    P2 mátrixát transzponálni kell mielőtt átlagoljuk P1-gyel,
-    mert P2 szemszögéből a saját paramétere az oszlop, de
-    P1 koordinátarendszerében ez a sor kellene legyen.
-    """
-    title_metric = get_title_metric_name()
-
     for method in ["Suppression", "Noise"]:
         all_P1, all_P2 = [], []
 
         for seed in range(0, 10):
             path = f"{output_base_path}games/seed{seed}/{method}_Full_FL_bimatrix.npy"
-
             if not os.path.exists(path):
                 print(f"Missing bimatrix for {method} (Full_FL) - Seed {seed}, skipping...")
                 continue
-
             bm = np.load(path)
             all_P1.append(bm[:, :, 0])
             all_P2.append(bm[:, :, 1])
@@ -177,8 +203,6 @@ def average_plot_Full():
 
         P1 = np.mean(all_P1, axis=0)
         P2 = np.mean(all_P2, axis=0)
-
-        # P2.T hogy P1 koordinátarendszerébe kerüljön, majd átlagolás
         final_real = (P1 + P2.T) / 2
 
         os.makedirs(f"{output_base_path}games/average", exist_ok=True)
@@ -186,31 +210,17 @@ def average_plot_Full():
         print(f"Average Full FL final matrix saved for {method}")
         print(f"  range: [{final_real.min():.4f}, {final_real.max():.4f}]")
 
-        plt.figure(figsize=(10, 8))
-        sns.heatmap(final_real, annot=True, fmt=".3f", cmap="RdYlGn", center=0)
-        plt.title(f"Average {method} (Full_FL) - {title_metric}")
-        plt.xlabel("Client 2 Params")
-        plt.ylabel("Client 1 Params")
-
         os.makedirs(f"{output_base_path}plots/average", exist_ok=True)
-        save_plot_path = f"{output_base_path}games/average/{method}_Final_Real.png"
-        plt.savefig(save_plot_path)
-        plt.close()
-        print(f"Saved: {save_plot_path}")
+        _save_heatmap(
+            matrix=final_real,
+            title=f"Average {method} (Full_FL) - {get_title_metric_name()}",
+            xlabel="Client 2 Params",
+            ylabel="Client 1 Params",
+            save_path=f"{output_base_path}games/average/{method}_Final_Real.png",
+        )
 
 
 def average_plot_SD():
-    """
-    SD esetén a logika:
-      P1_Subnet futtatás -> bimatrix[:,:,0] = P11, bimatrix[:,:,1] = P12
-      P2_Subnet futtatás -> bimatrix[:,:,0] = P21, bimatrix[:,:,1] = P22
-
-      P1_pred = (P11 + P12.T) / 2
-      P2_pred = (P22 + P21.T) / 2
-      final_pred = (P1_pred + P2_pred.T) / 2
-    """
-    title_metric = get_title_metric_name()
-
     for method in ["Suppression", "Noise"]:
         all_P11, all_P12 = [], []
         all_P21, all_P22 = [], []
@@ -249,25 +259,22 @@ def average_plot_SD():
         os.makedirs(f"{output_base_path}games/average", exist_ok=True)
         np.save(f"{output_base_path}games/average/{method}_Final_Pred.npy", final_pred)
         print(f"Average SD final matrix saved for {method}")
-        print(f"  P1_pred range: [{P1_pred.min():.4f}, {P1_pred.max():.4f}]")
-        print(f"  P2_pred range: [{P2_pred.min():.4f}, {P2_pred.max():.4f}]")
+        print(f"  P1_pred range:    [{P1_pred.min():.4f}, {P1_pred.max():.4f}]")
+        print(f"  P2_pred range:    [{P2_pred.min():.4f}, {P2_pred.max():.4f}]")
         print(f"  final_pred range: [{final_pred.min():.4f}, {final_pred.max():.4f}]")
 
-        plt.figure(figsize=(10, 8))
-        sns.heatmap(final_pred, annot=True, fmt=".3f", cmap="RdYlGn", center=0)
-        plt.title(f"Average {method} (SD) - {title_metric}")
-        plt.xlabel("Client 2 Params")
-        plt.ylabel("Client 1 Params")
-
         os.makedirs(f"{output_base_path}plots/average", exist_ok=True)
-        save_plot_path = f"{output_base_path}games/average/{method}_Final_Pred.png"
-        plt.savefig(save_plot_path)
-        plt.close()
-        print(f"Saved: {save_plot_path}")
+        _save_heatmap(
+            matrix=final_pred,
+            title=f"Average {method} (SD) - {get_title_metric_name()}",
+            xlabel="Client 2 Params",
+            ylabel="Client 1 Params",
+            save_path=f"{output_base_path}games/average/{method}_Final_Pred.png",
+        )
 
 
 if __name__ == "__main__":
-    mode = "half"  # "full", "half", or "quarter"
+    mode = "full"  # "full", "half", or "quarter"
 
     input_base_path = f"results/{mode}/"
     output_base_path = f"results/{mode}/{analyze}/"

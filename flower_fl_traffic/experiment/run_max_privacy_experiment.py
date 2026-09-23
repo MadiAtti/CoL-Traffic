@@ -2,16 +2,6 @@
 run_max_privacy_experiment.py
 ------------------------------
 Max-privacy kísérlet: minden privacy szint párosítva az echo klienssel.
-
-Scenario lista (N=5 szint esetén, 2N+1 = 11 db):
-  (echo, p1), (echo, p2), ..., (echo, pN)   <- C1 csendes, C2 normál
-  (p1, echo), (p2, echo), ..., (pN, echo)   <- C1 normál,  C2 csendes
-  (echo, echo)                               <- mindkettő csendes (baseline)
-
-Azonos struktúra mint a meglévő run_experiment.py, csak a scenario
-generálás tér el: product() helyett az "él" kombinációk.
-
-Output: results/<ds_mode>/4_max_privacy/max_privacy_results.csv
 """
 
 import logging
@@ -22,6 +12,7 @@ from pathlib import Path
 from utils.logger_silencer import silence_log
 silence_log()
 
+import ray
 import flwr as fl
 from omegaconf import OmegaConf
 
@@ -32,46 +23,25 @@ from models.neural_network import TrafficNN
 from utils.metrics import player_specific_metrics
 from utils.save import save_federated_history, setup_file
 
+ECHO = "echo"  # Sentinel érték None helyett
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Scenario generálás
-# ──────────────────────────────────────────────────────────────────────────────
 
 def build_max_privacy_scenarios(levels):
     """
-    Visszaadja az L-alakú scenario listát.
-
-    Minden elem: (val1, val2) ahol a None az echo klienst jelenti.
-
-    Pl. levels=[0.0, 0.5, 1.0, 1.5, 2.0] esetén:
-      (None, 0.0), (None, 0.5), ..., (None, 2.0)   <- C1 echo
-      (0.0, None), (0.5, None), ..., (2.0, None)   <- C2 echo
-      (None, None)                                   <- mindkettő echo
+    L-alakú scenario lista, None helyett "echo" sentinel értékkel.
     """
-    c1_echo = [(None, v) for v in levels]   # C1 csendes, C2 normál
-    c2_echo = [(v, None) for v in levels]   # C1 normál,  C2 csendes
-    both_echo = [(None, None)]              # mindkettő csendes
+    c1_echo = [(ECHO, v) for v in levels]
+    c2_echo = [(v, ECHO) for v in levels]
+    both_echo = [(ECHO, ECHO)]
     return list(chain(c1_echo, c2_echo, both_echo))
 
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Mixed client_fn: None → EchoClient, érték → UniversalTrafficClient
-# ──────────────────────────────────────────────────────────────────────────────
-
 def create_mixed_client_fn(train_loaders, test_loaders, cfg, val1, val2, param_key):
-    """
-    val1, val2: a privacy paraméter értéke (pl. noise vagy features),
-                vagy None ha az adott kliens echo.
-    param_key:  "client1_noise" / "client2_noise"  (dp módban)
-                "client1_features" / "client2_features"  (sup módban)
-    """
     vals = [val1, val2]
-    param_keys = [f"client1_{param_key}", f"client2_{param_key}"]
 
     def client_fn(cid: str) -> fl.client.Client:
         idx = int(cid)
-        if vals[idx] is None:
-            # Echo kliens: visszaadja a szerver modelljét változatlanul
+        if vals[idx] == ECHO:
             return EchoClient(
                 cid=cid,
                 model=TrafficNN(
@@ -82,45 +52,28 @@ def create_mixed_client_fn(train_loaders, test_loaders, cfg, val1, val2, param_k
                 cfg=cfg,
             ).to_client()
         else:
-            # Normál kliens: helyi tanítás a megadott privacy szinttel
             return create_client_fn(train_loaders, test_loaders, cfg)(cid)
 
     return client_fn
 
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Egyetlen scenario futtatása (külön folyamatban)
-# ──────────────────────────────────────────────────────────────────────────────
-
 def _run_single_scenario(args):
-    """
-    A meglévő _run_single_scenario-val azonos szignatúra és struktúra,
-    de val1/val2 lehet None (echo kliens).
-    """
     silence_log()
 
     (val1, val2, config, raw_train_loaders, test_loaders,
      subdir, mode, base_dir, metric_name, param_key, lock) = args
 
-    # Echo kliensnél nem kell adat-előkészítés (sup módban sincs suppression)
     active_loaders = raw_train_loaders
-
-    # Szép label a loghoz
-    def _label(v):
-        return "echo" if v is None else str(v)
 
     print(
         f"\n🔇 Max-privacy scenario ({mode.upper()}) "
-        f"| C1: {_label(val1)} | C2: {_label(val2)}",
+        f"| C1: {val1} | C2: {val2}",
         flush=True,
     )
 
-    # on_fit_config: echo klienseknél 0.0 noise-t adunk, így a szerver
-    # konfigja konzisztens marad; az EchoClient.fit() úgyis figyelmen
-    # kívül hagyja a tanítást
     fit_kwargs = {
-        f"client1_{param_key}": val1 if val1 is not None else 0.0,
-        f"client2_{param_key}": val2 if val2 is not None else 0.0,
+        f"client1_{param_key}": 0.0 if val1 == ECHO else val1,
+        f"client2_{param_key}": 0.0 if val2 == ECHO else val2,
     }
 
     strategy = fl.server.strategy.FedAvg(
@@ -158,29 +111,14 @@ def _run_single_scenario(args):
     res_1 = history.metrics_distributed["client1_accuracy"][-1][1]
     res_2 = history.metrics_distributed["client2_accuracy"][-1][1]
     print(
-        f"✅ Kész | C1: {_label(val1)}, C2: {_label(val2)} "
+        f"✅ Kész | C1: {val1}, C2: {val2} "
         f"| Acc: {res_1:.2%}, {res_2:.2%}",
         flush=True,
     )
     return (val1, val2, res_1, res_2)
 
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Fő belépési pont
-# ──────────────────────────────────────────────────────────────────────────────
-
 def run_max_privacy_experiment(config, train_loaders, test_loaders, subdir, mode):
-    """
-    Leváltja / kiegészíti a run_experiment()-et a max-privacy scenáriókhoz.
-
-    Hívás ugyanolyan mint run_experiment():
-        run_max_privacy_experiment(config, train_loaders, test_loaders, subdir, mode)
-
-    mode: "dp"  → noise szintek, param_key = "noise"
-          "sup" → feature szintek, param_key = "features"
-    """
-    import ray
-
     ds_mode = config.dataset.mode
 
     if mode == "dp":
@@ -201,13 +139,12 @@ def run_max_privacy_experiment(config, train_loaders, test_loaders, subdir, mode
 
     setup_file(config, subdir, base_dir=base_dir)
 
-    # L-alakú scenario lista: 2N+1 db
     scenarios = build_max_privacy_scenarios(levels)
 
     print(f"\n{'#'*60}")
     print(f"🔇 Max-privacy runner | Mode: {mode.upper()} | {len(scenarios)} scenario")
     print(f"   Szintek : {list(levels)}")
-    print(f"   Összes  : 2×{len(levels)}+1 = {len(scenarios)} (vs {len(levels)**2} normál gridnél)")
+    print(f"   Összes  : 2×{len(levels)}+1 = {len(scenarios)}")
     print(f"{'#'*60}\n")
 
     manager = mp.Manager()
@@ -221,12 +158,13 @@ def run_max_privacy_experiment(config, train_loaders, test_loaders, subdir, mode
 
     num_parallel_scenarios = 4
 
+    # FIX: ray.shutdown() kivéve a finally-ből, csak a pool után hívjuk
     try:
         with mp.Pool(processes=num_parallel_scenarios) as pool:
             pool.map(_run_single_scenario, tasks)
     except Exception as e:
         print(f"Hiba a párhuzamos futtatás során: {e}")
-    finally:
-        ray.shutdown()
+
+    ray.shutdown()  # Csak egyszer, a pool teljes befejezése után
 
     print(f"\n✨ Minden max-privacy scenario kész ({subdir}, {mode.upper()}).")

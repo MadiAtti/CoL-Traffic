@@ -1,6 +1,0 @@
-*.mtx
-*.log
-/outputs
-*.parquet
-*.csv
-*.gz

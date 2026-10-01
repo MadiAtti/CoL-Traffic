@@ -123,7 +123,7 @@ def run_pipeline(config: DictConfig):
     hours, rem = divmod(duration_seconds, 3600)
     minutes, seconds = divmod(rem, 60)
 
-    #     print(f"⏱️ Total Execution Time: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
+    print(f"⏱️ Total Execution Time: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
 
 if __name__ == "__main__":
 

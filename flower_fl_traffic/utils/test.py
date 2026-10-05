@@ -302,15 +302,23 @@ def compare_parquet(
 # ──────────────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    import tempfile, os
+    # import tempfile, os
 
-    print("=== Comparing identical files ===")
-    r = compare_parquet("dataset/dataset.parquet", "dataset/other.parquet")
-    print(f"Result: equal={r.equal}\n")
+    # print("=== Comparing identical files ===")
+    # r = compare_parquet("dataset/dataset.parquet", "dataset/other.parquet")
+    # print(f"Result: equal={r.equal}\n")
 
-    dataset = pd.read_parquet("dataset/dataset.parquet")
-    other = pd.read_parquet("dataset/other.parquet")
-    print(dataset.shape)
-    print(other.shape)
-    print(dataset.head(5))
-    print(other.head(5))
+    # dataset = pd.read_parquet("dataset/dataset.parquet")
+    # other = pd.read_parquet("dataset/other.parquet")
+    # print(dataset.shape)
+    # print(other.shape)
+    # print(dataset.head(5))
+    # print(other.head(5))
+
+    full_dataset = "dataset/dataset.parquet"
+    half_dataset_p1 = "dataset/half/p1.parquet"
+    half_dataset_p2 = "dataset/half/p2.parquet"
+
+    print("=== The two datasets sample counts ===")
+    print(f"Full dataset: {pq.read_metadata(full_dataset).num_rows} rows")
+    print(f"Half dataset: {pq.read_metadata(half_dataset_p1).num_rows + pq.read_metadata(half_dataset_p2).num_rows} rows")

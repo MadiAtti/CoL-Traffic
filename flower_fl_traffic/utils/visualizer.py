@@ -22,13 +22,27 @@ HEATMAP_FONT = {
 
 
 def _make_norm(matrix: np.ndarray) -> TwoSlopeNorm:
-    v_min = float(np.nanmin(matrix))
+    valid_vals = matrix[~np.isnan(matrix)]
+
+    if len(valid_vals) > 1:
+        v_min = float(np.partition(valid_vals, 1)[1])
+    elif len(valid_vals) == 1:
+        v_min = float(valid_vals[0])
+    else:
+        v_min = -1e-2
+
     v_max = float(np.nanmax(matrix))
     if v_min >= 0:
         v_min = -1e-2
     if v_max <= 0:
         v_max = 1e-2
     return TwoSlopeNorm(vmin=v_min, vcenter=0.0, vmax=v_max)
+
+
+def get_title_metric_name():
+    if analyze == "accuracy":
+        return "Relative Accuracy Improvement"
+    return "Relative Loss Change"
 
 
 def _save_heatmap(matrix: np.ndarray, title: str, xlabel: str, ylabel: str,
@@ -48,15 +62,13 @@ def _save_heatmap(matrix: np.ndarray, title: str, xlabel: str, ylabel: str,
             cbar_kws={"label": get_title_metric_name()},
         )
         plt.title(title)
-        plt.xlabel(xlabel)
-        plt.ylabel(ylabel)
+        plt.xlabel(xlabel)  # <- X tengely címsora
+        plt.ylabel(ylabel)  # <- Y tengely címsora
         plt.tight_layout()
         plt.savefig(save_path, dpi=300, bbox_inches="tight")
         plt.close()
     print(f"Saved: {save_path}")
 
-
-# ------------------------------------------------------------------
 
 def load_json(path):
     if not os.path.exists(path):
@@ -84,13 +96,33 @@ def get_metric_from_local(data, sub_path=""):
     return p1_metric, p2_metric
 
 
-def get_title_metric_name():
-    if analyze == "accuracy":
-        return "Relative Accuracy Improvement"
-    return "Relative Loss Change"
+def get_params_for_method(method_name, mode, config_data):
+    if method_name == "Noise":
+        level_map = {
+            "full": "full_noise_levels",
+            "half": "half_noise_levels",
+            "80percent": "80percent_noise_levels",
+            "30percent": "30percent_noise_levels",
+        }
+        level = level_map.get(mode, "full_noise_levels")
+        return config_data[level], "noise_p1", "noise_p2"
+    else:
+        return config_data["sup_levels"], "features_p1", "features_p2"
+
+def get_display_ticks(method, mode):
+    base_cfg = OmegaConf.load("conf/base.yaml")
+    config_data = base_cfg.config
+    params, _, _ = get_params_for_method(method, mode, config_data)
+    
+    if method == "Noise":
+        ticks = [f"{(x / (x + 1)):.2f}" if x is not None else "0.00" for x in params]
+    else:
+        ticks = [f"{((14 - x) / 14):.2f}" if x is not None else "0.00" for x in params]
+        
+    return ticks + ["1"]
 
 
-def save_matrices(m1_diff, m2_diff, params, method_name, sc_name, seed):
+def save_matrices(output_base_path, m1_diff, m2_diff, params, method_name, sc_name, seed):
     os.makedirs(f"{output_base_path}games/seed{seed}", exist_ok=True)
 
     bimatrix = np.zeros((len(params), len(params), 2))
@@ -102,7 +134,7 @@ def save_matrices(m1_diff, m2_diff, params, method_name, sc_name, seed):
     print(f"Matrix saved: {save_path}")
 
 
-def process_and_plot(seed):
+def process_and_plot(seed, mode, input_base_path, output_base_path):
     folders = [
         ("", "Full_FL"),
         ("P1/", "P1_Subnet"),
@@ -117,7 +149,13 @@ def process_and_plot(seed):
         "Noise": "4_max_privacy_noise/",
     }
 
+    base_cfg = OmegaConf.load("conf/base.yaml")
+    config_data = base_cfg.config
+
     for method_path, method_name in methods:
+        params, k1, k2 = get_params_for_method(method_name, mode, config_data)
+        size = len(params)
+
         for sub_path, sc_name in folders:
             loc_path = f"{input_base_path}1_local_baseline/{sub_path}{seed}.json"
             loc_data = load_json(loc_path)
@@ -131,27 +169,7 @@ def process_and_plot(seed):
             if not fed_data:
                 continue
 
-            base_cfg = OmegaConf.load("conf/base.yaml")  # igazítsd az útvonalhoz
-            config_data = base_cfg.config
-
-            if method_name == "Noise":
-                if mode == "full":
-                    level = "full_noise_levels"
-                elif mode == "half":
-                    level = "half_noise_levels"
-                elif mode == "80percent":
-                    level = "80percent_noise_levels"
-                elif mode == "30percent":
-                    level = "30percent_noise_levels"
-
-                params = config_data[level]
-                k1, k2 = "noise_p1", "noise_p2"
-            else:
-                params = config_data["sup_levels"]
-                k1, k2 = "features_p1", "features_p2"
-
             experiments = fed_data["experiments"]
-            size = len(params)
 
             m1_diff = np.zeros((size, size))
             m2_diff = np.zeros((size, size))
@@ -175,14 +193,15 @@ def process_and_plot(seed):
                     m1_diff[idx1][idx2] = (p1_metric - b_p1) / b_p1
                     m2_diff[idx1][idx2] = (p2_metric - b_p2) / b_p2
 
-            # --- Max privacy: extra sor és oszlop ---
+            # --- Max privacy ---
             mp_path = f"{input_base_path}{max_privacy_paths[method_name]}{sub_path}{seed}.json"
             mp_data = load_json(mp_path)
 
-            mp_row_m1 = np.full(size, np.nan)  # utolsó sor:    P1=echo, P2 változó
-            mp_col_m1 = np.full(size, np.nan)  # utolsó oszlop: P2=echo, P1 változó
+            mp_row_m1 = np.full(size, np.nan)
+            mp_col_m1 = np.full(size, np.nan)
             mp_row_m2 = np.full(size, np.nan)
             mp_col_m2 = np.full(size, np.nan)
+            mp_corner_m1, mp_corner_m2 = np.nan, np.nan
 
             if mp_data:
                 for exp in mp_data["experiments"]:
@@ -198,29 +217,33 @@ def process_and_plot(seed):
                         d1 = (p1_metric - b_p1) / b_p1
                         d2 = (p2_metric - b_p2) / b_p2
 
-                    if val1 == "echo" and val2 in params:   # P1=max → utolsó sor
+                    if val1 == "echo" and val2 in params:
                         j = params.index(val2)
                         mp_row_m1[j] = d1
                         mp_row_m2[j] = d2
-                    elif val2 == "echo" and val1 in params:  # P2=max → utolsó oszlop
+                    elif val2 == "echo" and val1 in params:
                         i = params.index(val1)
                         mp_col_m1[i] = d1
                         mp_col_m2[i] = d2
+                    elif val1 == "echo" and val2 == "echo":
+                        mp_corner_m1 = d1
+                        mp_corner_m2 = d2
 
-            # Mátrixok kibővítése (size+1) x (size+1) -re
             m1_ext = np.full((size + 1, size + 1), np.nan)
             m1_ext[:size, :size] = m1_diff
             m1_ext[size,  :size] = mp_row_m1
             m1_ext[:size,  size] = mp_col_m1
+            m1_ext[size,  size] = mp_corner_m1
 
             m2_ext = np.full((size + 1, size + 1), np.nan)
             m2_ext[:size, :size] = m2_diff
             m2_ext[size,  :size] = mp_row_m2
             m2_ext[:size,  size] = mp_col_m2
+            m2_ext[size,  size] = mp_corner_m2
 
-            display_params = [0.0 if x is None else x for x in params] + ["max"]
+            display_params = get_display_ticks(method_name, mode)
 
-            save_matrices(m1_ext, m2_ext, params + [None], method_name, sc_name, seed)
+            save_matrices(output_base_path, m1_ext, m2_ext, params + [None], method_name, sc_name, seed)
 
             os.makedirs(f"{output_base_path}plots/seed{seed}", exist_ok=True)
 
@@ -228,13 +251,14 @@ def process_and_plot(seed):
                 _save_heatmap(
                     matrix=matrix,
                     title=f"{method_name} ({sc_name}) - {p_tag} {get_title_metric_name()} (Seed {seed})",
-                    xlabel="Client 2 Params",
-                    ylabel="Client 1 Params",
+                    xlabel="Client 2 Params",  
+                    ylabel="Client 1 Params", 
                     save_path=f"{output_base_path}plots/seed{seed}/{method_name}_{sc_name}_{p_tag}.png",
                     tick_labels=display_params,
                 )
 
-def average_plot_Full():
+
+def average_plot_Full(mode, output_base_path):
     for method in ["Suppression", "Noise"]:
         all_P1, all_P2 = [], []
 
@@ -250,26 +274,29 @@ def average_plot_Full():
         if not all_P1 or not all_P2:
             continue
 
-        P1 = np.mean(all_P1, axis=0)
-        P2 = np.mean(all_P2, axis=0)
+        # Nan-biztos átlagolás
+        P1 = np.nanmean(all_P1, axis=0)
+        P2 = np.nanmean(all_P2, axis=0)
         final_real = (P1 + P2.T) / 2
 
         os.makedirs(f"{output_base_path}games/average", exist_ok=True)
         np.save(f"{output_base_path}games/average/{method}_Final_Real.npy", final_real)
-        print(f"Average Full FL final matrix saved for {method}")
-        print(f"  range: [{final_real.min():.4f}, {final_real.max():.4f}]")
 
+        ticks = get_display_ticks(method, mode)
+
+        # KÉP MENTÉSE A PLOTS MAP PÁBA!
         os.makedirs(f"{output_base_path}plots/average", exist_ok=True)
         _save_heatmap(
             matrix=final_real,
             title=f"Average {method} (Full_FL) - {get_title_metric_name()}",
             xlabel="Client 2 Params",
             ylabel="Client 1 Params",
-            save_path=f"{output_base_path}games/average/{method}_Final_Real.png",
+            save_path=f"{output_base_path}plots/average/{method}_Final_Real.png", # <- Javítva plots/-ra!
+            tick_labels=ticks,
         )
 
 
-def average_plot_SD():
+def average_plot_SD(mode, output_base_path):
     for method in ["Suppression", "Noise"]:
         all_P11, all_P12 = [], []
         all_P21, all_P22 = [], []
@@ -282,24 +309,20 @@ def average_plot_SD():
                 bm = np.load(p1_path)
                 all_P11.append(bm[:, :, 0])
                 all_P12.append(bm[:, :, 1])
-            else:
-                print(f"Missing: {p1_path}")
 
             if os.path.exists(p2_path):
                 bm = np.load(p2_path)
                 all_P21.append(bm[:, :, 0])
                 all_P22.append(bm[:, :, 1])
-            else:
-                print(f"Missing: {p2_path}")
 
         if not all_P11 or not all_P12 or not all_P21 or not all_P22:
-            print(f"Insufficient data for {method}, skipping...")
             continue
 
-        P11 = np.mean(all_P11, axis=0)
-        P12 = np.mean(all_P12, axis=0)
-        P21 = np.mean(all_P21, axis=0)
-        P22 = np.mean(all_P22, axis=0)
+        # Nan-biztos átlagolás
+        P11 = np.nanmean(all_P11, axis=0)
+        P12 = np.nanmean(all_P12, axis=0)
+        P21 = np.nanmean(all_P21, axis=0)
+        P22 = np.nanmean(all_P22, axis=0)
 
         P1_pred = (P11 + P12.T) / 2
         P2_pred = (P22 + P21.T) / 2
@@ -307,10 +330,8 @@ def average_plot_SD():
 
         os.makedirs(f"{output_base_path}games/average", exist_ok=True)
         np.save(f"{output_base_path}games/average/{method}_Final_Pred.npy", final_pred)
-        print(f"Average SD final matrix saved for {method}")
-        print(f"  P1_pred range:    [{P1_pred.min():.4f}, {P1_pred.max():.4f}]")
-        print(f"  P2_pred range:    [{P2_pred.min():.4f}, {P2_pred.max():.4f}]")
-        print(f"  final_pred range: [{final_pred.min():.4f}, {final_pred.max():.4f}]")
+
+        ticks = get_display_ticks(method, mode)
 
         os.makedirs(f"{output_base_path}plots/average", exist_ok=True)
         _save_heatmap(
@@ -318,12 +339,13 @@ def average_plot_SD():
             title=f"Average {method} (SD) - {get_title_metric_name()}",
             xlabel="Client 2 Params",
             ylabel="Client 1 Params",
-            save_path=f"{output_base_path}games/average/{method}_Final_Pred.png",
+            save_path=f"{output_base_path}plots/average/{method}_Final_Pred.png", 
+            tick_labels=ticks, 
         )
 
 
 if __name__ == "__main__":
-    mode = "full"  # "full", "half", or "quarter"
+    mode = "half"  # "full", "half", "80percent", "30percent"
 
     input_base_path = f"results/{mode}/"
     output_base_path = f"results/{mode}/{analyze}/"
@@ -335,7 +357,7 @@ if __name__ == "__main__":
             print(f"Missing results for seed {seed}, skipping...")
             continue
 
-        process_and_plot(seed)
+        process_and_plot(seed, mode, input_base_path, output_base_path)
 
-    average_plot_Full()
-    average_plot_SD()
+    average_plot_Full(mode, output_base_path)
+    average_plot_SD(mode, output_base_path)

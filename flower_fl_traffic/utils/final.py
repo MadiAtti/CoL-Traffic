@@ -7,47 +7,93 @@ import seaborn as sns
 from scipy.optimize import minimize, differential_evolution
 from sklearn.isotonic import IsotonicRegression
 from sklearn.metrics import mean_squared_error
+from omegaconf import OmegaConf
 
 base_path = "results/"
 
-# --- Shared visual style ---
-RWG_CMAP = LinearSegmentedColormap.from_list("RedWhiteGreen", ["#d73027", "#ffffff", "#1a9850"])
-HEATMAP_FONT = {
-    "font.size": 16,
-    "axes.titlesize": 20,
-    "axes.labelsize": 18,
-    "xtick.labelsize": 14,
-    "ytick.labelsize": 14,
+# --- Képen látható egyedi színskála: Lilás-Rózsaszín (Negatív) -> Fehér (0) -> Kék (Pozitív) ---
+PURPLE_WHITE_BLUE_CMAP = LinearSegmentedColormap.from_list(
+    "PurpleWhiteBlue",
+    [
+        "#b5338a",  # Sötét bíbor / lila (negatív értékek)
+        "#e891c3",  # Világos rózsaszín/lila
+        "#ffffff",  # Fehér (0.0 körüli értékek)
+        "#93b5e1",  # Világoskék
+        "#1f4299"   # Sötétkék (pozitív értékek)
+    ]
+)
+
+DIFF_FONT = {
+    "font.size": 14,
+    "axes.titlesize": 18,
+    "axes.labelsize": 16,
+    "xtick.labelsize": 12,
+    "ytick.labelsize": 12,
 }
 
 
-def _make_norm(matrix: np.ndarray) -> TwoSlopeNorm:
-    v_min = float(np.nanmin(matrix))
-    v_max = float(np.nanmax(matrix))
+def _make_norm_diff(matrix: np.ndarray) -> TwoSlopeNorm:
+    valid_vals = matrix[~np.isnan(matrix)]
+    if len(valid_vals) == 0:
+        return TwoSlopeNorm(vmin=-1e-2, vcenter=0.0, vmax=1e-2)
+
+    v_min = float(np.nanmin(valid_vals))
+    v_max = float(np.nanmax(valid_vals))
+
+    # Ha nincsenek negatív vagy pozitív értékek, egy kis eltolás a stabil skálához
     if v_min >= 0:
         v_min = -1e-2
     if v_max <= 0:
         v_max = 1e-2
+
     return TwoSlopeNorm(vmin=v_min, vcenter=0.0, vmax=v_max)
 
 
-def save_heatmap(matrix: np.ndarray, title: str, filepath: str,
-                 xlabel: str = "Client 2 Params", ylabel: str = "Client 1 Params",
-                 cbar_label: str = "Relative Accuracy Improvement",
-                 tick_labels=None) -> None:
-    norm = _make_norm(matrix)
-    with plt.rc_context(HEATMAP_FONT):
-        plt.figure(figsize=(12, 9))
+def get_params_for_method(method_name, mode, config_data):
+    if method_name == "Noise":
+        level_map = {
+            "full": "full_noise_levels",
+            "half": "half_noise_levels",
+            "80percent": "80percent_noise_levels",
+            "30percent": "30percent_noise_levels",
+        }
+        level = level_map.get(mode, "full_noise_levels")
+        return config_data[level], "noise_p1", "noise_p2"
+    else:
+        return config_data["sup_levels"], "features_p1", "features_p2"
+
+
+def get_display_ticks(method, mode="full"):
+    base_cfg = OmegaConf.load("conf/base.yaml")
+    config_data = base_cfg.config
+    params, _, _ = get_params_for_method(method, mode, config_data)
+    
+    if method == "Noise":
+        ticks = [f"{(x / (x + 1)):.2f}" if x is not None else "0.00" for x in params]
+    else:
+        ticks = [f"{((14 - x) / 14):.2f}" if x is not None else "0.00" for x in params]
+        
+    return ticks + ["1"]
+
+
+def save_diff_heatmap(matrix: np.ndarray, title: str, filepath: str,
+                      xlabel: str = "P_other", ylabel: str = "P_own",
+                      cbar_label: str = "Gain difference",
+                      tick_labels=None) -> None:
+    norm = _make_norm_diff(matrix)
+    with plt.rc_context(DIFF_FONT):
+        plt.figure(figsize=(10, 8))
         sns.heatmap(
             matrix,
             annot=True,
             fmt=".3f",
-            cmap=RWG_CMAP,
+            cmap=PURPLE_WHITE_BLUE_CMAP,
             norm=norm,
-            annot_kws={"size": 12},
+            annot_kws={"size": 11},
             xticklabels=tick_labels if tick_labels is not None else "auto",
             yticklabels=tick_labels if tick_labels is not None else "auto",
             cbar_kws={"label": cbar_label},
+            square=True  # Négyzetes cellák a pontos egyezéshez
         )
         plt.title(title)
         plt.xlabel(xlabel)
@@ -55,15 +101,10 @@ def save_heatmap(matrix: np.ndarray, title: str, filepath: str,
         plt.tight_layout()
         plt.savefig(filepath, dpi=300, bbox_inches="tight")
         plt.close()
-    print(f"Heatmap mentve: {filepath}")
+    print(f"Gain Difference Heatmap mentve: {filepath}")
 
 
 def monotonize_matrix(matrix):
-    """
-    Isotonic Regression a mátrix monotonitásának biztosítására.
-    A PATF property szerint növekvő p -> csökkenő accuracy gain,
-    ezért mindkét tengelyen csökkenő monotonitást kényszerítünk.
-    """
     result = matrix.copy()
     ir = IsotonicRegression(increasing=False)
     for i in range(matrix.shape[0]):
@@ -74,9 +115,6 @@ def monotonize_matrix(matrix):
 
 
 def apply_f(phi_tilde, D_n, grid, params):
-    """
-    f(Φ̃) = (x + y * D_n) * (α + β * pown + γ * pother) * Φ̃
-    """
     x, y, alpha, beta, gamma = params
     g = x + y * D_n
     pown_grid, pother_grid = np.meshgrid(grid, grid, indexing='ij')
@@ -95,11 +133,6 @@ def get_final_matrices():
         for method in ["Noise", "Suppression"]:
             real = np.load(f"{base_path}{size}/accuracy/games/average/{method}_Final_Real.npy")
             pred = np.load(f"{base_path}{size}/accuracy/games/average/{method}_Final_Pred.npy")
-
-            print(f"\n{size} | {method}")
-            print(f"  real range: [{real.min():.4f}, {real.max():.4f}]")
-            print(f"  pred range: [{pred.min():.4f}, {pred.max():.4f}]")
-
             matrices[size][method] = {"real": real, "pred": pred}
     return matrices
 
@@ -115,13 +148,7 @@ def fit_f_joint(pred_full, real_full, D_full,
             transformed_half = apply_f(pred_half, D_half, grid_half, params)
             return rmse(transformed_full, real_full) + rmse(transformed_half, real_half)
 
-    bounds = [
-        (-10.0, 10.0),  # x
-        (-10.0, 10.0),  # y
-        (-10.0, 10.0),  # alpha
-        (-10.0, 10.0),  # beta
-        (-10.0, 10.0),  # gamma
-    ]
+    bounds = [(-10.0, 10.0)] * 5
 
     de_result = differential_evolution(
         loss,
@@ -145,17 +172,8 @@ def fit_f_joint(pred_full, real_full, D_full,
     )
 
     params = nm_result.x if nm_result.fun < de_result.fun else de_result.x
-    x, y, alpha, beta, gamma = params
-
     transformed_full = apply_f(pred_full, D_full, grid_full, params)
     transformed_half = apply_f(pred_half, D_half, grid_half, params)
-
-    if verbose:
-        print(f"  DE loss:  {de_result.fun:.8f}")
-        print(f"  NM loss:  {nm_result.fun:.8f}")
-        print(f"  Paraméterek: x={x:.4f}, y={y:.4f}, α={alpha:.4f}, β={beta:.4f}, γ={gamma:.4f}")
-        print(f"  RMSE full  : {rmse(pred_full, real_full):.6f} -> {rmse(transformed_full, real_full):.6f}")
-        print(f"  RMSE half  : {rmse(pred_half, real_half):.6f} -> {rmse(transformed_half, real_half):.6f}")
 
     return params, transformed_full, transformed_half
 
@@ -163,18 +181,16 @@ def fit_f_joint(pred_full, real_full, D_full,
 def main():
     matrices = get_final_matrices()
 
-    D_full = 1   # <- cseréld le a tényleges full dataset méretre
-    D_half = 0.5 # <- cseréld le a tényleges half dataset méretre
+    D_full = 1
+    D_half = 0.5
 
     for method in ["Noise", "Suppression"]:
-        print(f"\n{'='*50}")
-        print(f"Method: {method}")
-        print(f"{'='*50}")
+        print(f"\nProcessing {method}...")
 
         real_full = monotonize_matrix(matrices["full"][method]["real"])
         pred_full = monotonize_matrix(matrices["full"][method]["pred"])
         real_half = monotonize_matrix(matrices["half"][method]["real"])
-        pred_half = monotonize_matrix(matrices["half"][method]["pred"])
+        pred_half = monotonize_matrix(matrices["half"][method]["half"] if "half" in matrices["half"][method] else matrices["half"][method]["pred"])
 
         G_full = real_full.shape[0]
         G_half = real_half.shape[0]
@@ -184,38 +200,40 @@ def main():
         params, transformed_full, transformed_half = fit_f_joint(
             pred_full, real_full, D_full,
             pred_half, real_half, D_half,
-            grid_full, grid_half
+            grid_full, grid_half,
+            verbose=False
         )
+
+        # Különbség kiszámítása (Transformed - Real)
+        diff_full = transformed_full - real_full
+        diff_half = transformed_half - real_half
 
         os.makedirs(f"{base_path}full/transformed/", exist_ok=True)
         os.makedirs(f"{base_path}half/transformed/", exist_ok=True)
 
-        np.save(f"{base_path}full/transformed/{method}_Transformed.npy", transformed_full)
-        np.save(f"{base_path}half/transformed/{method}_Transformed.npy", transformed_half)
-        np.save(f"{base_path}full/transformed/{method}_Params.npy", params)
+        full_ticks = get_display_ticks(method, mode="full")
+        half_ticks = get_display_ticks(method, mode="half")
 
-        save_heatmap(transformed_full, f"Full Transformed – {method} (Relative Accuracy Improvement)", f"{base_path}full/transformed/{method}_Transformed.png")
-        save_heatmap(transformed_half, f"Half Transformed – {method} (Relative Accuracy Improvement)", f"{base_path}half/transformed/{method}_Transformed.png")
-        save_heatmap(real_full, f"Full Real – {method} (Relative Accuracy Improvement)", f"{base_path}full/transformed/{method}_Real_heatmap.png")
-        save_heatmap(real_half, f"Half Real – {method} (Relative Accuracy Improvement)", f"{base_path}half/transformed/{method}_Real_heatmap.png")
+        # --- A képen látható Gain Difference Hőtérképek generálása ---
+        save_diff_heatmap(
+            diff_full,
+            title="Gain Difference",
+            filepath=f"{base_path}full/transformed/{method}_Gain_Difference.png",
+            xlabel="P_other",
+            ylabel="P_own",
+            cbar_label="Gain difference",
+            tick_labels=full_ticks
+        )
 
-        corr = np.corrcoef(pred_full, real_full)[0, 1]
-        print(f"\n{method}")
-        print(f"  korreláció: {corr:.4f}")
-        print(f"  pred negatív: {(pred_full < 0).mean():.1%}")
-        print(f"  real negatív: {(real_full < 0).mean():.1%}")
-
-        plt.figure(figsize=(6, 6))
-        plt.scatter(pred_full, real_full, alpha=0.5, s=20)
-        plt.axline((0, 0), slope=1, color='r', linestyle='--', label='y=x')
-        plt.xlabel("pred")
-        plt.ylabel("real")
-        plt.title(f"{method} – pred vs real")
-        plt.legend()
-        plt.tight_layout()
-        plt.savefig(f"scatter_{method}.png")
-        plt.close()
-        print(f"  scatter mentve: scatter_{method}.png")
+        save_diff_heatmap(
+            diff_half,
+            title="Gain Difference",
+            filepath=f"{base_path}half/transformed/{method}_Gain_Difference.png",
+            xlabel="P_other",
+            ylabel="P_own",
+            cbar_label="Gain difference",
+            tick_labels=half_ticks
+        )
 
 
 if __name__ == "__main__":

@@ -189,8 +189,8 @@ def plot_results(avg_accuracies: dict):
 
 
 if __name__ == "__main__":
-    START_SEED = 0
-    END_SEED   = 9
+    START_SEED = 10
+    END_SEED   = 10
 
     os.makedirs("results/baseline", exist_ok=True)
 

@@ -41,7 +41,7 @@ from sklearn.preprocessing import LabelEncoder
 # Config
 # ──────────────────────────────────────────────────────────────────────────────
 
-SEEDS       = list(range(10))          # 0 … 9
+SEEDS       = [10, 11, 12]        # 0 … 9
 NUM_WORKERS = 2       # parallel seeds (tune to your CPU)
 RESULTS_DIR = Path("results/multi-split")
 

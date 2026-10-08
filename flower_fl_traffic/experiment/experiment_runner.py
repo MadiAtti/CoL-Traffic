@@ -119,9 +119,9 @@ def run_experiment(config, train_loaders, test_loaders, subdir, mode):
         elif ds_mode == "quarter":
             levels = config.config.quarter_noise_levels
         elif ds_mode == "80percent":
-            levels = config.config.80percent_noise_levels
+            levels = config.config.percent80_noise_levels
         elif ds_mode == "30percent":
-            levels = config.config.30percent_noise_levels
+            levels = config.config.percent30_noise_levels
         else:
             raise ValueError(f"Unsupported dataset mode: {ds_mode}")
         param_keys = ["client1_noise", "client2_noise"]

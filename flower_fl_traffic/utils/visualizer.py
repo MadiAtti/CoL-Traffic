@@ -72,6 +72,57 @@ def _make_norm_diff(matrix: np.ndarray) -> TwoSlopeNorm:
 
     return TwoSlopeNorm(vmin=v_min, vcenter=0.0, vmax=v_max)
 
+def apply_f(phi_tilde, D_n, grid, params):
+    x, y, alpha, beta = params
+    g = x + y * D_n
+    pown_grid, pother_grid = np.meshgrid(grid, grid, indexing='ij')
+    h = 1 + alpha * pown_grid + beta * pother_grid
+    return g * h * phi_tilde
+
+
+def rmse(a, b):
+    return np.sqrt(mean_squared_error(a.ravel(), b.ravel()))
+
+def fit_f_joint(pred_full, real_full, D_full,
+    pred_half, real_half, D_half,
+    grid_full, grid_half, verbose=True):
+
+
+    def loss(params):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            transformed_full = apply_f(pred_full, D_full, grid_full, params)
+            transformed_half = apply_f(pred_half, D_half, grid_half, params)
+        return rmse(transformed_full, real_full) + rmse(transformed_half, real_half)
+
+    bounds = [(-10.0, 10.0)] * 4
+
+    de_result = differential_evolution(
+    loss,
+    bounds=bounds,
+    maxiter=10000,
+    tol=1e-10,
+    seed=42,
+    popsize=20,
+    mutation=(0.5, 1),
+    recombination=0.9,
+    polish=True,
+    workers=1,
+    disp=verbose,
+    )
+
+    nm_result = minimize(
+    loss,
+    x0=de_result.x,
+    method='Nelder-Mead',
+    options={'maxiter': 100000, 'xatol': 1e-10, 'fatol': 1e-10}
+    )
+
+    params = nm_result.x if nm_result.fun < de_result.fun else de_result.x
+    transformed_full = apply_f(pred_full, D_full, grid_full, params)
+    transformed_half = apply_f(pred_half, D_half, grid_half, params)
+
+    return params, transformed_full, transformed_half
 
 def get_params_for_method(method_name, mode, config_data):
     if method_name == "Noise":
@@ -227,6 +278,10 @@ def get_final_matrices():
             }
     return matrices
 
+def print_params(params):
+    param_names = ['x', 'y', 'alpha', 'beta']
+    return ', '.join(f"{name}={value:.8f}" for name, value in zip(param_names, params))
+
 
 def main():
     matrices = get_final_matrices()
@@ -244,84 +299,103 @@ def main():
         real_half_std = matrices["half"][method]["real_std"]
         pred_half_std = matrices["half"][method]["pred_std"]
 
-        # Különbség kiszámítása
-        diff_full = pred_full - real_full
-        diff_half = pred_half - real_half
+        # # Különbség kiszámítása
+        # diff_full = pred_full - real_full
+        # diff_half = pred_half - real_half
 
-        os.makedirs(f"{base_path}final/", exist_ok=True)
+        # os.makedirs(f"{base_path}final/", exist_ok=True)
 
-        full_ticks = get_display_ticks(method, mode="full")
-        half_ticks = get_display_ticks(method, mode="half")
+        # full_ticks = get_display_ticks(method, mode="full")
+        # half_ticks = get_display_ticks(method, mode="half")
 
-        # --- Gain Difference Hőtérképek ---
-        save_diff_heatmap(
-            diff_full,
-            title="Gain Difference",
-            filepath=f"{base_path}final/{method}_Gain_Difference_full.png",
-            xlabel="P_other",
-            ylabel="P_own",
-            cbar_label="Gain difference",
-            tick_labels=full_ticks
+        # # --- Gain Difference Hőtérképek ---
+        # save_diff_heatmap(
+        #     diff_full,
+        #     title="Gain Difference",
+        #     filepath=f"{base_path}final/{method}_Gain_Difference_full.png",
+        #     xlabel="P_other",
+        #     ylabel="P_own",
+        #     cbar_label="Gain difference",
+        #     tick_labels=full_ticks
+        # )
+
+        # save_diff_heatmap(
+        #     diff_half,
+        #     title="Gain Difference",
+        #     filepath=f"{base_path}final/{method}_Gain_Difference_half.png",
+        #     xlabel="P_other",
+        #     ylabel="P_own",
+        #     cbar_label="Gain difference",
+        #     tick_labels=half_ticks
+        # )
+
+        # if method == "Noise":
+        #     method_label = "DP"
+        # else:
+        #     method_label = "SUP"
+
+        # SD_title = f"Isotonic RMSE Gain - SIM AVG (4 SD variants: P11, P12, P21, P22) - {method_label}\n(Mean ± STD over 4 variants)"
+        # real_title = f"RMSE Gain - REAL - AVG(P_own, P_other) ({method_label})\n(Mean ± STD over Seeds)"
+
+        # # --- Átlag + Szórás Hőtérképek Generálása ---
+        # _save_heatmap(
+        #     matrix=real_full,
+        #     std_matrix=real_full_std,
+        #     title=real_title,
+        #     xlabel=f"P_other Privacy Parameter ({method_label})",  
+        #     ylabel=f"P_own Privacy Parameter ({method_label})", 
+        #     save_path=f"{base_path}final/real_full_{method}.png",
+        #     tick_labels=full_ticks,
+        # )
+
+        # _save_heatmap(
+        #     matrix=pred_full,
+        #     std_matrix=pred_full_std,
+        #     title=SD_title,
+        #     xlabel=f"P_other Privacy Parameter ({method_label})",  
+        #     ylabel=f"P_own Privacy Parameter ({method_label})", 
+        #     save_path=f"{base_path}final/pred_full_{method}.png",
+        #     tick_labels=full_ticks,
+        # )
+
+        # _save_heatmap(
+        #     matrix=real_half,
+        #     std_matrix=real_half_std,
+        #     title=real_title,
+        #     xlabel=f"P_other Privacy Parameter ({method_label})",  
+        #     ylabel=f"P_own Privacy Parameter ({method_label})", 
+        #     save_path=f"{base_path}final/real_half_{method}.png",
+        #     tick_labels=half_ticks,
+        # )
+
+        # _save_heatmap(
+        #     matrix=pred_half,
+        #     std_matrix=pred_half_std,
+        #     title=SD_title,
+        #     xlabel=f"P_other Privacy Parameter ({method_label})",  
+        #     ylabel=f"P_own Privacy Parameter ({method_label})", 
+        #     save_path=f"{base_path}final/pred_half_{method}.png",
+        #     tick_labels=half_ticks,
+        # )
+
+        G_full = real_full.shape[0]
+        G_half = real_half.shape[0]
+        grid_full = np.linspace(0, 1, G_full)
+        grid_half = np.linspace(0, 1, G_half)
+
+        D_full = 3163462
+        D_half = 1581731
+
+        params, transformed_full, transformed_half = fit_f_joint(
+        pred_full, real_full, D_full,
+        pred_half, real_half, D_half,
+        grid_full, grid_half,
+        verbose=False
         )
 
-        save_diff_heatmap(
-            diff_half,
-            title="Gain Difference",
-            filepath=f"{base_path}final/{method}_Gain_Difference_half.png",
-            xlabel="P_other",
-            ylabel="P_own",
-            cbar_label="Gain difference",
-            tick_labels=half_ticks
-        )
+        print(f"\nBefore fitting RMSE Full: {rmse(pred_full, real_full):.6f}, RMSE Half: {rmse(pred_half, real_half):.6f}")
+        print(f"\nFitted parameters for {method}: {print_params(params)}, RMSE Full: {rmse(transformed_full, real_full):.6f}, RMSE Half: {rmse(transformed_half, real_half):.6f}")
 
-        if method == "Noise":
-            method_label = "DP"
-        else:
-            method_label = "SUP"
-
-        SD_title = f"Isotonic RMSE Gain - SIM AVG (4 SD variants: P11, P12, P21, P22) - {method_label}\n(Mean ± STD over 4 variants)"
-        real_title = f"RMSE Gain - REAL - AVG(P_own, P_other) ({method_label})\n(Mean ± STD over Seeds)"
-
-        # --- Átlag + Szórás Hőtérképek Generálása ---
-        _save_heatmap(
-            matrix=real_full,
-            std_matrix=real_full_std,
-            title=real_title,
-            xlabel=f"P_other Privacy Parameter ({method_label})",  
-            ylabel=f"P_own Privacy Parameter ({method_label})", 
-            save_path=f"{base_path}final/real_full_{method}.png",
-            tick_labels=full_ticks,
-        )
-
-        _save_heatmap(
-            matrix=pred_full,
-            std_matrix=pred_full_std,
-            title=SD_title,
-            xlabel=f"P_other Privacy Parameter ({method_label})",  
-            ylabel=f"P_own Privacy Parameter ({method_label})", 
-            save_path=f"{base_path}final/pred_full_{method}.png",
-            tick_labels=full_ticks,
-        )
-
-        _save_heatmap(
-            matrix=real_half,
-            std_matrix=real_half_std,
-            title=real_title,
-            xlabel=f"P_other Privacy Parameter ({method_label})",  
-            ylabel=f"P_own Privacy Parameter ({method_label})", 
-            save_path=f"{base_path}final/real_half_{method}.png",
-            tick_labels=half_ticks,
-        )
-
-        _save_heatmap(
-            matrix=pred_half,
-            std_matrix=pred_half_std,
-            title=SD_title,
-            xlabel=f"P_other Privacy Parameter ({method_label})",  
-            ylabel=f"P_own Privacy Parameter ({method_label})", 
-            save_path=f"{base_path}final/pred_half_{method}.png",
-            tick_labels=half_ticks,
-        )
 
 
 if __name__ == "__main__":

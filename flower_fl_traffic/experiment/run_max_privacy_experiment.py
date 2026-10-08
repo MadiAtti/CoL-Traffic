@@ -164,6 +164,12 @@ def run_max_privacy_experiment(config, train_loaders, test_loaders, subdir, mode
             levels = config.config.full_noise_levels
         elif ds_mode == "half":
             levels = config.config.half_noise_levels
+        elif ds_mode == "quarter":
+            levels = config.config.quarter_noise_levels
+        elif ds_mode == "80percent":
+            levels = config.config.80percent_noise_levels
+        elif ds_mode == "30percent":
+            levels = config.config.30percent_noise_levels
         else:
             raise ValueError(f"Ismeretlen dataset mode: {ds_mode}")
     else:

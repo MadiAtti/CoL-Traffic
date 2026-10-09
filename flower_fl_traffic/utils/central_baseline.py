@@ -58,6 +58,21 @@ def load_dataset(seed: int) -> tuple:
     chunks = np.array_split(df, NUM_CHUNKS)
     return {f"chunk_{i}": chunk for i, chunk in enumerate(chunks)}, num_classes
 
+def load_seed_curves(seeds=None, results_dir="results/baseline"):
+    """Load the per-seed learning curves (seed_<n>_learning_curve.csv)."""
+    if seeds is None:
+        seeds = range(10)  # Default: seeds 0-9
+
+    curves = {}
+    for seed in seeds:
+        file_path = os.path.join(results_dir, f"seed_{seed}_learning_curve.csv")
+        if os.path.exists(file_path):
+            d = pd.read_csv(file_path).sort_values("percentage").set_index("percentage")["accuracy"]
+            curves[seed] = (d.index.tolist(), d.values.tolist())
+        else:
+            print(f"Warning: File not found for seed {seed}: {file_path}")
+    return curves
+
 
 def train_step(
     X_train: np.ndarray,
@@ -189,21 +204,28 @@ def plot_results(avg_accuracies: dict):
 
 
 if __name__ == "__main__":
-    START_SEED = 10
-    END_SEED   = 10
 
-    os.makedirs("results/baseline", exist_ok=True)
+    mode = "plot"  # "run" vagy "plot"
 
-    print(f"🔧 Párhuzamos workerek száma: {NUM_WORKERS}")
+    if torch.mode == "run":
+        START_SEED = 10
+        END_SEED   = 10
 
-    with Pool(processes=NUM_WORKERS) as pool:
-        results = pool.map(run_seed, range(START_SEED, END_SEED + 1))
+        os.makedirs("results/baseline", exist_ok=True)
 
-    all_results = {
-        seed: (pcts, accs)
-        for seed, pcts, accs in results
-        if pcts is not None
-    }
+        print(f"🔧 Párhuzamos workerek száma: {NUM_WORKERS}")
+
+        with Pool(processes=NUM_WORKERS) as pool:
+            results = pool.map(run_seed, range(START_SEED, END_SEED + 1))
+
+        all_results = {
+            seed: (pcts, accs)
+            for seed, pcts, accs in results
+            if pcts is not None
+        }
+    elif mode == "plot":
+        seeds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10]
+        all_results = load_seed_curves(seeds=seeds)
 
     if not all_results:
         print("Nem sikerült egyetlen futást sem végrehajtani.")

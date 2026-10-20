@@ -142,10 +142,11 @@ class DrugDiscoveryClient(fl.client.NumPyClient):
         targets_all = np.vstack(targets_batches) if targets_batches else np.zeros((0, output_size))
 
         global_acc = 0.0
-        if preds_all.size > 0:
+        measured = ~np.isnan(targets_all)
+        if measured.any():
+            # Score measured (compound, target) pairs only; unmeasured pairs have no label
             preds_bin_all = (preds_all > 0.5).astype(int)
-            targets_all_zero = np.nan_to_num(targets_all, nan=0.0).astype(int)
-            global_acc = accuracy_score(targets_all_zero.flatten(), preds_bin_all.flatten())
+            global_acc = accuracy_score(targets_all[measured].astype(int), preds_bin_all[measured])
 
         avg_loss = total_loss / max(1, samples)
         return float(avg_loss), samples, {"accuracy": float(global_acc), "loss": float(avg_loss)}

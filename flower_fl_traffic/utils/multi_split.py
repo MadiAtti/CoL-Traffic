@@ -1,21 +1,19 @@
 """
 multi_seed_experiment.py
 ------------------------
-Runs the local vs federated training experiment over seeds 0–9,
+Runs the local vs federated training experiment over seeds,
 in parallel across seeds (one process per seed), saves per-seed JSON
-results, then writes an averaged CSV and plots 3 curves (1x / 5x / 10x).
+results, then writes an averaged CSV, a per-seed analysis (std, min/max and
+the seeds where they occur) and plots the curves (1x / 5x / 10x).
 
 Output layout
 -------------
 results/multi-split
-  seed_0.json
-  seed_1.json
-  ...
-  seed_9.json
+  seed_<n>.json
   averaged_results.csv
-  curves_1x.png
-  curves_5x.png
-  curves_10x.png
+  per_seed_results.csv
+  per_seed_stats.csv
+  curves_all.png
 """
 
 from __future__ import annotations
@@ -41,8 +39,15 @@ from sklearn.preprocessing import LabelEncoder
 # Config
 # ──────────────────────────────────────────────────────────────────────────────
 
-SEEDS       = [10, 11, 12]        # 0 … 9
+SEEDS       = [10, 11, 12]        # seeds used in "run" mode
+PLOT_SEEDS  = [0, 2, 3, 6, 7, 8, 9, 10, 11, 12]   # seeds loaded in "plot" mode
 NUM_WORKERS = 2       # parallel seeds (tune to your CPU)
+
+# --- "rerun" mode: re-train only the invalid (0.0) 10x entries -------------
+RERUN_SEEDS   = None   # None = auto-detect every seed in PLOT_SEEDS with invalid entries
+RERUN_KEYS    = [10]   # only the 10x dataset
+RERUN_WORKERS = 1      # 1 = sequential, safest for RAM / Ray
+MAX_RETRIES   = 3      # attempts per config if the federated result is invalid
 RESULTS_DIR = Path("results/multi-split")
 
 TARGET_COLUMN = "application_name"
@@ -69,6 +74,9 @@ FEATURE_COLUMNS = [
     "bidirectional_max_piat_ms",
     "bidirectional_rst_packets",
 ]
+
+# Metrics analysed per seed in the "plot" mode analysis
+ANALYSIS_METRICS = ["local_p1", "local_p2", "fed_p1", "fed_p2", "avg_gain", "norm_impr_p1"]
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -113,13 +121,17 @@ def _worker_imports():
 # Dataset loading
 # ──────────────────────────────────────────────────────────────────────────────
 
-def load_dataset(seed: int) -> dict[int, pd.DataFrame]:
+def load_dataset(seed: int, keys=None) -> dict[int, pd.DataFrame]:
+    keys = DATASET_KEYS if keys is None else keys
     base = pd.read_parquet("dataset/dataset.parquet")
-    return {
-        1:  base.sample(frac=0.1, random_state=seed),
-        5:  base.sample(frac=0.5, random_state=seed),
-        10: base,
-    }
+    out: dict[int, pd.DataFrame] = {}
+    if 1 in keys:
+        out[1] = base.sample(frac=0.1, random_state=seed)
+    if 5 in keys:
+        out[5] = base.sample(frac=0.5, random_state=seed)
+    if 10 in keys:
+        out[10] = base
+    return out
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -228,8 +240,18 @@ def train_federated(p1_df, p2_df, le) -> tuple[float, float]:
         },
     )
 
-    p1_acc = history.metrics_distributed["client1_accuracy"][-1][1]
-    p2_acc = history.metrics_distributed["client2_accuracy"][-1][1]
+    p1_hist = history.metrics_distributed.get("client1_accuracy", [])
+    p2_hist = history.metrics_distributed.get("client2_accuracy", [])
+    p1_acc = p1_hist[-1][1] if p1_hist else 0.0
+    p2_acc = p2_hist[-1][1] if p2_hist else 0.0
+
+    if not (p1_acc > 0.0 and p2_acc > 0.0):
+        # Diagnostics: show where the value gets lost
+        print("  P1 acc history:", p1_hist, flush=True)
+        print("  P2 acc history:", p2_hist, flush=True)
+        print("  distributed losses:", history.losses_distributed, flush=True)
+        raise RuntimeError(f"Invalid federated accuracy: p1={p1_acc}, p2={p2_acc}")
+
     return float(p1_acc), float(p2_acc)
 
 
@@ -237,32 +259,96 @@ def train_federated(p1_df, p2_df, le) -> tuple[float, float]:
 # Per-seed worker  (runs in a separate process)
 # ──────────────────────────────────────────────────────────────────────────────
 
-def run_seed(seed: int) -> dict:
+def is_valid_entry(entry: dict) -> bool:
+    """Invalid = any accuracy is missing, NaN or exactly 0.0 (lost client evaluation)."""
+    vals = [
+        entry["local"]["player1"], entry["local"]["player2"],
+        entry["federated"]["player1"], entry["federated"]["player2"],
+    ]
+    return all(v is not None and not np.isnan(v) and v > 0.0 for v in vals)
+
+
+def find_bad_configs(seeds: list[int], dataset_keys=None) -> dict[int, list[str]]:
+    """Scan seed_<n>.json files. Returns {seed: [invalid config tags]}."""
+    bad: dict[int, list[str]] = {}
+    for seed in seeds:
+        path = RESULTS_DIR / f"seed_{seed}.json"
+        if not path.exists():
+            continue
+        with open(path) as f:
+            res = json.load(f)["results"]
+        tags = [
+            tag for tag, e in res.items()
+            if (dataset_keys is None or e["dataset_key"] in dataset_keys)
+            and not is_valid_entry(e)
+        ]
+        if tags:
+            bad[seed] = tags
+    return bad
+
+
+def train_federated_checked(p1, p2, le, tag: str, seed: int):
+    """Retry federated training if the result is invalid. Returns None if all attempts fail."""
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            return train_federated(p1, p2, le)
+        except RuntimeError as exc:
+            print(f"[seed={seed}] {tag} attempt {attempt}/{MAX_RETRIES} failed: {exc}", flush=True)
+    return None
+
+
+def run_seed(seed: int, dataset_keys=None, only_tags=None) -> dict:
     """
-    Trains all dataset-sizes × ratios for one seed.
-    Returns a nested dict and also writes results/seed_{seed}.json.
+    Trains dataset-sizes x ratios for one seed and writes results/seed_{seed}.json.
+
+    dataset_keys : which datasets to run (default: all)
+    only_tags    : if given, only these configs (e.g. {"10x_r0.125"}) are (re)run;
+                   existing valid entries are kept, and a valid existing LOCAL result
+                   is reused so only the federated part is retrained.
+    The JSON is updated after every config, and invalid results are never saved.
     """
     _worker_imports()
     set_seed(seed)
 
-    datasets = load_dataset(seed)
-    seed_results: dict = {}   # key: (dataset_key, ratio)
+    dataset_keys = DATASET_KEYS if dataset_keys is None else dataset_keys
 
-    for key in DATASET_KEYS:
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    out_path = RESULTS_DIR / f"seed_{seed}.json"
+
+    seed_results: dict = {}
+    if out_path.exists():
+        with open(out_path) as f:
+            seed_results = json.load(f)["results"]
+
+    datasets = load_dataset(seed, dataset_keys)
+
+    for key in dataset_keys:
         dataset = datasets[key]
         le = LabelEncoder()
         le.fit(dataset[TARGET_COLUMN])
 
         for ratio in RATIOS:
+            tag = f"{key}x_r{ratio}"
+            if only_tags is not None and tag not in only_tags:
+                continue
+
             split_idx = int(len(dataset) * ratio / (1 + ratio))
             p1 = dataset.iloc[:split_idx]
             p2 = dataset.iloc[split_idx:]
-
-            tag = f"{key}x_r{ratio}"
             print(f"[seed={seed}] {tag} | P1:{len(p1)} P2:{len(p2)}", flush=True)
 
-            p1_loc, p2_loc = train_local(p1, p2, le)
-            p1_fed, p2_fed = train_federated(p1, p2, le)
+            # reuse an existing valid local result (local training is the slow part)
+            old = seed_results.get(tag)
+            if old and old["local"]["player1"] > 0 and old["local"]["player2"] > 0:
+                p1_loc, p2_loc = old["local"]["player1"], old["local"]["player2"]
+            else:
+                p1_loc, p2_loc = train_local(p1, p2, le)
+
+            fed = train_federated_checked(p1, p2, le, tag, seed)
+            if fed is None:
+                print(f"[seed={seed}] {tag} SKIPPED (all {MAX_RETRIES} attempts invalid)", flush=True)
+                continue
+            p1_fed, p2_fed = fed
 
             seed_results[tag] = {
                 "dataset_key": key,
@@ -270,7 +356,6 @@ def run_seed(seed: int) -> dict:
                 "local":       {"player1": p1_loc, "player2": p2_loc},
                 "federated":   {"player1": p1_fed, "player2": p2_fed},
             }
-
             print(
                 f"[seed={seed}] {tag} "
                 f"local=({p1_loc:.4f},{p2_loc:.4f}) "
@@ -278,13 +363,11 @@ def run_seed(seed: int) -> dict:
                 flush=True,
             )
 
-    # ── save per-seed JSON ────────────────────────────────────────────────────
-    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    out_path = RESULTS_DIR / f"seed_{seed}.json"
-    with open(out_path, "w") as f:
-        json.dump({"seed": seed, "results": seed_results}, f, indent=2)
-    print(f"[seed={seed}] Saved → {out_path}", flush=True)
+            # save after every config so progress is never lost
+            with open(out_path, "w") as f:
+                json.dump({"seed": seed, "results": seed_results}, f, indent=2)
 
+    print(f"[seed={seed}] Saved -> {out_path}", flush=True)
     return seed_results
 
 
@@ -327,11 +410,109 @@ def aggregate(all_seed_results: list[dict]) -> pd.DataFrame:
     return agg
 
 
+def load_seed_curves(seeds: list[int]) -> dict[int, dict]:
+    """Load seed_<n>.json files. Returns {seed: results_dict}."""
+    results_by_seed: dict[int, dict] = {}
+    for seed in seeds:
+        path = RESULTS_DIR / f"seed_{seed}.json"
+        if not path.exists():
+            print(f"Warning: {path} does not exist, skipping seed {seed}")
+            continue
+        with open(path) as f:
+            data = json.load(f)
+        results_by_seed[seed] = data["results"]
+    return results_by_seed
+
+
 # ──────────────────────────────────────────────────────────────────────────────
-# Plotting  (one figure per dataset_key)
+# Per-seed analysis (std, min/max and which seeds they come from)
 # ──────────────────────────────────────────────────────────────────────────────
 
-def plot_curves(agg: pd.DataFrame):
+def analyze_per_seed(results_by_seed: dict[int, dict]) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    For every (dataset_key, ratio) configuration and metric, compute the mean,
+    std, min / max across seeds and the seed in which min / max occurs.
+
+    Returns (long_df, stats_df):
+      long_df  – one row per (seed, config) with all metrics
+      stats_df – one row per (config, metric) with summary statistics
+    """
+    rows = []
+    for seed, res in results_by_seed.items():
+        for tag, v in res.items():
+            lp1, lp2 = v["local"]["player1"], v["local"]["player2"]
+            fp1, fp2 = v["federated"]["player1"], v["federated"]["player2"]
+            rows.append({
+                "seed": seed,
+                "dataset_key": v["dataset_key"],
+                "ratio": v["ratio"],
+                "local_p1": lp1, "local_p2": lp2,
+                "fed_p1": fp1, "fed_p2": fp2,
+                "avg_gain": (fp1 + fp2) / 2 - (lp1 + lp2) / 2,
+                "norm_impr_p1": (fp1 - lp1) / (1 - lp1) if lp1 < 1 else np.nan,
+            })
+    long_df = pd.DataFrame(rows)
+
+    stats = []
+    for (key, ratio), g in long_df.groupby(["dataset_key", "ratio"]):
+        g = g.set_index("seed")
+        for m in ANALYSIS_METRICS:
+            s = g[m].dropna()
+            if s.empty:
+                continue
+            stats.append({
+                "dataset_key": key, "ratio": ratio, "metric": m,
+                "n_seeds": len(s),
+                "mean": s.mean(), "std": s.std(),
+                "min": s.min(), "min_seed": s.idxmin(),
+                "max": s.max(), "max_seed": s.idxmax(),
+                "range": s.max() - s.min(),
+            })
+    stats_df = pd.DataFrame(stats)
+    return long_df, stats_df
+
+
+def print_seed_analysis(results_by_seed: dict[int, dict]) -> None:
+    long_df, stats_df = analyze_per_seed(results_by_seed)
+
+    pd.set_option("display.width", 200)
+    pd.set_option("display.max_columns", None)
+
+    for m in ANALYSIS_METRICS:
+        sub = stats_df[stats_df["metric"] == m].drop(columns="metric")
+        print(f"\n=== {m}: seedek közötti statisztika konfigurációnként ===")
+        print(sub.to_string(index=False, float_format=lambda x: f"{x:.4f}"))
+
+    # Which seed is how often the min / max?
+    print("\n=== Melyik seed hányszor min / max (avg_gain alapján) ===")
+    g = stats_df[stats_df["metric"] == "avg_gain"]
+    counts = pd.DataFrame({
+        "times_min": g["min_seed"].value_counts(),
+        "times_max": g["max_seed"].value_counts(),
+    }).fillna(0).astype(int).sort_index()
+    print(counts.to_string())
+
+    # Seed × configuration table for avg_gain
+    print("\n=== avg_gain: seed × (dataset_key, ratio) ===")
+    pivot = long_df.pivot_table(
+        index="seed", columns=["dataset_key", "ratio"], values="avg_gain"
+    )
+    print(pivot.to_string(float_format=lambda x: f"{x:.4f}"))
+
+    # Save to CSV
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    long_path  = RESULTS_DIR / "per_seed_results.csv"
+    stats_path = RESULTS_DIR / "per_seed_stats.csv"
+    long_df.to_csv(long_path, index=False)
+    stats_df.to_csv(stats_path, index=False)
+    print(f"\nMentve → {long_path}, {stats_path}")
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Plotting  (one figure with 2 rows × 3 columns)
+# ──────────────────────────────────────────────────────────────────────────────
+
+def plot_curves(agg: pd.DataFrame, n_seeds: int):
     """
     One figure with 2 rows × 3 columns:
       Row 0: accuracy curves (local vs federated, P1 & P2, ±std)  for 1x / 5x / 10x
@@ -351,7 +532,7 @@ def plot_curves(agg: pd.DataFrame):
         gridspec_kw={"hspace": 0.45, "wspace": 0.30},
     )
     fig.suptitle(
-        f"Local vs Federated accuracy  –  averaged over {len(SEEDS)} seeds",
+        f"Local vs Federated accuracy  –  averaged over {n_seeds} seeds",
         fontsize=14, y=1.01,
     )
 
@@ -407,40 +588,85 @@ def plot_curves(agg: pd.DataFrame):
 # ──────────────────────────────────────────────────────────────────────────────
 
 def main():
-    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    mode = "plot"  # "run", "rerun" or "plot"
 
-    all_seed_results: list[dict] = []
+    results_by_seed: dict[int, dict] = {}
 
-    # ── parallel seed execution ───────────────────────────────────────────────
-    # Each seed runs in its own process to avoid Ray / Lightning state clashes.
-    # Reduce NUM_WORKERS if you run out of RAM.
-    print(f"Launching {len(SEEDS)} seeds with {NUM_WORKERS} parallel workers …")
+    if mode == "run":
+        RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
-    with ProcessPoolExecutor(max_workers=NUM_WORKERS) as pool:
-        futures = {pool.submit(run_seed, s): s for s in SEEDS}
-        for future in as_completed(futures):
-            seed = futures[future]
-            try:
-                result = future.result()
-                all_seed_results.append(result)
-                print(f"✓ Seed {seed} complete")
-            except Exception as exc:
-                print(f"✗ Seed {seed} FAILED: {exc}")
+        # Each seed runs in its own process to avoid Ray / Lightning state clashes.
+        print(f"Launching {len(SEEDS)} seeds with {NUM_WORKERS} parallel workers ...")
 
-    if not all_seed_results:
-        print("No results collected — aborting.")
+        with ProcessPoolExecutor(max_workers=NUM_WORKERS) as pool:
+            futures = {pool.submit(run_seed, s): s for s in SEEDS}
+            for future in as_completed(futures):
+                seed = futures[future]
+                try:
+                    results_by_seed[seed] = future.result()
+                    print(f"OK Seed {seed} complete")
+                except Exception as exc:
+                    print(f"FAILED Seed {seed}: {exc}")
+
+    elif mode == "rerun":
+        seeds = PLOT_SEEDS if RERUN_SEEDS is None else RERUN_SEEDS
+        bad = find_bad_configs(seeds, RERUN_KEYS)
+        if not bad:
+            print("No invalid entries found - nothing to rerun.")
+        else:
+            print("Invalid configs found:")
+            for s, tags in bad.items():
+                print(f"  seed {s}: {len(tags)} configs -> {tags}")
+            print(f"\nRerunning {len(bad)} seeds with {RERUN_WORKERS} worker(s) ...")
+
+            with ProcessPoolExecutor(max_workers=RERUN_WORKERS) as pool:
+                futures = {
+                    pool.submit(run_seed, s, RERUN_KEYS, set(tags)): s
+                    for s, tags in bad.items()
+                }
+                for future in as_completed(futures):
+                    seed = futures[future]
+                    try:
+                        future.result()
+                        print(f"OK Seed {seed} rerun complete")
+                    except Exception as exc:
+                        print(f"FAILED Seed {seed} rerun: {exc}")
+
+            still_bad = find_bad_configs(seeds, RERUN_KEYS)
+            if still_bad:
+                print("\nStill invalid after rerun:")
+                for s, tags in still_bad.items():
+                    print(f"  seed {s}: {tags}")
+            else:
+                print("\nAll previously invalid configs are now valid.")
+
+        results_by_seed = load_seed_curves(seeds=PLOT_SEEDS)
+
+    elif mode == "plot":
+        results_by_seed = load_seed_curves(seeds=PLOT_SEEDS)
+
+    else:
+        raise ValueError(f"Unknown mode: {mode!r} (use 'run', 'rerun' or 'plot')")
+
+    if not results_by_seed:
+        print("No results collected - aborting.")
         return
 
-    # ── aggregate ─────────────────────────────────────────────────────────────
+    all_seed_results = list(results_by_seed.values())
+
+    # per-seed analysis (std, min/max + seeds)
+    print_seed_analysis(results_by_seed)
+
+    # aggregate
     agg = aggregate(all_seed_results)
 
     csv_path = RESULTS_DIR / "averaged_results.csv"
     agg.to_csv(csv_path, index=False)
-    print(f"\nAveraged results saved → {csv_path}")
+    print(f"\nAveraged results saved -> {csv_path}")
     print(agg.to_string(index=False))
 
-    # ── plot ──────────────────────────────────────────────────────────────────
-    plot_curves(agg)
+    # plot
+    plot_curves(agg, n_seeds=len(all_seed_results))
 
     print("\nDone. All outputs are in the results/ directory.")
 

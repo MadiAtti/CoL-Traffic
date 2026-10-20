@@ -1,5 +1,3 @@
-import argparse
-import glob
 import json
 from pathlib import Path
 
@@ -11,8 +9,6 @@ RATIO_ORDER = [0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0]
 RATIO_LABELS = ["1/8", "1/4", "1/2", "1/1", "2/1", "4/1", "8/1"]
 
 REQUIRED_COLS = {"dataset_key", "ratio", "local_p1_mean", "local_p2_mean", "fed_p1_mean", "fed_p2_mean"}
-
-DEFAULT_SEED_GLOB = "results/multi-split/seed_*.json"
 
 
 def load_curve_data(csv_path: Path) -> pd.DataFrame:
@@ -79,124 +75,63 @@ def load_seed_json(path: str) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def load_seed_curves(seed_glob: str) -> pd.DataFrame | None:
-    files = sorted(glob.glob(seed_glob))
-    if not files:
-        return None
+def plot_union(input_file: Path, output_file: Path) -> None:
+    input_file = Path(input_file)
+    output_file = Path(output_file)
 
-    frames = []
-    for i, f in enumerate(files):
-        d = load_seed_json(f).copy()
-        d["seed_id"] = i
-        d["file"] = Path(f).name
-        d["y"] = normalized_improvement(d)
-        frames.append(d)
-    print(f"Loaded {len(files)} seed files.")
-    return pd.concat(frames, ignore_index=True)
-
-
-# (dataset_key, ratio) points for which the lowest-value file is reported
-REPORT_POINTS = [(5, 1.0), (1, 1), (10, 0.5)]
-
-
-def report_lowest_minimum(seed_df: pd.DataFrame, dataset_labels: dict) -> None:
-    """Print which seed file gave the lowest value at selected (dataset, ratio) points."""
-    valid = seed_df.dropna(subset=["y"])
-
-    print("\nSeed file with the lowest value:")
-    for key, ratio in REPORT_POINTS:
-        s = valid[(valid["dataset_key"] == key) & ((valid["ratio"] - ratio).abs() < 1e-9)]
-        name = f"{dataset_labels.get(key, key)} {ratio:g}"
-        if s.empty:
-            print(f"  {name}: no data")
-            continue
-        r = s.loc[s["y"].idxmin()]
-        print(f"  {name}: {r['file']}  (y = {r['y']:.4f})")
-    print()
-
-
-def plot_union(input_file: Path, output_file: Path, seed_glob: str = DEFAULT_SEED_GLOB) -> None:
     df = load_curve_data(input_file)
-    seed_df = load_seed_curves(seed_glob)
-    if seed_df is None:
-        print(f"Warning: no per-seed files found for '{seed_glob}', plotting without spread band.")
 
-    plt.rcParams.update(
-        {
-            "font.size": 16,
-            "axes.titlesize": 20,
-            "axes.labelsize": 36,
-            "xtick.labelsize": 32,
-            "ytick.labelsize": 32,
-            "legend.fontsize": 32,
-        }
-    )
-    plt.figure(figsize=(13, 8))
+    font_cfg = {
+        "font.size": 16,
+        "axes.titlesize": 20,
+        "axes.labelsize": 36,
+        "xtick.labelsize": 32,
+        "ytick.labelsize": 32,
+        "legend.fontsize": 32,
+    }
 
     dataset_labels = {1: "1x", 5: "5x", 10: "10x"}
     x = list(range(len(RATIO_ORDER)))
 
-    if seed_df is not None:
-        report_lowest_minimum(seed_df, dataset_labels)
+    with plt.rc_context(font_cfg):
+        plt.figure(figsize=(13, 8))
 
-    for key in sorted(df["dataset_key"].unique()):
-        label = dataset_labels.get(key, str(key))
-        subset = df[df["dataset_key"] == key].copy()
-        subset = subset.set_index("ratio").reindex(RATIO_ORDER).reset_index()
+        for key in sorted(df["dataset_key"].unique()):
+            label = dataset_labels.get(key, str(key))
+            subset = df[df["dataset_key"] == key].copy()
+            subset = subset.set_index("ratio").reindex(RATIO_ORDER).reset_index()
 
-        y = normalized_improvement(subset)
+            y = normalized_improvement(subset)
 
-        (line,) = plt.plot(
-            x,
-            y,
-            marker="o",
-            markersize=16,
-            markeredgewidth=2.5,
-            linewidth=10,
-            label=label,
-            zorder=3,
-        )
-        color = line.get_color()
-
-        if seed_df is not None:
-            s = seed_df[seed_df["dataset_key"] == key]
-
-            # Faint band: min-max across seeds
-            spread = s.groupby("ratio")["y"].agg(["min", "max"]).reindex(RATIO_ORDER)
-            plt.fill_between(
-                x, spread["min"], spread["max"],
-                color=color, alpha=0.15, linewidth=0, zorder=1,
+            plt.plot(
+                x,
+                y,
+                marker="o",
+                markersize=16,
+                markeredgewidth=2.5,
+                linewidth=10,
+                label=label,
+                zorder=3,
             )
 
-            # Very faint individual seed curves
-            for _, sd in s.groupby("seed_id"):
-                sd = sd.set_index("ratio").reindex(RATIO_ORDER)
-                plt.plot(x, sd["y"], color=color, alpha=0.12, linewidth=1, zorder=2)
+        plt.axhline(0.0, color="gray", linestyle="--", linewidth=1)
+        plt.xticks(x, RATIO_LABELS)
+        plt.xlabel("Datasize Ratio")
+        plt.ylabel("Normalized Accuracy\nImprovement")
+        plt.grid(True, linestyle=":", alpha=0.5)
+        plt.legend()
+        plt.tight_layout()
 
-    plt.axhline(0.0, color="gray", linestyle="--", linewidth=1)
-    plt.xticks(x, RATIO_LABELS)
-    plt.xlabel("Datasize Ratio")
-    plt.ylabel("Normalized Accuracy\nImprovement")
-    plt.grid(True, linestyle=":", alpha=0.5)
-    plt.legend()
-    plt.tight_layout()
-
-    output_file.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(output_file, dpi=300)
-    plt.close()
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(output_file, dpi=300)
+        plt.close()
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input", default="results/multi-split/averaged_results.csv")
-    parser.add_argument("--output", default="results/multi-split/averaged_rcurves.png")
-    parser.add_argument("--seed-glob", default=DEFAULT_SEED_GLOB)
-    args = parser.parse_args()
+    input_path = Path("results/multi-split/averaged_results.csv")
+    output_path = Path("results/final/tg_vs_all_NT.png")
 
-    input_path = Path(args.input)
-    output_path = Path(args.output)
-
-    plot_union(input_path, output_path, seed_glob=args.seed_glob)
+    plot_union(input_path, output_path)
 
     print(f"Saved: {output_path}")
 

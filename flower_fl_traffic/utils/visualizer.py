@@ -1,3 +1,4 @@
+import json
 import os
 import warnings
 from matplotlib import pyplot as plt
@@ -23,7 +24,7 @@ SCENARIO_LABELS = {
 
 def get_title_metric_name():
     if analyze == "accuracy":
-        return "Isotonic Accuracy Gain"
+        return "Gain"
     return "Relative Loss Change"
 
 
@@ -80,20 +81,28 @@ def apply_f(phi_tilde, D_n, grid, params):
     return g * h * phi_tilde
 
 
-def rmse(a, b):
+def rmse(a, b, mask=None):
+    if mask is not None:
+        a = a[mask]
+        b = b[mask]
     return np.sqrt(mean_squared_error(a.ravel(), b.ravel()))
 
 def fit_f_joint(pred_full, real_full, D_full,
     pred_half, real_half, D_half,
     grid_full, grid_half, verbose=True):
 
+    mask_full = np.ones(pred_full.shape, dtype=bool)
+    mask_full[-1, -1] = False
+
+    mask_half = np.ones(pred_half.shape, dtype=bool)
+    mask_half[-1, -1] = False
 
     def loss(params):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             transformed_full = apply_f(pred_full, D_full, grid_full, params)
             transformed_half = apply_f(pred_half, D_half, grid_half, params)
-        return rmse(transformed_full, real_full) + rmse(transformed_half, real_half)
+        return rmse(transformed_full, real_full, mask=mask_full) + rmse(transformed_half, real_half, mask=mask_half)
 
     bounds = [(-10.0, 10.0)] * 4
 
@@ -122,7 +131,7 @@ def fit_f_joint(pred_full, real_full, D_full,
     transformed_full = apply_f(pred_full, D_full, grid_full, params)
     transformed_half = apply_f(pred_half, D_half, grid_half, params)
 
-    return params, transformed_full, transformed_half
+    return params, transformed_full, transformed_half, mask_full, mask_half
 
 def get_params_for_method(method_name, mode, config_data):
     if method_name == "Noise":
@@ -170,8 +179,8 @@ def save_diff_heatmap(matrix: np.ndarray, title: str, filepath: str,
             cbar_kws={"label": cbar_label},
             square=True
         )
-        ax.invert_yaxis()  # <-- (0,0) bal alul, (1,1) jobb felül
-        ax.tick_params(axis="y", rotation=0)  # y feliratok maradjanak vízszintesek
+        ax.invert_yaxis() 
+        ax.tick_params(axis="y", rotation=0) 
         plt.title(title)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
@@ -220,7 +229,7 @@ def _save_heatmap(matrix: np.ndarray, title: str, xlabel: str, ylabel: str,
                     std_val = 0.0 if np.isnan(std) else std
                     annot_matrix[i, j] = f"{val:.3f}\n±{std_val:.3f}"
         annot_arg = annot_matrix
-        fmt_arg = ""  # Mivel az annot_matrix már előre megformázott stringeket tartalmaz
+        fmt_arg = "" 
     else:
         annot_arg = True
         fmt_arg = ".3f"
@@ -238,7 +247,7 @@ def _save_heatmap(matrix: np.ndarray, title: str, xlabel: str, ylabel: str,
             yticklabels=tick_labels if tick_labels is not None else "auto",
             cbar_kws={"label": get_title_metric_name()},
         )
-        ax.invert_yaxis()  # <-- y tengely megtükrözése
+        ax.invert_yaxis()
         ax.tick_params(axis="y", rotation=0)
         plt.title(title)
         plt.xlabel(xlabel)
@@ -288,6 +297,7 @@ def print_params(params):
 
 
 def main():
+    mode = "both"  # "heatmap", "transform" vagy "both"
     matrices = get_final_matrices()
 
     for method in ["Noise", "Suppression"]:
@@ -296,111 +306,134 @@ def main():
         real_full = monotonize_matrix(matrices["full"][method]["real"])
         pred_full = monotonize_matrix(matrices["full"][method]["pred"])
         real_half = monotonize_matrix(matrices["half"][method]["real"])
-        pred_half = monotonize_matrix(matrices["half"][method]["half"] if "half" in matrices["half"][method] else matrices["half"][method]["pred"])
+        pred_half = monotonize_matrix(matrices["half"][method]["pred"])
 
         real_full_std = matrices["full"][method]["real_std"]
         pred_full_std = matrices["full"][method]["pred_std"]
         real_half_std = matrices["half"][method]["real_std"]
         pred_half_std = matrices["half"][method]["pred_std"]
 
-        # Különbség kiszámítása
-        diff_full = pred_full - real_full
-        diff_half = pred_half - real_half
+        if mode in ["heatmap", "both"]:
+            # Különbség kiszámítása
+            diff_full = pred_full - real_full
+            diff_half = pred_half - real_half
 
-        os.makedirs(f"{base_path}final/", exist_ok=True)
+            os.makedirs(f"{base_path}final/", exist_ok=True)
 
-        full_ticks = get_display_ticks(method, mode="full")
-        half_ticks = get_display_ticks(method, mode="half")
+            full_ticks = get_display_ticks(method, mode="full")
+            half_ticks = get_display_ticks(method, mode="half")
 
-        if method == "Noise":
-            method_label = "DP"
-            method_name = "DP"
-        else:
-            method_label = "SUP"
-            method_name = "Sup"
+            if method == "Noise":
+                method_label = "DP"
+                method_name = "DP"
+            else:
+                method_label = "SUP"
+                method_name = "Sup"
 
-        # --- Gain Difference Hőtérképek ---
-        save_diff_heatmap(
-            diff_full,
-            title="Gain Difference",
-            filepath=f"{base_path}final/DIFF_NT_{method_name}_size2.png",
-            xlabel="P_other",
-            ylabel="P_own",
-            cbar_label="Gain difference",
-            tick_labels=full_ticks
-        )
+            # --- Gain Difference Hőtérképek ---
+            save_diff_heatmap(
+                diff_full,
+                title="Gain Difference",
+                filepath=f"{base_path}final/DIFF_NT_{method_name}_size2.png",
+                xlabel="P_other",
+                ylabel="P_own",
+                cbar_label="Gain difference",
+                tick_labels=full_ticks
+            )
 
-        save_diff_heatmap(
-            diff_half,
-            title="Gain Difference",
-            filepath=f"{base_path}final/DIFF_NT_{method_name}_size1.png",
-            xlabel="P_other",
-            ylabel="P_own",
-            cbar_label="Gain difference",
-            tick_labels=half_ticks
-        )
+            save_diff_heatmap(
+                diff_half,
+                title="Gain Difference",
+                filepath=f"{base_path}final/DIFF_NT_{method_name}_size1.png",
+                xlabel="P_other",
+                ylabel="P_own",
+                cbar_label="Gain difference",
+                tick_labels=half_ticks
+            )
 
-        SD_title = f"Isotonic RMSE Gain - SIM AVG (4 SD variants: P11, P12, P21, P22) - {method_label}\n(Mean ± STD over 4 variants)"
-        real_title = f"RMSE Gain - REAL - AVG(P_own, P_other) ({method_label})\n(Mean ± STD over Seeds)"
+            SD_title = f"Gain - SIM AVG (4 SD variants: P11, P12, P21, P22) - {method_label}\n(Mean ± STD over 4 variants)"
+            real_title = f"Gain - REAL - AVG(P_own, P_other) ({method_label})\n(Mean ± STD over Seeds)"
 
-        # --- Átlag + Szórás Hőtérképek Generálása ---
-        _save_heatmap(
-            matrix=real_full,
-            std_matrix=real_full_std,
-            title=real_title,
-            xlabel=f"P_other Privacy Parameter ({method_label})",  
-            ylabel=f"P_own Privacy Parameter ({method_label})", 
-            save_path=f"{base_path}final/NT_{method_name}_size2.png",
-            tick_labels=full_ticks,
-        )
+            # --- Átlag + Szórás Hőtérképek Generálása ---
+            _save_heatmap(
+                matrix=real_full,
+                std_matrix=real_full_std,
+                title=real_title,
+                xlabel=f"P_other Privacy Parameter ({method_label})",  
+                ylabel=f"P_own Privacy Parameter ({method_label})", 
+                save_path=f"{base_path}final/NT_{method_name}_size2.png",
+                tick_labels=full_ticks,
+            )
 
-        _save_heatmap(
-            matrix=pred_full,
-            std_matrix=pred_full_std,
-            title=SD_title,
-            xlabel=f"P_other Privacy Parameter ({method_label})",  
-            ylabel=f"P_own Privacy Parameter ({method_label})", 
-            save_path=f"{base_path}final/SD_NT_{method_name}_size2.png",
-            tick_labels=full_ticks,
-        )
+            _save_heatmap(
+                matrix=pred_full,
+                std_matrix=pred_full_std,
+                title=SD_title,
+                xlabel=f"P_other Privacy Parameter ({method_label})",  
+                ylabel=f"P_own Privacy Parameter ({method_label})", 
+                save_path=f"{base_path}final/SD_NT_{method_name}_size2.png",
+                tick_labels=full_ticks,
+            )
 
-        _save_heatmap(
-            matrix=real_half,
-            std_matrix=real_half_std,
-            title=real_title,
-            xlabel=f"P_other Privacy Parameter ({method_label})",  
-            ylabel=f"P_own Privacy Parameter ({method_label})", 
-            save_path=f"{base_path}final/NT_{method_name}_size1.png",
-            tick_labels=half_ticks,
-        )
+            _save_heatmap(
+                matrix=real_half,
+                std_matrix=real_half_std,
+                title=real_title,
+                xlabel=f"P_other Privacy Parameter ({method_label})",  
+                ylabel=f"P_own Privacy Parameter ({method_label})", 
+                save_path=f"{base_path}final/NT_{method_name}_size1.png",
+                tick_labels=half_ticks,
+            )
 
-        _save_heatmap(
-            matrix=pred_half,
-            std_matrix=pred_half_std,
-            title=SD_title,
-            xlabel=f"P_other Privacy Parameter ({method_label})",  
-            ylabel=f"P_own Privacy Parameter ({method_label})", 
-            save_path=f"{base_path}final/SD_NT_{method_name}_size1.png",
-            tick_labels=half_ticks,
-        )
+            _save_heatmap(
+                matrix=pred_half,
+                std_matrix=pred_half_std,
+                title=SD_title,
+                xlabel=f"P_other Privacy Parameter ({method_label})",  
+                ylabel=f"P_own Privacy Parameter ({method_label})", 
+                save_path=f"{base_path}final/SD_NT_{method_name}_size1.png",
+                tick_labels=half_ticks,
+            )
 
-        G_full = real_full.shape[0]
-        G_half = real_half.shape[0]
-        grid_full = np.linspace(0, 1, G_full)
-        grid_half = np.linspace(0, 1, G_half)
+        if mode in ["transform", "both"]:
+            G_full = real_full.shape[0]
+            G_half = real_half.shape[0]
+            grid_full = np.linspace(0, 1, G_full)
+            grid_half = np.linspace(0, 1, G_half)
 
-        D_full = 3163462
-        D_half = 1581731
+            D_full = 3.163462
+            D_half = 1.581731
 
-        params, transformed_full, transformed_half = fit_f_joint(
-        pred_full, real_full, D_full,
-        pred_half, real_half, D_half,
-        grid_full, grid_half,
-        verbose=False
-        )
+            params, transformed_full, transformed_half, mask_full, mask_half = fit_f_joint(
+            pred_full, real_full, D_full,
+            pred_half, real_half, D_half,
+            grid_full, grid_half,
+            verbose=False
+            )
 
-        print(f"\nBefore fitting RMSE Full: {rmse(pred_full, real_full):.6f}, RMSE Half: {rmse(pred_half, real_half):.6f}")
-        print(f"\nFitted parameters for {method}: {print_params(params)}, RMSE Full: {rmse(transformed_full, real_full):.6f}, RMSE Half: {rmse(transformed_half, real_half):.6f}")
+            print(f"\nBefore fitting RMSE Full: {rmse(pred_full, real_full, mask=mask_full):.6f}, RMSE Half: {rmse(pred_half, real_half, mask=mask_half):.6f}")
+            print(f"\nFitted parameters for {method}: {print_params(params)}, RMSE Full: {rmse(transformed_full, real_full, mask=mask_full):.6f}, RMSE Half: {rmse(transformed_half, real_half, mask=mask_half):.6f}")
+            # print parameters and RMSE values to a json file
+            params_dict = {
+                "method": method,
+                "params": {
+                    "x": float(params[0]),
+                    "y": float(params[1]),
+                    "alpha": float(params[2]),
+                    "beta": float(params[3])
+                },
+                "rmse_before": {
+                    "full": float(rmse(pred_full, real_full, mask=mask_full)),
+                    "half": float(rmse(pred_half, real_half, mask=mask_half))
+                },
+                "rmse_after": {
+                    "full": float(rmse(transformed_full, real_full, mask=mask_full)),
+                    "half": float(rmse(transformed_half, real_half, mask=mask_half))
+                }
+            }
+        
+            with open(f"{base_path}final/{method}_params.json", "w") as f:
+                json.dump(params_dict, f, indent=4)
 
 
 

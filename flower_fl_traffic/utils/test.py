@@ -315,10 +315,16 @@ if __name__ == "__main__":
     # print(dataset.head(5))
     # print(other.head(5))
 
-    full_dataset = "dataset/dataset.parquet"
-    half_dataset_p1 = "dataset/half/p1.parquet"
-    half_dataset_p2 = "dataset/half/p2.parquet"
-
-    print("=== The two datasets sample counts ===")
-    print(f"Full dataset: {pq.read_metadata(full_dataset).num_rows} rows")
-    print(f"Half dataset: {pq.read_metadata(half_dataset_p1).num_rows + pq.read_metadata(half_dataset_p2).num_rows} rows")
+    df = pd.read_csv("results/multi-split/per_seed_results.csv")
+    sub = df[df.dataset_key == 1]
+    print(sub.pivot_table(index="seed", columns="ratio", values="fed_p2").round(3))
+    print(sub.pivot_table(index="seed", columns="ratio", values="fed_p1").round(3))
+    print(sub.isna().sum())
+    sub = df[df.dataset_key == 5]
+    print(sub.pivot_table(index="seed", columns="ratio", values="fed_p2").round(3))
+    print(sub.pivot_table(index="seed", columns="ratio", values="fed_p1").round(3))
+    print(sub.isna().sum())
+    sub = df[df.dataset_key == 10]
+    print(sub.pivot_table(index="seed", columns="ratio", values="fed_p2").round(3))
+    print(sub.pivot_table(index="seed", columns="ratio", values="fed_p1").round(3))
+    print(sub.isna().sum())

@@ -17,8 +17,15 @@ def hide_h_percent(X_train, Y_train, h, seed=42):
     
     return X_train[shared_data_indices], Y_train[shared_data_indices]
 
+def to_binary_labels(Y):
+    """Labels are stored as -1/+1; BCEWithLogitsLoss needs 0/1. Unmeasured pairs stay unstored."""
+    Y = Y.tocsr(copy=True)
+    Y.data = (Y.data > 0).astype(np.float32)
+    return Y
+
 def get_client_datasets(data_path, k, privacy_param, privacy_mode, conf, seed=42):
     X_train, Y_train = du.load_ratio_split_data(data_path, k, train=True)
+    Y_train = to_binary_labels(Y_train)
     
     if privacy_mode == 'sup' and privacy_param > 0.0:
         X_train, Y_train = hide_h_percent(X_train, Y_train, privacy_param, seed=seed)
@@ -27,6 +34,7 @@ def get_client_datasets(data_path, k, privacy_param, privacy_mode, conf, seed=42
     conf.output_size = Y_train.shape[1]
 
     X_test, Y_test = du.load_ratio_split_data(data_path, k, train=False)
+    Y_test = to_binary_labels(Y_test)
     test_dataset = sc.SparseDataset(X_test, Y_test)
 
     return train_dataset, test_dataset

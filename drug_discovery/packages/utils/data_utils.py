@@ -108,20 +108,20 @@ def load_split_data(rel_path, k):
 
 
 def load_ratio_split_data(rel_path, k, train):
-    x_candidates = ["x_tr.npz", "x_te.npz", "x_test.npz", "X_data.mtx"]
-    y_candidates = ["y_tr.npz", "y_te.npz", "y_test.npz", "Y_data.mtx"]
-
     if train:
-        direct_path = rel_path
+        x_candidates = ["x_tr.npz", "X_data.mtx"]
+        y_candidates = ["y_tr.npz", "Y_data.mtx"]
         split_path = os.path.join(rel_path, f"{k}_train")
-        path = direct_path if os.path.exists(os.path.join(direct_path, "x_tr.npz")) else split_path
+        path = rel_path if os.path.exists(os.path.join(rel_path, "x_tr.npz")) else split_path
     else:
-        direct_path = rel_path
+        x_candidates = ["x_te.npz", "x_test.npz", "X_data.mtx"]
+        y_candidates = ["y_te.npz", "y_test.npz", "Y_data.mtx"]
         split_path = os.path.join(rel_path, f"{k}_test")
-        path = direct_path if os.path.exists(os.path.join(direct_path, "x_te.npz")) or os.path.exists(os.path.join(direct_path, "x_tr.npz")) else split_path
-
-        if not os.path.exists(path):
-            path = os.path.join(rel_path, f"{k}_train")
+        path = rel_path if (
+            os.path.exists(os.path.join(rel_path, "x_te.npz"))
+            or os.path.exists(os.path.join(rel_path, "x_test.npz"))
+            or os.path.exists(os.path.join(rel_path, "X_data.mtx"))
+        ) else split_path
 
     X_data = _load_sparse_matrix(path, x_candidates)
     Y_data = _load_sparse_matrix(path, y_candidates)

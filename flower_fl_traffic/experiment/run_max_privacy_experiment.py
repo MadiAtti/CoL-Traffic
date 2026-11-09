@@ -1,7 +1,8 @@
-"""
-run_max_privacy_experiment.py
-------------------------------
-Max-privacy kísérlet: minden privacy szint párosítva az echo klienssel.
+"""Run scenarios that pair configured privacy levels with an echo client.
+
+The echo boundary models full protection by returning the received global
+weights unchanged. Regular privacy levels are crossed with echo in both player
+positions, with an additional echo-versus-echo scenario.
 """
 
 import logging
@@ -25,7 +26,15 @@ ECHO = "echo"
 
 
 def build_max_privacy_scenarios(levels):
-    """L-alakú scenario lista: minden szint párosítva az echo klienssel."""
+    """Create the L-shaped grid of regular and maximum-privacy scenarios.
+
+    Args:
+        levels: Configured suppression counts or DP noise multipliers.
+
+    Returns:
+        Ordered pairs containing echo-versus-level, level-versus-echo, and
+        echo-versus-echo settings.
+    """
     c1_echo = [(ECHO, v) for v in levels]
     c2_echo = [(v, ECHO) for v in levels]
     both_echo = [(ECHO, ECHO)]
@@ -33,16 +42,28 @@ def build_max_privacy_scenarios(levels):
 
 
 def create_mixed_client_fn(train_loaders, test_loaders, cfg, val1, val2):
-    """
-    Vegyes client_fn: echo vagy normál kliens az értékek alapján.
-    Az echo kliens n_samples-ként a másik kliens train dataset méretét kapja,
-    hogy a FedAvg 50-50 arányban súlyozzon.
+    """Build a Flower client factory for one mixed echo/active scenario.
+
+    The echo client's reported example count matches the active client's
+    training-set size. This gives both clients equal weight in FedAvg for
+    equal-sized participant splits.
+
+    Args:
+        train_loaders: Training loaders for both clients.
+        test_loaders: Evaluation loaders for both clients.
+        cfg: Experiment configuration used to create each client model.
+        val1: First client's privacy level or ``"echo"``.
+        val2: Second client's privacy level or ``"echo"``.
+
+    Returns:
+        A Flower ``client_fn`` accepting a client ID.
     """
     vals = [val1, val2]
 
     def client_fn(cid: str) -> fl.client.Client:
+        """Create the active or echo client associated with ``cid``."""
         idx = int(cid)
-        other_idx = 1 - idx  # a másik kliens indexe
+        other_idx = 1 - idx  # Index of the other client.
 
         if vals[idx] == ECHO:
             return EchoClient(
@@ -62,12 +83,21 @@ def create_mixed_client_fn(train_loaders, test_loaders, cfg, val1, val2):
 
 
 def _run_single_scenario(args):
+    """Run one maximum-privacy scenario and save its federated history.
+
+    Args:
+        args: Worker tuple containing privacy parameters, client loaders,
+            configuration, output metadata, and a shared file lock.
+
+    Returns:
+        The scenario parameters and final per-client accuracies.
+    """
     silence_log()
 
     (val1, val2, config, raw_train_loaders, test_loaders,
      subdir, mode, base_dir, metric_name, param_key, lock) = args
 
-    # Suppression esetén szűrjük az adatot a nem-echo klienseknél
+    # Apply feature suppression only to active clients, never to echo clients.
     if mode == "sup":
         from data.custom_dataset import CustomDataset
         from torch.utils.data import DataLoader
@@ -154,7 +184,22 @@ def _run_single_scenario(args):
 
 
 def run_max_privacy_experiment(config, train_loaders, test_loaders, subdir, mode):
+    """Run all echo-boundary scenarios for one method and client split.
+
+    Args:
+        config: Hydra experiment configuration.
+        train_loaders: Two client training DataLoaders.
+        test_loaders: Two client evaluation DataLoaders.
+        subdir: Empty for the full participant pair or ``P1``/``P2`` for
+            self-division games.
+        mode: Either ``"dp"`` or ``"sup"``.
+
+    Raises:
+        ValueError: If the dataset or experiment mode is unsupported.
+    """
     ds_mode = config.dataset.mode
+    if ds_mode not in {"full", "half", "80percent", "30percent"}:
+        raise ValueError(f"Ismeretlen dataset mode: {ds_mode}")
 
     if mode == "dp":
         base_dir  = f"results/{ds_mode}/4_max_privacy_noise"
@@ -164,19 +209,19 @@ def run_max_privacy_experiment(config, train_loaders, test_loaders, subdir, mode
             levels = config.config.full_noise_levels
         elif ds_mode == "half":
             levels = config.config.half_noise_levels
-        elif ds_mode == "quarter":
-            levels = config.config.quarter_noise_levels
         elif ds_mode == "80percent":
             levels = config.config.percent80_noise_levels
         elif ds_mode == "30percent":
             levels = config.config.percent30_noise_levels
         else:
             raise ValueError(f"Ismeretlen dataset mode: {ds_mode}")
-    else:
+    elif mode == "sup":
         base_dir    = f"results/{ds_mode}/4_max_privacy_suppression"
         metric_name = "features"
         param_key   = "features"
         levels      = config.config.sup_levels
+    else:
+        raise ValueError(f"Unsupported experiment mode: {mode}")
 
     setup_file(config, subdir, base_dir=base_dir)
 
@@ -202,9 +247,7 @@ def run_max_privacy_experiment(config, train_loaders, test_loaders, subdir, mode
     try:
         with mp.Pool(processes=num_parallel_scenarios) as pool:
             pool.map(_run_single_scenario, tasks)
-    except Exception as e:
-        print(f"Hiba a párhuzamos futtatás során: {e}")
-
-    ray.shutdown()
+    finally:
+        ray.shutdown()
 
     print(f"\n✨ Minden max-privacy scenario kész ({subdir}, {mode.upper()}).")

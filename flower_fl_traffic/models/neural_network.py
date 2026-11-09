@@ -1,3 +1,9 @@
+"""Neural-network architectures used by local and federated traffic training.
+
+The Lightning and Flower models share the same two-hidden-layer architecture
+so their parameter shapes remain compatible during federated aggregation.
+"""
+
 import torch.nn as nn
 
 import torch
@@ -11,6 +17,13 @@ class TrafficLightningModule(L.LightningModule):
     Encapsulates the model, training/validation steps, and optimizer configuration.
     """
     def __init__(self, input_dim, num_classes, lr=1e-3):
+        """Create the classifier and configure its training hyperparameters.
+
+        Args:
+            input_dim: Number of input features.
+            num_classes: Number of target classes.
+            lr: Adam learning rate.
+        """
         super().__init__()
         self.save_hyperparameters()
         
@@ -67,6 +80,12 @@ class TrafficNN(nn.Module):
     heuristic based on the input dimension and the number of classes.
     '''
     def __init__(self, input_dim, num_classes):
+        """Initialize the feed-forward classifier used by Flower clients.
+
+        Args:
+            input_dim: Number of input features.
+            num_classes: Number of output classes.
+        """
         super(TrafficNN, self).__init__()
         
         hidden_layer1_neurons = int((2 / 3) * input_dim + num_classes)
@@ -81,4 +100,5 @@ class TrafficNN(nn.Module):
         )
         
     def forward(self, x):
+        """Return class logits for an input batch."""
         return self.model(x)

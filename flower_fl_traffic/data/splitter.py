@@ -1,5 +1,11 @@
+"""Build cached P1/P2 partitions from the source traffic Parquet file.
+
+The source is cleaned, standardized, and label-encoded before optional
+stratified downsampling and a stratified participant split. Existing complete
+P1/P2 splits are reused rather than overwritten.
+"""
+
 import os
-from unittest import case
 
 import numpy as np
 import pandas as pd
@@ -8,22 +14,37 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 
 def dataset_splitter(cfg):
-    '''
-    This function performs the hierarchical splitting of the dataset into P1/P2 and then into P11/P12 and P21/P22.
-    It saves the splits as Parquet files for consistent loading in future runs.
-    '''
+    """Prepare and persist the configured P1/P2 dataset splits.
+
+    Args:
+        cfg: Hydra configuration specifying source data, columns, mode, and
+            participant split ratio.
+
+    Raises:
+        ValueError: If the selected dataset mode is unsupported.
+        FileNotFoundError: If exactly one cached participant split exists.
+    """
     ds_cfg = cfg.dataset
     ds_mode = ds_cfg.mode
-    
+    supported_modes = {"full", "half", "80percent", "30percent"}
+    if ds_mode not in supported_modes:
+        raise ValueError(f"Unsupported dataset mode: {ds_mode}")
 
     p1_path = "dataset/{ds_mode}{p1}".format(ds_mode=ds_mode, p1=ds_cfg.paths.p1)
     p2_path = "dataset/{ds_mode}{p2}".format(ds_mode=ds_mode, p2=ds_cfg.paths.p2)
 
     print(f"Checking for existing dataset splits at:\n - {p1_path}\n - {p2_path}")
 
-    if os.path.exists(p1_path) and os.path.exists(p2_path):
+    p1_exists = os.path.exists(p1_path)
+    p2_exists = os.path.exists(p2_path)
+    if p1_exists and p2_exists:
         print("Dataset splits already exist. Skipping splitting.")
         return
+    if p1_exists or p2_exists:
+        raise FileNotFoundError(
+            "Only one of the cached P1/P2 splits exists. Refusing to overwrite "
+            "the existing split; restore its matching file before continuing."
+        )
         
     print("Dataset splits not found. Performing splitting...")
 
@@ -37,12 +58,12 @@ def dataset_splitter(cfg):
         pass  # Use the full dataset without sampling
     elif ds_mode == "half": # Reduce to half the dataset
         X, _, y, _ = train_test_split(X, y, test_size=0.5, stratify=y, random_state=42)
-    elif ds_mode == "quarter": # Reduce to quarter of the dataset
-        X, _, y, _ = train_test_split(X, y, test_size=0.75, stratify=y, random_state=42)
     elif ds_mode == "80percent": # Reduce to 80% of the dataset
         X, _, y, _ = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
     elif ds_mode == "30percent": # Reduce to 30% of the dataset
         X, _, y, _ = train_test_split(X, y, test_size=0.7, stratify=y, random_state=42)
+    else:
+        raise ValueError(f"Unsupported dataset mode: {ds_mode}")
 
     # Base -> P1, P2
     X1, X2, y1, y2 = train_test_split(X, y, test_size=ds_cfg.initial_split_ratio, stratify=y, random_state=42)

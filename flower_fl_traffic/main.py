@@ -1,149 +1,128 @@
-# --- CRITICAL: Import silencer FIRST to set environment variables ---
-from experiment.run_max_privacy_experiment import run_max_privacy_experiment
-from utils.logger_silencer import silence_log
+"""Run the configured multi-seed federated traffic-classification study.
 
-import os
+The pipeline creates participant data loaders, trains local baselines, runs
+regular and maximum-privacy Flower simulations, and builds game matrices.
+Visualization and Nash-equilibrium analysis are intentionally separate tools.
+"""
+
 import multiprocessing as mp
-from time import time as get_time
+import os
+from time import perf_counter
+
 import hydra
 from omegaconf import DictConfig, OmegaConf
-import torch
+
+from utils.logger_silencer import silence_log
+
+silence_log()
+
 from data.dataset import prepare_data_and_loaders, setup_directories
+from data.splitter import dataset_splitter
 from experiment.experiment_runner import run_experiment
 from experiment.local_baseline import run_local_experiment
+from experiment.run_max_privacy_experiment import run_max_privacy_experiment
+from utils.average_plots import build_matrices_for_mode
 from utils.seed import set_seed
-from data.splitter import dataset_splitter
 
-def run_pipeline(config: DictConfig):
-    ## Execute runtime silencing
+
+def run_pipeline(config: DictConfig) -> None:
+    """Run all baseline and federated scenarios for one configured seed.
+
+    The seed's cached participant splits are prepared before training. Each
+    experiment uses the full participant pair and both self-division pairs.
+
+    Args:
+        config: Resolved Hydra configuration for the current seed.
+    """
     silence_log()
-
-    start_time = get_time()
-
-    ## Set random seed for reproducibility
+    start_time = perf_counter()
+    if config.num_clients != 2:
+        raise ValueError("This experiment pipeline requires exactly two clients.")
     set_seed(config.config.seed)
 
-    ## Load configuration and setup directories
     OmegaConf.set_struct(config, False)
     setup_directories(config)
-
     dataset_splitter(config)
 
-    ## Prepare dataset and update config with dataset info (input_dim, num_classes)
-    loaders = prepare_data_and_loaders(config)               
+    loaders = prepare_data_and_loaders(config)
+    p1_train = loaders["p1"]["train"].dataset
+    p2_train = loaders["p2"]["train"].dataset
+    p1_test = loaders["p1"]["test"].dataset
+    p2_test = loaders["p2"]["test"].dataset
+    if not len(p1_train) or not len(p2_train):
+        raise ValueError("The configured training split is empty.")
 
-    sample_batch_x, sample_batch_y = next(iter(loaders["p1"]["train"]))
-    if "dataset" not in config:
-        config.dataset = {}
-    
-    config.dataset.input_dim = sample_batch_x.shape[1]
-    config.dataset.num_classes = len(torch.unique(sample_batch_y))
-
-    ## Define experiments (client pairs and their corresponding dataset keys)
+    config.dataset.input_dim = len(config.dataset.feature_columns)
+    labels = set(p1_train.y.tolist())
+    labels.update(p2_train.y.tolist())
+    labels.update(p1_test.y.tolist())
+    labels.update(p2_test.y.tolist())
+    config.dataset.num_classes = len(labels)
 
     experiments = [
-        ("P1-P2",   "p1",  "p2",  ""),      
-        ("P11-P12", "p11", "p12", "P1"),   
-        ("P21-P22", "p21", "p22", "P2") 
+        ("P1-P2", "p1", "p2", ""),
+        ("P11-P12", "p11", "p12", "P1"),
+        ("P21-P22", "p21", "p22", "P2"),
     ]
 
-    ## Run local baseline experiments (M1, M2, M11, M12, M21, M22)
-    for exp_name, client1_key, client2_key, subdir in experiments:
-        print(f"\n{'#'*80}")
-        print(f"🚀 START EXPERIMENT: {exp_name} (BASELINE)🚀")
-        print(f"{'#'*80}\n")
+    for experiment_name, client1_key, client2_key, subdir in experiments:
+        print(f"\n{'#' * 80}\nStarting {experiment_name}\n{'#' * 80}")
+        train_loaders = [
+            loaders[client1_key]["train"],
+            loaders[client2_key]["train"],
+        ]
+        test_loaders = [
+            loaders[client1_key]["test"],
+            loaders[client2_key]["test"],
+        ]
 
-        # setup train and test loaders for the current experiment
-        train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
-        test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
-        
-        # run the local experiment and save results
         run_local_experiment(
-            config=config, 
-            train_loaders=train_loaders, 
-            test_loaders=test_loaders, 
+            config=config,
+            train_loaders=train_loaders,
+            test_loaders=test_loaders,
             subdir=subdir,
-            client_ids=[client1_key, client2_key]
+            client_ids=[client1_key, client2_key],
+        )
+        run_experiment(config, train_loaders, test_loaders, subdir, mode="dp")
+        run_experiment(config, train_loaders, test_loaders, subdir, mode="sup")
+        run_max_privacy_experiment(
+            config, train_loaders, test_loaders, subdir, mode="dp"
+        )
+        run_max_privacy_experiment(
+            config, train_loaders, test_loaders, subdir, mode="sup"
         )
 
-
-    ## Run experiments with different noise levels
-    for exp_name, client1_key, client2_key, subdir in experiments:
-        print(f"\n{'#'*80}")
-        print(f"START EXPERIMENT: {exp_name} (DP)🚀")
-        print(f"{'#'*80}\n")
-
-        # setup train and test loaders for the current experiment
-        train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
-        test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
-
-        #run the federated experiment with DP and save results
-        run_experiment(
-            config=config, 
-            train_loaders=train_loaders, 
-            test_loaders=test_loaders, 
-            subdir=subdir, mode="dp")
+    elapsed = perf_counter() - start_time
+    print(f"Total execution time: {elapsed / 3600:.2f} hours")
 
 
-    ## Run experiments with different suppression levels
-    for exp_name, client1_key, client2_key, subdir in experiments:
-        print(f"\n{'#'*80}")
-        print(f"START EXPERIMENT: {exp_name} (SUP)🚀")
-        print(f"{'#'*80}\n")
+@hydra.main(config_path="conf", config_name="base", version_base=None)
+def main(config: DictConfig) -> None:
+    """Execute the pipeline for the inclusive configured seed range.
 
-        # setup train and test loaders for the current experiment
-        train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
-        test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
+    After all seeds finish, construct per-seed and averaged payoff matrices
+    for the selected dataset mode.
 
-        # run the federated experiment with feature suppression and save results
-        run_experiment(
-            config=config, 
-            train_loaders=train_loaders, 
-            test_loaders=test_loaders, 
-            subdir=subdir, mode="sup")
+    Args:
+        config: Hydra configuration loaded from ``conf/base.yaml``.
+    """
+    os.environ["RAY_GCS_SERVER_PORT"] = "0"
+    seed_start = int(config.config.seed_start)
+    seed_end = int(config.config.seed_end)
+    if seed_end < seed_start:
+        raise ValueError("config.seed_end must be greater than or equal to config.seed_start.")
 
-    ##Run experiment whit max privacy
-    for exp_name, client1_key, client2_key, subdir in experiments:
-        print(f"\n{'#'*80}")
-        print(f"START EXPERIMENT: {exp_name} (MAX PRIVACY)🚀")
-        print(f"{'#'*80}\n")
+    for seed in range(seed_start, seed_end + 1):
+        config.config.seed = seed
+        print(f"\n{'#' * 80}\nRunning seed {seed}\n{'#' * 80}")
+        run_pipeline(config)
 
-        # setup train and test loaders for the current experiment
-        train_loaders = [loaders[client1_key]["train"], loaders[client2_key]["train"]]
-        test_loaders = [loaders[client1_key]["test"], loaders[client2_key]["test"]]
+    build_matrices_for_mode(
+        config.dataset.mode,
+        seeds=range(seed_start, seed_end + 1),
+    )
 
-        run_max_privacy_experiment(config, train_loaders, test_loaders, subdir, mode="dp")
-        run_max_privacy_experiment(config, train_loaders, test_loaders, subdir, mode="sup")
-
-        
-    end_time = get_time()
-    duration_seconds = end_time - start_time
-    
-    # Formázás óra:perc:másodperc alakba
-    hours, rem = divmod(duration_seconds, 3600)
-    minutes, seconds = divmod(rem, 60)
-
-    print(f"⏱️ Total Execution Time: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
 
 if __name__ == "__main__":
-
-    start_seed = 0
-    end_seed = 9  # Run the main function multiple times with different seeds
-
-    for i in range(start_seed, end_seed + 1):  # Run the main function multiple times if needed
-
-        try:
-            mp.set_start_method('spawn', force=True)
-        except RuntimeError:
-            pass
-
-        print(f"\n{'#'*80}")
-        print(f"RUNNING MAIN FUNCTION ITERATION {i+1}")
-        print(f"{'#'*80}\n")
-
-        config = OmegaConf.load("conf/base.yaml")
-        config.config.seed = i
-
-        os.environ["RAY_GCS_SERVER_PORT"] = "0"
-        
-        run_pipeline(config)
+    mp.set_start_method("spawn", force=True)
+    main()

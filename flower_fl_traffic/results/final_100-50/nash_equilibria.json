@@ -1,0 +1,3714 @@
+{
+  "metadata": {
+    "created_utc": "2026-11-09T08:32:17+00:00",
+    "analyze": "accuracy",
+    "monotonize": "per-player before seed/player averaging; after f for transformed SD",
+    "start_cell": [
+      0,
+      0
+    ],
+    "utility_formula": "utility = clipped_gain - C * leakage(own choice), leakage = 1 - protection",
+    "C_pairs": {
+      "full": {
+        "Noise": [
+          {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.0,
+            "second_player": 0.31
+          },
+          {
+            "first_player": 0.31,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.31,
+            "second_player": 0.31
+          }
+        ],
+        "Suppression": [
+          {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.0,
+            "second_player": 0.33
+          },
+          {
+            "first_player": 0.33,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.33,
+            "second_player": 0.33
+          }
+        ]
+      },
+      "half": {
+        "Noise": [
+          {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.0,
+            "second_player": 0.3
+          },
+          {
+            "first_player": 0.3,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.3,
+            "second_player": 0.3
+          }
+        ],
+        "Suppression": [
+          {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.0,
+            "second_player": 0.32
+          },
+          {
+            "first_player": 0.32,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.32,
+            "second_player": 0.32
+          }
+        ]
+      },
+      "80percent": {
+        "Noise": [
+          {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.0,
+            "second_player": 0.27
+          },
+          {
+            "first_player": 0.27,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.27,
+            "second_player": 0.27
+          }
+        ],
+        "Suppression": [
+          {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.0,
+            "second_player": 0.4
+          },
+          {
+            "first_player": 0.4,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.4,
+            "second_player": 0.4
+          }
+        ]
+      },
+      "30percent": {
+        "Noise": [
+          {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.0,
+            "second_player": 0.29
+          },
+          {
+            "first_player": 0.29,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.29,
+            "second_player": 0.29
+          }
+        ],
+        "Suppression": [
+          {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.0,
+            "second_player": 0.35000000000000003
+          },
+          {
+            "first_player": 0.35000000000000003,
+            "second_player": 0.0
+          },
+          {
+            "first_player": 0.35000000000000003,
+            "second_player": 0.35000000000000003
+          }
+        ]
+      }
+    },
+    "modes": [
+      "full",
+      "half"
+    ],
+    "methods": [
+      "Noise",
+      "Suppression"
+    ],
+    "games": {
+      "real": {
+        "scenario": "Full_FL",
+        "players": [
+          "p1",
+          "p2"
+        ]
+      },
+      "sd_transformed": {
+        "scenario": "Transformed_SD_average",
+        "players": [
+          "P1",
+          "P2"
+        ]
+      }
+    },
+    "move_orders": [
+      "first_player_starts",
+      "second_player_starts"
+    ]
+  },
+  "schema": {
+    "cell": "[row, column] grid index of the equilibrium; row = first player's choice, column = second player's choice; index 0 = no defence, last = maximum privacy",
+    "protection / leakage": "[first player, second player]; leakage = 1 - protection",
+    "gain": "clipped (and optionally monotonised) accuracy gain at the cell, before the penalty",
+    "leakage_penalty": "weight * leakage per player",
+    "utility": "gain - leakage_penalty, per player",
+    "status": "nash = pure Nash equilibrium reached, cycle = best responses loop, max_iter = limit hit",
+    "path": "cells visited by the dynamics (only turns in which somebody moved), starting at [0, 0]",
+    "first_player_starts / second_player_starts": "which player of the pair moves first in the dynamics",
+    "comparison": "transformed SD equilibrium vs. measured NT equilibrium; differences are transformed - real",
+    "summary": "aggregates over all ordered C pairs and both move orders"
+  },
+  "grids": {
+    "full": {
+      "Noise": {
+        "raw_levels": [
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5,
+          0.6,
+          "echo"
+        ],
+        "protection": [
+          0.0,
+          0.09090909090909091,
+          0.16666666666666669,
+          0.23076923076923075,
+          0.28571428571428575,
+          0.3333333333333333,
+          0.37499999999999994,
+          1.0
+        ],
+        "leakage": [
+          1.0,
+          0.9090909090909091,
+          0.8333333333333333,
+          0.7692307692307693,
+          0.7142857142857142,
+          0.6666666666666667,
+          0.625,
+          0.0
+        ]
+      },
+      "Suppression": {
+        "raw_levels": [
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          "echo"
+        ],
+        "protection": [
+          0.0,
+          0.07142857142857142,
+          0.14285714285714285,
+          0.21428571428571427,
+          0.2857142857142857,
+          0.35714285714285715,
+          0.42857142857142855,
+          0.5,
+          1.0
+        ],
+        "leakage": [
+          1.0,
+          0.9285714285714286,
+          0.8571428571428572,
+          0.7857142857142857,
+          0.7142857142857143,
+          0.6428571428571428,
+          0.5714285714285714,
+          0.5,
+          0.0
+        ]
+      }
+    },
+    "half": {
+      "Noise": {
+        "raw_levels": [
+          0.0,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25,
+          0.3,
+          "echo"
+        ],
+        "protection": [
+          0.0,
+          0.047619047619047616,
+          0.09090909090909091,
+          0.13043478260869565,
+          0.16666666666666669,
+          0.2,
+          0.23076923076923075,
+          1.0
+        ],
+        "leakage": [
+          1.0,
+          0.9523809523809523,
+          0.9090909090909091,
+          0.8695652173913043,
+          0.8333333333333333,
+          0.8,
+          0.7692307692307693,
+          0.0
+        ]
+      },
+      "Suppression": {
+        "raw_levels": [
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          "echo"
+        ],
+        "protection": [
+          0.0,
+          0.07142857142857142,
+          0.14285714285714285,
+          0.21428571428571427,
+          0.2857142857142857,
+          0.35714285714285715,
+          0.42857142857142855,
+          0.5,
+          1.0
+        ],
+        "leakage": [
+          1.0,
+          0.9285714285714286,
+          0.8571428571428572,
+          0.7857142857142857,
+          0.7142857142857143,
+          0.6428571428571428,
+          0.5714285714285714,
+          0.5,
+          0.0
+        ]
+      }
+    }
+  },
+  "results": {
+    "full": {
+      "Noise": {
+        "C1=0_C2=0": {
+          "C": {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          "weights": {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.3133322412656569,
+                  0.27500188017173965
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.3133322412656569,
+                  0.27500188017173965
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.3133322412656569,
+                  0.27500188017173965
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.3133322412656569,
+                  0.27500188017173965
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.31335338644667265,
+                  0.31335338644667265
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.31335338644667265,
+                  0.31335338644667265
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.31335338644667265,
+                  0.31335338644667265
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.31335338644667265,
+                  0.31335338644667265
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  2.114518101575813e-05,
+                  0.038351506274933
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  2.114518101575813e-05,
+                  0.038351506274933
+                ]
+              }
+            }
+          }
+        },
+        "C1=0_C2=0.31": {
+          "C": {
+            "first_player": 0.0,
+            "second_player": 0.31
+          },
+          "weights": {
+            "first_player": 0.0,
+            "second_player": 0.31
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  7
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  1.0
+                ],
+                "leakage": [
+                  1.0,
+                  0.0
+                ],
+                "gain": [
+                  0.08474809670161909,
+                  0.05800124835093175
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.08474809670161909,
+                  0.05800124835093175
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    7
+                  ]
+                ],
+                "num_moves": 1
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  7
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  1.0
+                ],
+                "leakage": [
+                  1.0,
+                  0.0
+                ],
+                "gain": [
+                  0.08474809670161909,
+                  0.05800124835093175
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.08474809670161909,
+                  0.05800124835093175
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    7
+                  ]
+                ],
+                "num_moves": 1
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  7
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  1.0
+                ],
+                "leakage": [
+                  1.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.03897621754761157
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.03897621754761157
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    7
+                  ]
+                ],
+                "num_moves": 1
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  7
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  1.0
+                ],
+                "leakage": [
+                  1.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.03897621754761157
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.03897621754761157
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    7
+                  ]
+                ],
+                "num_moves": 1
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  -0.08474809670161909,
+                  -0.01902503080332018
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  -0.08474809670161909,
+                  -0.01902503080332018
+                ]
+              }
+            }
+          }
+        },
+        "C1=0.31_C2=0": {
+          "C": {
+            "first_player": 0.31,
+            "second_player": 0.0
+          },
+          "weights": {
+            "first_player": 0.31,
+            "second_player": 0.0
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  7,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  0.0
+                ],
+                "leakage": [
+                  0.0,
+                  1.0
+                ],
+                "gain": [
+                  0.11914638697978948,
+                  0.025779681250650645
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.11914638697978948,
+                  0.025779681250650645
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    7,
+                    0
+                  ]
+                ],
+                "num_moves": 1
+              },
+              "second_player_starts": {
+                "cell": [
+                  7,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  0.0
+                ],
+                "leakage": [
+                  0.0,
+                  1.0
+                ],
+                "gain": [
+                  0.11914638697978948,
+                  0.025779681250650645
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.11914638697978948,
+                  0.025779681250650645
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    7,
+                    0
+                  ]
+                ],
+                "num_moves": 1
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  7,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  0.0
+                ],
+                "leakage": [
+                  0.0,
+                  1.0
+                ],
+                "gain": [
+                  0.03897621754761157,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.03897621754761157,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    7,
+                    0
+                  ]
+                ],
+                "num_moves": 1
+              },
+              "second_player_starts": {
+                "cell": [
+                  7,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  0.0
+                ],
+                "leakage": [
+                  0.0,
+                  1.0
+                ],
+                "gain": [
+                  0.03897621754761157,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.03897621754761157,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    7,
+                    0
+                  ]
+                ],
+                "num_moves": 1
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  -0.08017016943217792,
+                  -0.025779681250650645
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  -0.08017016943217792,
+                  -0.025779681250650645
+                ]
+              }
+            }
+          }
+        },
+        "C1=0.31_C2=0.31": {
+          "C": {
+            "first_player": 0.31,
+            "second_player": 0.31
+          },
+          "weights": {
+            "first_player": 0.31,
+            "second_player": 0.31
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  7,
+                  7
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  1.0
+                ],
+                "leakage": [
+                  0.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    7,
+                    0
+                  ],
+                  [
+                    7,
+                    7
+                  ]
+                ],
+                "num_moves": 2
+              },
+              "second_player_starts": {
+                "cell": [
+                  7,
+                  7
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  1.0
+                ],
+                "leakage": [
+                  0.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    7
+                  ],
+                  [
+                    7,
+                    7
+                  ]
+                ],
+                "num_moves": 2
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  7,
+                  7
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  1.0
+                ],
+                "leakage": [
+                  0.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    7,
+                    0
+                  ],
+                  [
+                    7,
+                    7
+                  ]
+                ],
+                "num_moves": 2
+              },
+              "second_player_starts": {
+                "cell": [
+                  7,
+                  7
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  1.0
+                ],
+                "leakage": [
+                  0.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    7
+                  ],
+                  [
+                    7,
+                    7
+                  ]
+                ],
+                "num_moves": 2
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          }
+        }
+      },
+      "Suppression": {
+        "C1=0_C2=0": {
+          "C": {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          "weights": {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.2852179892677655,
+                  0.24881408617986356
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.2852179892677655,
+                  0.24881408617986356
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.2852179892677655,
+                  0.24881408617986356
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.2852179892677655,
+                  0.24881408617986356
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.44073759033122534,
+                  0.44073759033122534
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.44073759033122534,
+                  0.44073759033122534
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.44073759033122534,
+                  0.44073759033122534
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.44073759033122534,
+                  0.44073759033122534
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.15551960106345986,
+                  0.19192350415136178
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.15551960106345986,
+                  0.19192350415136178
+                ]
+              }
+            }
+          }
+        },
+        "C1=0_C2=0.33": {
+          "C": {
+            "first_player": 0.0,
+            "second_player": 0.33
+          },
+          "weights": {
+            "first_player": 0.0,
+            "second_player": 0.33
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  8
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  1.0
+                ],
+                "leakage": [
+                  1.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    8
+                  ]
+                ],
+                "num_moves": 1
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  8
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  1.0
+                ],
+                "leakage": [
+                  1.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    8
+                  ]
+                ],
+                "num_moves": 1
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.44073759033122534,
+                  0.44073759033122534
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.33
+                ],
+                "utility": [
+                  0.44073759033122534,
+                  0.11073759033122532
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.44073759033122534,
+                  0.44073759033122534
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.33
+                ],
+                "utility": [
+                  0.44073759033122534,
+                  0.11073759033122532
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": false,
+                "cell_distance_l1": 8,
+                "cell_distance_linf": 8,
+                "protection_diff": [
+                  0.0,
+                  -1.0
+                ],
+                "utility_diff": [
+                  0.44073759033122534,
+                  0.11073759033122532
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": false,
+                "cell_distance_l1": 8,
+                "cell_distance_linf": 8,
+                "protection_diff": [
+                  0.0,
+                  -1.0
+                ],
+                "utility_diff": [
+                  0.44073759033122534,
+                  0.11073759033122532
+                ]
+              }
+            }
+          }
+        },
+        "C1=0.33_C2=0": {
+          "C": {
+            "first_player": 0.33,
+            "second_player": 0.0
+          },
+          "weights": {
+            "first_player": 0.33,
+            "second_player": 0.0
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  8,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  0.0
+                ],
+                "leakage": [
+                  0.0,
+                  1.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    8,
+                    0
+                  ]
+                ],
+                "num_moves": 1
+              },
+              "second_player_starts": {
+                "cell": [
+                  8,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  0.0
+                ],
+                "leakage": [
+                  0.0,
+                  1.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    8,
+                    0
+                  ]
+                ],
+                "num_moves": 1
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.44073759033122534,
+                  0.44073759033122534
+                ],
+                "leakage_penalty": [
+                  0.33,
+                  0.0
+                ],
+                "utility": [
+                  0.11073759033122532,
+                  0.44073759033122534
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.44073759033122534,
+                  0.44073759033122534
+                ],
+                "leakage_penalty": [
+                  0.33,
+                  0.0
+                ],
+                "utility": [
+                  0.11073759033122532,
+                  0.44073759033122534
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": false,
+                "cell_distance_l1": 8,
+                "cell_distance_linf": 8,
+                "protection_diff": [
+                  -1.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.11073759033122532,
+                  0.44073759033122534
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": false,
+                "cell_distance_l1": 8,
+                "cell_distance_linf": 8,
+                "protection_diff": [
+                  -1.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.11073759033122532,
+                  0.44073759033122534
+                ]
+              }
+            }
+          }
+        },
+        "C1=0.33_C2=0.33": {
+          "C": {
+            "first_player": 0.33,
+            "second_player": 0.33
+          },
+          "weights": {
+            "first_player": 0.33,
+            "second_player": 0.33
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  8,
+                  8
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  1.0
+                ],
+                "leakage": [
+                  0.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    8,
+                    0
+                  ],
+                  [
+                    8,
+                    8
+                  ]
+                ],
+                "num_moves": 2
+              },
+              "second_player_starts": {
+                "cell": [
+                  8,
+                  8
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  1.0
+                ],
+                "leakage": [
+                  0.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    8
+                  ],
+                  [
+                    8,
+                    8
+                  ]
+                ],
+                "num_moves": 2
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.44073759033122534,
+                  0.44073759033122534
+                ],
+                "leakage_penalty": [
+                  0.33,
+                  0.33
+                ],
+                "utility": [
+                  0.11073759033122532,
+                  0.11073759033122532
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.44073759033122534,
+                  0.44073759033122534
+                ],
+                "leakage_penalty": [
+                  0.33,
+                  0.33
+                ],
+                "utility": [
+                  0.11073759033122532,
+                  0.11073759033122532
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": false,
+                "cell_distance_l1": 16,
+                "cell_distance_linf": 8,
+                "protection_diff": [
+                  -1.0,
+                  -1.0
+                ],
+                "utility_diff": [
+                  0.11073759033122532,
+                  0.11073759033122532
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": false,
+                "cell_distance_l1": 16,
+                "cell_distance_linf": 8,
+                "protection_diff": [
+                  -1.0,
+                  -1.0
+                ],
+                "utility_diff": [
+                  0.11073759033122532,
+                  0.11073759033122532
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "half": {
+      "Noise": {
+        "C1=0_C2=0": {
+          "C": {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          "weights": {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.35393742048658805,
+                  0.3403449371484439
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.35393742048658805,
+                  0.3403449371484439
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.35393742048658805,
+                  0.3403449371484439
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.35393742048658805,
+                  0.3403449371484439
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.39672552051354815,
+                  0.39672552051354815
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.39672552051354815,
+                  0.39672552051354815
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.39672552051354815,
+                  0.39672552051354815
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.39672552051354815,
+                  0.39672552051354815
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.042788100026960096,
+                  0.056380583365104264
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.042788100026960096,
+                  0.056380583365104264
+                ]
+              }
+            }
+          }
+        },
+        "C1=0_C2=0.3": {
+          "C": {
+            "first_player": 0.0,
+            "second_player": 0.3
+          },
+          "weights": {
+            "first_player": 0.0,
+            "second_player": 0.3
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.35393742048658805,
+                  0.3403449371484439
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.3
+                ],
+                "utility": [
+                  0.35393742048658805,
+                  0.04034493714844389
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.35393742048658805,
+                  0.3403449371484439
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.3
+                ],
+                "utility": [
+                  0.35393742048658805,
+                  0.04034493714844389
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.39672552051354815,
+                  0.39672552051354815
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.3
+                ],
+                "utility": [
+                  0.39672552051354815,
+                  0.09672552051354816
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.39672552051354815,
+                  0.39672552051354815
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.3
+                ],
+                "utility": [
+                  0.39672552051354815,
+                  0.09672552051354816
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.042788100026960096,
+                  0.056380583365104264
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.042788100026960096,
+                  0.056380583365104264
+                ]
+              }
+            }
+          }
+        },
+        "C1=0.3_C2=0": {
+          "C": {
+            "first_player": 0.3,
+            "second_player": 0.0
+          },
+          "weights": {
+            "first_player": 0.3,
+            "second_player": 0.0
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  7,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  0.0
+                ],
+                "leakage": [
+                  0.0,
+                  1.0
+                ],
+                "gain": [
+                  0.07476101553968101,
+                  0.02675583078944701
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.07476101553968101,
+                  0.02675583078944701
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    7,
+                    0
+                  ]
+                ],
+                "num_moves": 1
+              },
+              "second_player_starts": {
+                "cell": [
+                  7,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  0.0
+                ],
+                "leakage": [
+                  0.0,
+                  1.0
+                ],
+                "gain": [
+                  0.07476101553968101,
+                  0.02675583078944701
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.07476101553968101,
+                  0.02675583078944701
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    7,
+                    0
+                  ]
+                ],
+                "num_moves": 1
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.39672552051354815,
+                  0.39672552051354815
+                ],
+                "leakage_penalty": [
+                  0.3,
+                  0.0
+                ],
+                "utility": [
+                  0.09672552051354816,
+                  0.39672552051354815
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.39672552051354815,
+                  0.39672552051354815
+                ],
+                "leakage_penalty": [
+                  0.3,
+                  0.0
+                ],
+                "utility": [
+                  0.09672552051354816,
+                  0.39672552051354815
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": false,
+                "cell_distance_l1": 7,
+                "cell_distance_linf": 7,
+                "protection_diff": [
+                  -1.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.02196450497386715,
+                  0.36996968972410116
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": false,
+                "cell_distance_l1": 7,
+                "cell_distance_linf": 7,
+                "protection_diff": [
+                  -1.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.02196450497386715,
+                  0.36996968972410116
+                ]
+              }
+            }
+          }
+        },
+        "C1=0.3_C2=0.3": {
+          "C": {
+            "first_player": 0.3,
+            "second_player": 0.3
+          },
+          "weights": {
+            "first_player": 0.3,
+            "second_player": 0.3
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  7,
+                  7
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  1.0
+                ],
+                "leakage": [
+                  0.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    7,
+                    0
+                  ],
+                  [
+                    7,
+                    7
+                  ]
+                ],
+                "num_moves": 2
+              },
+              "second_player_starts": {
+                "cell": [
+                  7,
+                  7
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  1.0
+                ],
+                "leakage": [
+                  0.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    7,
+                    0
+                  ],
+                  [
+                    7,
+                    7
+                  ]
+                ],
+                "num_moves": 2
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.39672552051354815,
+                  0.39672552051354815
+                ],
+                "leakage_penalty": [
+                  0.3,
+                  0.3
+                ],
+                "utility": [
+                  0.09672552051354816,
+                  0.09672552051354816
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.39672552051354815,
+                  0.39672552051354815
+                ],
+                "leakage_penalty": [
+                  0.3,
+                  0.3
+                ],
+                "utility": [
+                  0.09672552051354816,
+                  0.09672552051354816
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": false,
+                "cell_distance_l1": 14,
+                "cell_distance_linf": 7,
+                "protection_diff": [
+                  -1.0,
+                  -1.0
+                ],
+                "utility_diff": [
+                  0.09672552051354816,
+                  0.09672552051354816
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": false,
+                "cell_distance_l1": 14,
+                "cell_distance_linf": 7,
+                "protection_diff": [
+                  -1.0,
+                  -1.0
+                ],
+                "utility_diff": [
+                  0.09672552051354816,
+                  0.09672552051354816
+                ]
+              }
+            }
+          }
+        }
+      },
+      "Suppression": {
+        "C1=0_C2=0": {
+          "C": {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          "weights": {
+            "first_player": 0.0,
+            "second_player": 0.0
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.3360747000401442,
+                  0.3051239589219345
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.3360747000401442,
+                  0.3051239589219345
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.3360747000401442,
+                  0.3051239589219345
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.3360747000401442,
+                  0.3051239589219345
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.559214450278659,
+                  0.559214450278659
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.559214450278659,
+                  0.559214450278659
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.559214450278659,
+                  0.559214450278659
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.559214450278659,
+                  0.559214450278659
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.2231397502385148,
+                  0.2540904913567245
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.2231397502385148,
+                  0.2540904913567245
+                ]
+              }
+            }
+          }
+        },
+        "C1=0_C2=0.32": {
+          "C": {
+            "first_player": 0.0,
+            "second_player": 0.32
+          },
+          "weights": {
+            "first_player": 0.0,
+            "second_player": 0.32
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  8
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  1.0
+                ],
+                "leakage": [
+                  1.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    8
+                  ]
+                ],
+                "num_moves": 1
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  8
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  1.0
+                ],
+                "leakage": [
+                  1.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    8
+                  ]
+                ],
+                "num_moves": 1
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.559214450278659,
+                  0.559214450278659
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.32
+                ],
+                "utility": [
+                  0.559214450278659,
+                  0.239214450278659
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.559214450278659,
+                  0.559214450278659
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.32
+                ],
+                "utility": [
+                  0.559214450278659,
+                  0.239214450278659
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": false,
+                "cell_distance_l1": 8,
+                "cell_distance_linf": 8,
+                "protection_diff": [
+                  0.0,
+                  -1.0
+                ],
+                "utility_diff": [
+                  0.559214450278659,
+                  0.239214450278659
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": false,
+                "cell_distance_l1": 8,
+                "cell_distance_linf": 8,
+                "protection_diff": [
+                  0.0,
+                  -1.0
+                ],
+                "utility_diff": [
+                  0.559214450278659,
+                  0.239214450278659
+                ]
+              }
+            }
+          }
+        },
+        "C1=0.32_C2=0": {
+          "C": {
+            "first_player": 0.32,
+            "second_player": 0.0
+          },
+          "weights": {
+            "first_player": 0.32,
+            "second_player": 0.0
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.3360747000401442,
+                  0.3051239589219345
+                ],
+                "leakage_penalty": [
+                  0.32,
+                  0.0
+                ],
+                "utility": [
+                  0.01607470004014422,
+                  0.3051239589219345
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.3360747000401442,
+                  0.3051239589219345
+                ],
+                "leakage_penalty": [
+                  0.32,
+                  0.0
+                ],
+                "utility": [
+                  0.01607470004014422,
+                  0.3051239589219345
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.559214450278659,
+                  0.559214450278659
+                ],
+                "leakage_penalty": [
+                  0.32,
+                  0.0
+                ],
+                "utility": [
+                  0.239214450278659,
+                  0.559214450278659
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.559214450278659,
+                  0.559214450278659
+                ],
+                "leakage_penalty": [
+                  0.32,
+                  0.0
+                ],
+                "utility": [
+                  0.239214450278659,
+                  0.559214450278659
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.2231397502385148,
+                  0.2540904913567245
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": true,
+                "cell_distance_l1": 0,
+                "cell_distance_linf": 0,
+                "protection_diff": [
+                  0.0,
+                  0.0
+                ],
+                "utility_diff": [
+                  0.2231397502385148,
+                  0.2540904913567245
+                ]
+              }
+            }
+          }
+        },
+        "C1=0.32_C2=0.32": {
+          "C": {
+            "first_player": 0.32,
+            "second_player": 0.32
+          },
+          "weights": {
+            "first_player": 0.32,
+            "second_player": 0.32
+          },
+          "games": {
+            "real": {
+              "scenario": "Full_FL",
+              "players": [
+                "p1",
+                "p2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  8,
+                  8
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  1.0
+                ],
+                "leakage": [
+                  0.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    8
+                  ],
+                  [
+                    8,
+                    8
+                  ]
+                ],
+                "num_moves": 2
+              },
+              "second_player_starts": {
+                "cell": [
+                  8,
+                  8
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  1.0,
+                  1.0
+                ],
+                "leakage": [
+                  0.0,
+                  0.0
+                ],
+                "gain": [
+                  0.0,
+                  0.0
+                ],
+                "leakage_penalty": [
+                  0.0,
+                  0.0
+                ],
+                "utility": [
+                  0.0,
+                  0.0
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    8
+                  ],
+                  [
+                    8,
+                    8
+                  ]
+                ],
+                "num_moves": 2
+              }
+            },
+            "sd_transformed": {
+              "scenario": "Transformed_SD_average",
+              "players": [
+                "P1",
+                "P2"
+              ],
+              "first_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.559214450278659,
+                  0.559214450278659
+                ],
+                "leakage_penalty": [
+                  0.32,
+                  0.32
+                ],
+                "utility": [
+                  0.239214450278659,
+                  0.239214450278659
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              },
+              "second_player_starts": {
+                "cell": [
+                  0,
+                  0
+                ],
+                "status": "nash",
+                "converged": true,
+                "protection": [
+                  0.0,
+                  0.0
+                ],
+                "leakage": [
+                  1.0,
+                  1.0
+                ],
+                "gain": [
+                  0.559214450278659,
+                  0.559214450278659
+                ],
+                "leakage_penalty": [
+                  0.32,
+                  0.32
+                ],
+                "utility": [
+                  0.239214450278659,
+                  0.239214450278659
+                ],
+                "path": [
+                  [
+                    0,
+                    0
+                  ]
+                ],
+                "num_moves": 0
+              }
+            }
+          },
+          "comparison": {
+            "first_player_starts": {
+              "sd_transformed": {
+                "matches_real": false,
+                "cell_distance_l1": 16,
+                "cell_distance_linf": 8,
+                "protection_diff": [
+                  -1.0,
+                  -1.0
+                ],
+                "utility_diff": [
+                  0.239214450278659,
+                  0.239214450278659
+                ]
+              }
+            },
+            "second_player_starts": {
+              "sd_transformed": {
+                "matches_real": false,
+                "cell_distance_l1": 16,
+                "cell_distance_linf": 8,
+                "protection_diff": [
+                  -1.0,
+                  -1.0
+                ],
+                "utility_diff": [
+                  0.239214450278659,
+                  0.239214450278659
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "summary": {
+    "full": {
+      "Noise": {
+        "num_C_pairs": 4,
+        "num_comparisons": 8,
+        "transformed_matches_real": 8,
+        "transformed_match_rate": 1.0,
+        "transformed_status_counts": {
+          "nash": 8
+        }
+      },
+      "Suppression": {
+        "num_C_pairs": 4,
+        "num_comparisons": 8,
+        "transformed_matches_real": 2,
+        "transformed_match_rate": 0.25,
+        "transformed_status_counts": {
+          "nash": 8
+        }
+      }
+    },
+    "half": {
+      "Noise": {
+        "num_C_pairs": 4,
+        "num_comparisons": 8,
+        "transformed_matches_real": 4,
+        "transformed_match_rate": 0.5,
+        "transformed_status_counts": {
+          "nash": 8
+        }
+      },
+      "Suppression": {
+        "num_C_pairs": 4,
+        "num_comparisons": 8,
+        "transformed_matches_real": 4,
+        "transformed_match_rate": 0.5,
+        "transformed_status_counts": {
+          "nash": 8
+        }
+      }
+    }
+  }
+}

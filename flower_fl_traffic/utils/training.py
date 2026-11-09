@@ -1,9 +1,22 @@
+"""Training loops shared by federated clients."""
+
 import torch
 from opacus import PrivacyEngine
 from opacus.validators import ModuleValidator
 
 def train_standard(model, loader, optimizer, epochs, device):
-    """Standard training loop for federated learning without differential privacy."""
+    """Train a model for the requested epochs without differential privacy.
+
+    Args:
+        model: PyTorch model to update.
+        loader: Iterable of feature and label batches.
+        optimizer: Optimizer attached to ``model``.
+        epochs: Number of complete passes over ``loader``.
+        device: PyTorch device for model inputs and labels.
+
+    Returns:
+        The trained model.
+    """
     model.train()
     criterion = torch.nn.CrossEntropyLoss()
     for _ in range(epochs):
@@ -15,12 +28,31 @@ def train_standard(model, loader, optimizer, epochs, device):
             optimizer.step()
     return model
 
-def train_dp(model, loader, optimizer, epochs, noise, max_grad_norm, device):
-    """
-    Differential Privacy (DP) training loop for Federated Learning clients.
-    
-    This function wraps a standard PyTorch model with Opacus to ensure 
-    DP guarantees (per-sample gradient clipping and noise addition).
+def train_dp(
+    model,
+    loader,
+    optimizer,
+    epochs,
+    noise,
+    max_grad_norm,
+    device,
+    privacy_engine=None,
+):
+    """Train with Opacus per-sample clipping and Gaussian noise addition.
+
+    Args:
+        model: PyTorch model to update.
+        loader: Iterable of feature and label batches.
+        optimizer: Optimizer attached to ``model``.
+        epochs: Number of complete passes over the private loader.
+        noise: Opacus noise multiplier.
+        max_grad_norm: Per-sample gradient clipping threshold.
+        device: PyTorch device for model inputs and labels.
+        privacy_engine: Optional client-level accountant to reuse across
+            federated rounds.
+
+    Returns:
+        The underlying trained model after removing per-sample gradient hooks.
     """
 
     # 1. DP COMPATIBILITY CHECK
@@ -30,10 +62,10 @@ def train_dp(model, loader, optimizer, epochs, noise, max_grad_norm, device):
         model = ModuleValidator.fix(model)
     model.to(device)
 
-    # 2. PRIVACY ENGINE INITIALIZATION
-    # We initialize the engine only if the model isn't already "private".
-    # In FL, we usually re-wrap every round because the optimizer is re-initialized.
-    privacy_engine = PrivacyEngine()
+    # Keep one accountant per client across FL rounds while creating a fresh
+    # optimizer and private wrapper for each round.
+    if privacy_engine is None:
+        privacy_engine = PrivacyEngine()
     
     # poisson_sampling=False: Essential for Federated Learning as Flower 
     # provides fixed-size batches/iterators.
@@ -66,8 +98,9 @@ def train_dp(model, loader, optimizer, epochs, noise, max_grad_norm, device):
             # Optimizer step: Gradients are clipped and noise is added here
             optimizer.step()
 
-    # 4. UNWRAPPING
-    # Opacus wraps the model in a 'GradSampleModule'. 
-    # We return the underlying '_module' so the weights can be extracted 
-    # by the Flower server without serialization/metadata errors.
+    # Remove per-sample-gradient hooks before the next FL round re-wraps
+    # the underlying model with a fresh optimizer.
+    if hasattr(model, "remove_hooks"):
+        model.remove_hooks()
+
     return model._module if hasattr(model, "_module") else model

@@ -1,14 +1,24 @@
+"""Shared model-evaluation routine for local and federated clients."""
+
 import torch
 
 @torch.no_grad()
 def evaluate_model(model, test_loader, criterion):
-    '''
-    Evaluate the given model on the test set using the provided criterion (loss function).
-    Returns the average loss and accuracy over the test set.
-    '''
+    """Compute sample-weighted mean loss and accuracy on a data loader.
 
+    Args:
+        model: Model whose predictions are evaluated.
+        test_loader: Iterable of ``(inputs, labels)`` batches.
+        criterion: Loss function evaluated on each batch.
+
+    Returns:
+        A pair ``(mean_loss, accuracy)`` as Python floats.
+
+    Raises:
+        ValueError: If the loader contains no examples.
+    """
     model.eval()
-    total_loss = 0
+    total_loss = 0.0
     correct = 0
     total = 0
     
@@ -16,9 +26,11 @@ def evaluate_model(model, test_loader, criterion):
         outputs = model(inputs)
         loss = criterion(outputs, labels)
         
-        total_loss += loss.item()
+        total_loss += loss.item() * labels.size(0)
         preds = outputs.argmax(dim=1)
         correct += (preds == labels).sum().item()
         total += labels.size(0)
 
-    return total_loss / len(test_loader), correct / total
+    if total == 0:
+        raise ValueError("Cannot evaluate a model with an empty test dataset.")
+    return total_loss / total, correct / total

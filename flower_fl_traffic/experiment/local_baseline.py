@@ -1,3 +1,10 @@
+"""Train independent local baselines and save their evaluation metrics.
+
+Each local model is trained separately with Lightning. Its final model is
+evaluated on both test loaders so the matrix builder can select the matching
+local reference metric for each game participant.
+"""
+
 import torch
 import json
 import os
@@ -15,9 +22,14 @@ from models.neural_network import TrafficLightningModule
 logging.getLogger("lightning.pytorch").setLevel(logging.ERROR)
 
 def _train_single_local_model(args):
-    """
-    Worker function to train an independent local model using PyTorch Lightning.
-    Uses CSVLogger to capture epoch-by-epoch metrics for the JSON report.
+    """Train and evaluate one local baseline in a worker process.
+
+    Args:
+        args: Tuple containing client index, training loader, both test
+            loaders, experiment configuration, client IDs, and device.
+
+    Returns:
+        A model key and its training history and per-client evaluations.
     """
     # Restrict each process to a single thread to optimize CPU parallelization
     torch.set_num_threads(1)
@@ -90,9 +102,21 @@ def _train_single_local_model(args):
     return model_key, {"training": training_history, "evaluation": evaluation_results}
 
 def run_local_experiment(config, train_loaders, test_loaders, subdir, client_ids=None):
-    """
-    Main entry point for local baseline execution. 
-    Parallelizes client training using a multiprocessing Pool.
+    """Train both local baselines or reuse a matching existing result file.
+
+    Args:
+        config: Hydra experiment configuration.
+        train_loaders: Two client training DataLoaders.
+        test_loaders: Two client test DataLoaders.
+        subdir: Empty for P1/P2 or a self-division result subdirectory.
+        client_ids: Names used to associate local evaluations with players.
+
+    Returns:
+        The path to the saved per-seed local-baseline JSON file.
+
+    Raises:
+        ValueError: If an existing result file was created with different
+            parameters.
     """
     if client_ids is None:
         client_ids = ["P1", "P2"]
@@ -100,6 +124,20 @@ def run_local_experiment(config, train_loaders, test_loaders, subdir, client_ids
     # Serialization-friendly config
     clean_params = OmegaConf.to_container(config, resolve=True)
     device = torch.device("cpu")
+
+    mode = config.dataset.mode
+    target_path = os.path.join(f"results/{mode}/1_local_baseline", subdir)
+    os.makedirs(target_path, exist_ok=True)
+    file_path = os.path.join(target_path, f"{config.config.seed}.json")
+    if os.path.exists(file_path):
+        with open(file_path, "r", encoding="utf-8") as f:
+            existing_results = json.load(f)
+        if existing_results.get("parameters") != clean_params:
+            raise ValueError(
+                f"Existing local baseline has different parameters: {file_path}"
+            )
+        print(f"Local baseline already exists; keeping it: {file_path}")
+        return file_path
     
     # Prepare task arguments
     tasks = []
@@ -119,11 +157,6 @@ def run_local_experiment(config, train_loaders, test_loaders, subdir, client_ids
     }
 
     # Save to JSON
-    mode = config.dataset.mode
-    target_path = os.path.join(f"results/{mode}/1_local_baseline", subdir)
-    os.makedirs(target_path, exist_ok=True)
-    file_path = os.path.join(target_path, f"{config.config.seed}.json")
-
     with open(file_path, "w") as f:
         json.dump(final_results, f, indent=4)
         

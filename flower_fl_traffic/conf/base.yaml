@@ -5,10 +5,13 @@ num_clients: 2 # Total number of clients in the federated learning simulation
 config: # Configuration for the training process, including hyperparameters and settings
   lr: 0.001
   seed: 0 ## Random seed for reproducibility, change it for different runs
+  seed_start: 0
+  seed_end: 9
   federated_rounds: 20
   num_epochs: 2         
   batch_size: 256
   max_grad_norm: 1.0     
+  dp_delta: 0.00001
   full_noise_levels: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6] #x/x+1
   percent80_noise_levels: [0.0, 0.08, 0.16, 0.24, 0.32, 0.4, 0.48] #x/x+1
   half_noise_levels: [0.0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3] #x/x+1
@@ -16,7 +19,7 @@ config: # Configuration for the training process, including hyperparameters and 
   sup_levels: [14, 13, 12, 11, 10, 9, 8, 7] #1-x/14 #TODO change this
 
 dataset: # Configuration related to the dataset, including paths and feature/target columns
-  mode: "80percent" # Mode for dataset splitting, can be "full", "half", "quarter", "30percent", or "80percent"
+  mode: "30percent" # Supported modes: full, half, 30percent, 80percent
   input_path: "dataset/dataset.parquet"
   paths:
     p1: "/p1.parquet"

@@ -1,3 +1,12 @@
+"""Measure centralized classifier accuracy at 5% dataset-size increments.
+
+For each seed, the dataset is shuffled and evaluated in cumulative 5% chunks.
+At each increment a fresh model is trained and evaluated on a stratified
+holdout set. Per-seed curves and an averaged appendix figure are saved under
+``results/baseline/``.
+"""
+
+import argparse
 import os
 import sys
 
@@ -11,12 +20,12 @@ import lightning as L
 from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from multiprocessing import Pool, cpu_count
+from multiprocessing import Pool
 import logging
 
 logging.getLogger("lightning.pytorch").setLevel(logging.ERROR)
 
-from seed import set_seed
+from utils.seed import set_seed
 from data.custom_dataset import CustomDataset
 from models.neural_network import TrafficLightningModule
 
@@ -47,21 +56,37 @@ NUM_WORKERS   = 2
 
 
 def load_dataset(seed: int) -> tuple:
+    """Shuffle and split the source data into twenty equal-sized chunks.
+
+    Args:
+        seed: Random seed controlling the chunk order.
+
+    Returns:
+        A mapping of chunk names to data frames and the number of classes.
+    """
     df = pd.read_parquet("dataset/dataset.parquet")
 
     le = LabelEncoder()
     df[TARGET_COLUMN] = le.fit_transform(df[TARGET_COLUMN])
     num_classes = len(le.classes_)
-    print(f"  Osztályok száma: {num_classes}  |  Példa: {list(le.classes_[:5])}")
+    print(f"  Number of classes: {num_classes} | Examples: {list(le.classes_[:5])}")
 
     df = df.sample(frac=1, random_state=seed).reset_index(drop=True)
     chunks = np.array_split(df, NUM_CHUNKS)
     return {f"chunk_{i}": chunk for i, chunk in enumerate(chunks)}, num_classes
 
 def load_seed_curves(seeds=None, results_dir="results/baseline"):
-    """Load the per-seed learning curves (seed_<n>_learning_curve.csv)."""
+    """Load per-seed learning curves from their CSV files.
+
+    Args:
+        seeds: Seed identifiers to load; defaults to seeds 0 through 10.
+        results_dir: Directory containing the per-seed curve CSV files.
+
+    Returns:
+        A mapping from seed to ``(percentages, accuracies)``.
+    """
     if seeds is None:
-        seeds = range(10)  # Default: seeds 0-9
+        seeds = range(11)
 
     curves = {}
     for seed in seeds:
@@ -82,6 +107,19 @@ def train_step(
     num_classes: int,
     seed: int,
 ) -> float:
+    """Train one centralized classifier and return holdout accuracy.
+
+    Args:
+        X_train: Training feature matrix.
+        y_train: Integer-encoded training labels.
+        X_test: Holdout feature matrix.
+        y_test: Integer-encoded holdout labels.
+        num_classes: Number of target classes.
+        seed: Random seed for model initialization and batching.
+
+    Returns:
+        Accuracy on the holdout set.
+    """
     set_seed(seed)
     torch.set_num_threads(1)
     os.environ["OMP_NUM_THREADS"] = "1"
@@ -121,6 +159,16 @@ def train_step(
 
 
 def train_and_evaluate(dataset_chunks: dict, num_classes: int, seed: int):
+    """Retrain a model after each additional 5% of shuffled data.
+
+    Args:
+        dataset_chunks: Ordered 5% data chunks from :func:`load_dataset`.
+        num_classes: Number of target classes.
+        seed: Random seed used for the stratified train/holdout split.
+
+    Returns:
+        Lists of cumulative dataset percentages and corresponding accuracies.
+    """
     percentages = []
     accuracies  = []
     accumulated = pd.DataFrame()
@@ -142,11 +190,11 @@ def train_and_evaluate(dataset_chunks: dict, num_classes: int, seed: int):
         )
 
         print(f"  [seed={seed}] {current_pct:3d}% ({len(X_train):,} train / "
-              f"{len(X_test):,} test) – tanítás...")
+              f"{len(X_test):,} test) - training...")
 
         acc = train_step(X_train, y_train, X_test, y_test, num_classes, seed)
 
-        print(f"  [seed={seed}] {current_pct:3d}% → val_acc = {acc:.4f}")
+        print(f"  [seed={seed}] {current_pct:3d}% -> accuracy = {acc:.4f}")
         percentages.append(current_pct)
         accuracies.append(acc)
 
@@ -154,29 +202,24 @@ def train_and_evaluate(dataset_chunks: dict, num_classes: int, seed: int):
 
 
 def run_seed(seed: int):
-    try:
-        print(f"\n{'#'*70}")
-        print(f"  SEED: {seed} 🚀")
-        print(f"{'#'*70}")
+    """Run and save the complete 5%-increment curve for one seed."""
+    print(f"\n{'#' * 70}\n  SEED: {seed}\n{'#' * 70}")
+    set_seed(seed)
+    chunks, num_classes = load_dataset(seed=seed)
+    percentages, accuracies = train_and_evaluate(chunks, num_classes, seed=seed)
 
-        set_seed(seed)
-        chunks, num_classes = load_dataset(seed=seed)
-        pcts, accs = train_and_evaluate(chunks, num_classes, seed=seed)
-
-        save_path = f"results/baseline/seed_{seed}_learning_curve.csv"
-        pd.DataFrame({"percentage": pcts, "accuracy": accs}).to_csv(save_path, index=False)
-        print(f"💾 Eredmények elmentve: {save_path}")
-
-        return seed, pcts, accs
-
-    except Exception as e:
-        import traceback
-        print(f"❌ Hiba seed={seed} esetén: {e}")
-        traceback.print_exc()
-        return seed, None, None
+    output_dir = "results/baseline"
+    os.makedirs(output_dir, exist_ok=True)
+    save_path = os.path.join(output_dir, f"seed_{seed}_learning_curve.csv")
+    pd.DataFrame(
+        {"percentage": percentages, "accuracy": accuracies}
+    ).to_csv(save_path, index=False)
+    print(f"Saved: {save_path}")
+    return seed, percentages, accuracies
 
 
 def plot_results(avg_accuracies: dict):
+    """Save the averaged centralized accuracy-versus-data-size figure."""
     output_dir = "results/baseline"
     os.makedirs(output_dir, exist_ok=True)
 
@@ -189,62 +232,82 @@ def plot_results(avg_accuracies: dict):
     plt.figure(figsize=(10, 6))
     plt.plot(
         percentages, accuracies,
-        marker="o", color="blue", linewidth=2.5, label="Átlagolt Accuracy",
+        marker="o", color="blue", linewidth=2.5, label="Mean accuracy",
     )
-    plt.xlabel("Adat mennyisége (%)")
+    plt.xlabel("Dataset size (%)")
     plt.ylabel("Accuracy")
-    plt.title("Modell teljesítmény az adatmennyiség függvényében")
+    plt.title("Centralized accuracy by dataset size")
     plt.legend()
     plt.grid(True)
 
     plot_path = os.path.join(output_dir, "averaged_learning_curve.png")
     plt.savefig(plot_path, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"📊 Diagram elmentve: {plot_path}")
+    print(f"Plot saved: {plot_path}")
+
+
+def main(argv=None):
+    """Run seeds or aggregate existing seed curves into the appendix figure."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--mode", choices=("run", "plot"), default="plot")
+    parser.add_argument(
+        "--seeds",
+        nargs="+",
+        type=int,
+        default=list(range(11)),
+        help="Seed IDs to run or load (default: 0 through 10).",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=NUM_WORKERS,
+        help=f"Parallel seed workers in run mode (default: {NUM_WORKERS}).",
+    )
+    args = parser.parse_args(argv)
+    if args.workers < 1:
+        parser.error("--workers must be at least one")
+
+    if args.mode == "run":
+        os.makedirs("results/baseline", exist_ok=True)
+        if args.workers == 1:
+            results = [run_seed(seed) for seed in args.seeds]
+        else:
+            with Pool(processes=args.workers) as pool:
+                results = pool.map(run_seed, args.seeds)
+        curves = {
+            seed: (percentages, accuracies)
+            for seed, percentages, accuracies in results
+        }
+    else:
+        curves = load_seed_curves(seeds=args.seeds)
+        if not curves:
+            raise FileNotFoundError(
+                "No per-seed learning curves were found; run with --mode run first."
+            )
+
+    sum_accuracy = {}
+    counts = {}
+    for percentages, accuracies in curves.values():
+        if len(percentages) != len(accuracies):
+            raise ValueError("A per-seed learning curve has mismatched columns.")
+        for percentage, accuracy in zip(percentages, accuracies):
+            sum_accuracy[percentage] = sum_accuracy.get(percentage, 0.0) + accuracy
+            counts[percentage] = counts.get(percentage, 0) + 1
+
+    mean_accuracy = {
+        percentage: sum_accuracy[percentage] / counts[percentage]
+        for percentage in sorted(sum_accuracy)
+    }
+    results_df = pd.DataFrame(
+        list(mean_accuracy.items()),
+        columns=["percentage", "mean_accuracy"],
+    )
+    os.makedirs("results/baseline", exist_ok=True)
+    csv_path = "results/baseline/averaged_learning_curve.csv"
+    results_df.to_csv(csv_path, index=False)
+    print(f"Averaged curve saved: {csv_path}")
+    plot_results(mean_accuracy)
 
 
 if __name__ == "__main__":
-
-    mode = "plot"  # "run" vagy "plot"
-
-    if torch.mode == "run":
-        START_SEED = 10
-        END_SEED   = 10
-
-        os.makedirs("results/baseline", exist_ok=True)
-
-        print(f"🔧 Párhuzamos workerek száma: {NUM_WORKERS}")
-
-        with Pool(processes=NUM_WORKERS) as pool:
-            results = pool.map(run_seed, range(START_SEED, END_SEED + 1))
-
-        all_results = {
-            seed: (pcts, accs)
-            for seed, pcts, accs in results
-            if pcts is not None
-        }
-    elif mode == "plot":
-        seeds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10]
-        all_results = load_seed_curves(seeds=seeds)
-
-    if not all_results:
-        print("Nem sikerült egyetlen futást sem végrehajtani.")
-    else:
-        sum_acc = {}
-        counts  = {}
-        for seed, (pcts, accs) in all_results.items():
-            for pct, acc in zip(pcts, accs):
-                sum_acc[pct] = sum_acc.get(pct, 0.0) + acc
-                counts[pct]  = counts.get(pct, 0) + 1
-
-        avg_accuracies = {pct: sum_acc[pct] / counts[pct] for pct in sorted(sum_acc)}
-
-        results_df = pd.DataFrame(
-            list(avg_accuracies.items()),
-            columns=["percentage", "mean_accuracy"],
-        )
-        csv_path = "results/baseline/averaged_learning_curve.csv"
-        results_df.to_csv(csv_path, index=False)
-        print(f"\n💾 CSV elmentve: {csv_path}")
-
-        plot_results(avg_accuracies)
+    main()

@@ -1,12 +1,14 @@
+"""Configure process-wide logging, warning, and thread limits for experiments."""
+
 import logging
 import os
 import warnings
-import ray
-import torch
 
 def silence_log():
-    """
-    Enhanced silence function to handle Ray, Flower, and PyTorch noise.
+    """Reduce routine Ray, Flower, Lightning, PyTorch, and warning output.
+
+    Environment variables are set before logger-level changes so child
+    processes inherit the same limits when they are started afterward.
     """
     # --- 1. Environment variables (Must be set BEFORE imports if possible) ---
     os.environ["RAY_DEDUP_LOGS"] = "1"              # Deduplicate logs

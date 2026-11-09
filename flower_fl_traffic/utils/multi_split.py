@@ -19,6 +19,7 @@ results/multi-split
 from __future__ import annotations
 
 import json
+import argparse
 import logging
 import os
 import sys
@@ -89,7 +90,7 @@ def _worker_imports():
     global get_on_fit_config, create_client_fn, player_specific_metrics
     global OmegaConf, set_seed, silence_log
 
-    from logger_silencer import silence_log as _sl
+    from utils.logger_silencer import silence_log as _sl
     silence_log = _sl
     silence_log()
 
@@ -102,7 +103,7 @@ def _worker_imports():
     from federated.server import get_on_fit_config as _gof
     from federated.universal_client import create_client_fn as _ccf
     from models.neural_network import TrafficLightningModule as _TLM
-    from seed import set_seed as _ss
+    from utils.seed import set_seed as _ss
     from utils.metrics import player_specific_metrics as _psm
 
     fl                    = _fl
@@ -122,6 +123,15 @@ def _worker_imports():
 # ──────────────────────────────────────────────────────────────────────────────
 
 def load_dataset(seed: int, keys=None) -> dict[int, pd.DataFrame]:
+    """Load reproducible 10%, 50%, and full-size samples from the source data.
+
+    Args:
+        seed: Random seed controlling sampled rows.
+        keys: Dataset size keys to load; defaults to :data:`DATASET_KEYS`.
+
+    Returns:
+        A mapping from dataset size key to sampled data frame.
+    """
     keys = DATASET_KEYS if keys is None else keys
     base = pd.read_parquet("dataset/dataset.parquet")
     out: dict[int, pd.DataFrame] = {}
@@ -138,30 +148,63 @@ def load_dataset(seed: int, keys=None) -> dict[int, pd.DataFrame]:
 # DataLoaders
 # ──────────────────────────────────────────────────────────────────────────────
 
-def make_loaders(p1_df, p2_df, le):
-    def to_loader(df, shuffle=True):
+def make_loaders(p1_df, p2_df, le, shuffle=True):
+    """Create aligned participant DataLoaders using a shared label encoder.
+
+    Args:
+        p1_df: First participant's data frame.
+        p2_df: Second participant's data frame.
+        le: Label encoder fitted to the combined participant data.
+        shuffle: Whether to shuffle each participant's batches.
+
+    Returns:
+        The DataLoaders for participants one and two.
+    """
+    def to_loader(df, shuffle):
+        """Convert one participant frame to a feature/label DataLoader."""
         X = df[FEATURE_COLUMNS].values.astype(np.float32)
         y = le.transform(df[TARGET_COLUMN].values).astype(np.int64)
         return DataLoader(
             CustomDataset(X=X, y=y), batch_size=BATCH_SIZE, shuffle=shuffle
         )
-    return to_loader(p1_df), to_loader(p2_df)
+    return to_loader(p1_df, shuffle=shuffle), to_loader(p2_df, shuffle=shuffle)
+
+
+def _split_participant_frame(df):
+    """Create a deterministic stratified 80/20 train/test split for a client."""
+    return train_test_split(
+        df,
+        test_size=0.2,
+        stratify=df[TARGET_COLUMN],
+        random_state=0,
+    )
 
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Local training
 # ──────────────────────────────────────────────────────────────────────────────
 
-def train_local(p1_df, p2_df, le) -> tuple[float, float]:
+def train_local(p1_df, p2_df, le, seed: int = 0) -> tuple[float, float]:
+    """Train local models and evaluate each on the held-out participant data.
+
+    Args:
+        p1_df: First participant's data frame.
+        p2_df: Second participant's data frame.
+        le: Label encoder fitted to the combined participant data.
+        seed: Seed used for deterministic local model initialization.
+
+    Returns:
+        Holdout accuracies for participants one and two.
+    """
     silence_log()
     results = []
-    for df in [p1_df, p2_df]:
-        X = df[FEATURE_COLUMNS].values.astype(np.float32)
-        y = le.transform(df[TARGET_COLUMN].values).astype(np.int64)
-
-        X_tr, X_te, y_tr, y_te = train_test_split(
-            X, y, test_size=0.2, stratify=y, random_state=0
-        )
+    for client_index, df in enumerate([p1_df, p2_df]):
+        set_seed(seed + client_index)
+        train_df, test_df = _split_participant_frame(df)
+        X_tr = train_df[FEATURE_COLUMNS].values.astype(np.float32)
+        y_tr = le.transform(train_df[TARGET_COLUMN].values).astype(np.int64)
+        X_te = test_df[FEATURE_COLUMNS].values.astype(np.float32)
+        y_te = le.transform(test_df[TARGET_COLUMN].values).astype(np.int64)
         tr_ld = DataLoader(
             CustomDataset(X=X_tr, y=y_tr), batch_size=BATCH_SIZE, shuffle=True
         )
@@ -193,9 +236,30 @@ def train_local(p1_df, p2_df, le) -> tuple[float, float]:
 # Federated training
 # ──────────────────────────────────────────────────────────────────────────────
 
-def train_federated(p1_df, p2_df, le) -> tuple[float, float]:
-    tr_p1, tr_p2 = make_loaders(p1_df, p2_df, le)
-    te_p1, te_p2 = make_loaders(p1_df, p2_df, le)
+def train_federated(p1_df, p2_df, le, seed: int = 0) -> tuple[float, float]:
+    """Train the two participants federatively and evaluate on local holdouts.
+
+    The stratified 80/20 split matches the local-baseline protocol, preventing
+    the federated evaluation from using its training examples.
+
+    Args:
+        p1_df: First participant's data frame.
+        p2_df: Second participant's data frame.
+        le: Label encoder fitted to the combined participant data.
+        seed: Seed recorded in the client experiment configuration.
+
+    Returns:
+        Final holdout accuracies for both clients.
+
+    Raises:
+        RuntimeError: If a client's final distributed accuracy is absent or
+            zero.
+    """
+    p1_train, p1_test = _split_participant_frame(p1_df)
+    p2_train, p2_test = _split_participant_frame(p2_df)
+    tr_p1, tr_p2 = make_loaders(p1_train, p2_train, le)
+    te_p1, te_p2 = make_loaders(p1_test, p2_test, le, shuffle=False)
+    set_seed(seed)
 
     config = OmegaConf.create({
         "num_clients": 2,
@@ -205,7 +269,7 @@ def train_federated(p1_df, p2_df, le) -> tuple[float, float]:
             "lr": LR,
             "federated_rounds": FED_ROUNDS,
             "max_grad_norm": 1.0,
-            "seed": 0,
+            "seed": seed,
         },
         "dataset": {
             "input_dim": len(FEATURE_COLUMNS),
@@ -260,7 +324,7 @@ def train_federated(p1_df, p2_df, le) -> tuple[float, float]:
 # ──────────────────────────────────────────────────────────────────────────────
 
 def is_valid_entry(entry: dict) -> bool:
-    """Invalid = any accuracy is missing, NaN or exactly 0.0 (lost client evaluation)."""
+    """Return whether all local and federated accuracies are finite and positive."""
     vals = [
         entry["local"]["player1"], entry["local"]["player2"],
         entry["federated"]["player1"], entry["federated"]["player2"],
@@ -269,7 +333,7 @@ def is_valid_entry(entry: dict) -> bool:
 
 
 def find_bad_configs(seeds: list[int], dataset_keys=None) -> dict[int, list[str]]:
-    """Scan seed_<n>.json files. Returns {seed: [invalid config tags]}."""
+    """Find invalid saved configurations for the requested seeds and sizes."""
     bad: dict[int, list[str]] = {}
     for seed in seeds:
         path = RESULTS_DIR / f"seed_{seed}.json"
@@ -288,24 +352,30 @@ def find_bad_configs(seeds: list[int], dataset_keys=None) -> dict[int, list[str]
 
 
 def train_federated_checked(p1, p2, le, tag: str, seed: int):
-    """Retry federated training if the result is invalid. Returns None if all attempts fail."""
+    """Retry federated training after invalid client metrics.
+
+    Returns ``None`` after all retries fail; non-runtime exceptions propagate.
+    """
     for attempt in range(1, MAX_RETRIES + 1):
         try:
-            return train_federated(p1, p2, le)
+            return train_federated(p1, p2, le, seed=seed)
         except RuntimeError as exc:
             print(f"[seed={seed}] {tag} attempt {attempt}/{MAX_RETRIES} failed: {exc}", flush=True)
     return None
 
 
 def run_seed(seed: int, dataset_keys=None, only_tags=None) -> dict:
-    """
-    Trains dataset-sizes x ratios for one seed and writes results/seed_{seed}.json.
+    """Run all selected size/participant-ratio configurations for one seed.
 
-    dataset_keys : which datasets to run (default: all)
-    only_tags    : if given, only these configs (e.g. {"10x_r0.125"}) are (re)run;
-                   existing valid entries are kept, and a valid existing LOCAL result
-                   is reused so only the federated part is retrained.
-    The JSON is updated after every config, and invalid results are never saved.
+    Args:
+        seed: Random seed identifying the run.
+        dataset_keys: Dataset size keys to run; defaults to all configured sizes.
+        only_tags: Optional set of configuration tags to rerun. Existing local
+            results are reused and the JSON is updated after each successful
+            configuration.
+
+    Returns:
+        The per-configuration result mapping saved for this seed.
     """
     _worker_imports()
     set_seed(seed)
@@ -342,7 +412,7 @@ def run_seed(seed: int, dataset_keys=None, only_tags=None) -> dict:
             if old and old["local"]["player1"] > 0 and old["local"]["player2"] > 0:
                 p1_loc, p2_loc = old["local"]["player1"], old["local"]["player2"]
             else:
-                p1_loc, p2_loc = train_local(p1, p2, le)
+                p1_loc, p2_loc = train_local(p1, p2, le, seed=seed)
 
             fed = train_federated_checked(p1, p2, le, tag, seed)
             if fed is None:
@@ -376,9 +446,17 @@ def run_seed(seed: int, dataset_keys=None, only_tags=None) -> dict:
 # ──────────────────────────────────────────────────────────────────────────────
 
 def aggregate(all_seed_results: list[dict]) -> pd.DataFrame:
-    """
-    Average metrics across seeds.
-    Returns a DataFrame indexed by (dataset_key, ratio).
+    """Average participant metrics over seeds for each size and data ratio.
+
+    Args:
+        all_seed_results: Per-seed mappings returned by :func:`run_seed`.
+
+    Returns:
+        A data frame with means and standard deviations for both participants'
+        local and federated accuracies.
+
+    Raises:
+        ValueError: If there are no usable results to aggregate.
     """
     rows = []
     for seed_res in all_seed_results:
@@ -392,6 +470,8 @@ def aggregate(all_seed_results: list[dict]) -> pd.DataFrame:
                 "federated_p2":       v["federated"]["player2"],
             })
 
+    if not rows:
+        raise ValueError("No valid multi-split results are available to aggregate.")
     df = pd.DataFrame(rows)
     agg = (
         df.groupby(["dataset_key", "ratio"])
@@ -473,6 +553,11 @@ def analyze_per_seed(results_by_seed: dict[int, dict]) -> tuple[pd.DataFrame, pd
 
 
 def print_seed_analysis(results_by_seed: dict[int, dict]) -> None:
+    """Print and save seed-level metric summaries and variability tables.
+
+    Args:
+        results_by_seed: Per-seed mappings loaded from the result JSON files.
+    """
     long_df, stats_df = analyze_per_seed(results_by_seed)
 
     pd.set_option("display.width", 200)
@@ -480,11 +565,11 @@ def print_seed_analysis(results_by_seed: dict[int, dict]) -> None:
 
     for m in ANALYSIS_METRICS:
         sub = stats_df[stats_df["metric"] == m].drop(columns="metric")
-        print(f"\n=== {m}: seedek közötti statisztika konfigurációnként ===")
+        print(f"\n=== {m}: across-seed statistics by configuration ===")
         print(sub.to_string(index=False, float_format=lambda x: f"{x:.4f}"))
 
     # Which seed is how often the min / max?
-    print("\n=== Melyik seed hányszor min / max (avg_gain alapján) ===")
+    print("\n=== Seed counts for minimum / maximum average gain ===")
     g = stats_df[stats_df["metric"] == "avg_gain"]
     counts = pd.DataFrame({
         "times_min": g["min_seed"].value_counts(),
@@ -493,7 +578,7 @@ def print_seed_analysis(results_by_seed: dict[int, dict]) -> None:
     print(counts.to_string())
 
     # Seed × configuration table for avg_gain
-    print("\n=== avg_gain: seed × (dataset_key, ratio) ===")
+    print("\n=== Average gain by seed and (dataset size, ratio) ===")
     pivot = long_df.pivot_table(
         index="seed", columns=["dataset_key", "ratio"], values="avg_gain"
     )
@@ -505,7 +590,7 @@ def print_seed_analysis(results_by_seed: dict[int, dict]) -> None:
     stats_path = RESULTS_DIR / "per_seed_stats.csv"
     long_df.to_csv(long_path, index=False)
     stats_df.to_csv(stats_path, index=False)
-    print(f"\nMentve → {long_path}, {stats_path}")
+    print(f"\nSaved: {long_path}, {stats_path}")
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -576,7 +661,7 @@ def plot_curves(agg: pd.DataFrame, n_seeds: int):
         ax2.set_title(f"Federated gain  {key}x", fontsize=10)
         ax2.grid(True, axis="y", linestyle="--", alpha=0.35)
 
-    plt.tight_layout()
+    fig.subplots_adjust(top=0.93)
     out = RESULTS_DIR / "curves_all.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
     plt.close(fig)
@@ -587,70 +672,92 @@ def plot_curves(agg: pd.DataFrame, n_seeds: int):
 # Main
 # ──────────────────────────────────────────────────────────────────────────────
 
-def main():
-    mode = "plot"  # "run", "rerun" or "plot"
+def main(argv=None):
+    """Run, repair, or plot the appendix experiment for unequal data splits."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--mode", choices=("run", "rerun", "plot"), default="plot")
+    parser.add_argument(
+        "--seeds",
+        nargs="+",
+        type=int,
+        default=None,
+        help="Seed IDs to run/load; defaults depend on the selected mode.",
+    )
+    parser.add_argument(
+        "--dataset-keys",
+        nargs="+",
+        type=int,
+        choices=DATASET_KEYS,
+        default=None,
+        help="Dataset sizes to run, from 1x, 5x, and 10x.",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=NUM_WORKERS,
+        help=f"Parallel seed workers for run mode (default: {NUM_WORKERS}).",
+    )
+    args = parser.parse_args(argv)
+    if args.workers < 1:
+        parser.error("--workers must be at least one")
 
+    dataset_keys = DATASET_KEYS if args.dataset_keys is None else args.dataset_keys
+    run_seeds = SEEDS if args.seeds is None else args.seeds
+    load_seeds = PLOT_SEEDS if args.seeds is None else args.seeds
     results_by_seed: dict[int, dict] = {}
 
-    if mode == "run":
+    if args.mode == "run":
         RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-
-        # Each seed runs in its own process to avoid Ray / Lightning state clashes.
-        print(f"Launching {len(SEEDS)} seeds with {NUM_WORKERS} parallel workers ...")
-
-        with ProcessPoolExecutor(max_workers=NUM_WORKERS) as pool:
-            futures = {pool.submit(run_seed, s): s for s in SEEDS}
-            for future in as_completed(futures):
-                seed = futures[future]
-                try:
-                    results_by_seed[seed] = future.result()
-                    print(f"OK Seed {seed} complete")
-                except Exception as exc:
-                    print(f"FAILED Seed {seed}: {exc}")
-
-    elif mode == "rerun":
-        seeds = PLOT_SEEDS if RERUN_SEEDS is None else RERUN_SEEDS
-        bad = find_bad_configs(seeds, RERUN_KEYS)
-        if not bad:
-            print("No invalid entries found - nothing to rerun.")
+        print(f"Launching {len(run_seeds)} seeds with {args.workers} workers...")
+        if args.workers == 1:
+            results_by_seed = {
+                seed: run_seed(seed, dataset_keys)
+                for seed in run_seeds
+            }
         else:
-            print("Invalid configs found:")
-            for s, tags in bad.items():
-                print(f"  seed {s}: {len(tags)} configs -> {tags}")
-            print(f"\nRerunning {len(bad)} seeds with {RERUN_WORKERS} worker(s) ...")
-
-            with ProcessPoolExecutor(max_workers=RERUN_WORKERS) as pool:
+            with ProcessPoolExecutor(max_workers=args.workers) as pool:
                 futures = {
-                    pool.submit(run_seed, s, RERUN_KEYS, set(tags)): s
-                    for s, tags in bad.items()
+                    pool.submit(run_seed, seed, dataset_keys): seed
+                    for seed in run_seeds
                 }
                 for future in as_completed(futures):
                     seed = futures[future]
-                    try:
-                        future.result()
-                        print(f"OK Seed {seed} rerun complete")
-                    except Exception as exc:
-                        print(f"FAILED Seed {seed} rerun: {exc}")
+                    results_by_seed[seed] = future.result()
 
-            still_bad = find_bad_configs(seeds, RERUN_KEYS)
-            if still_bad:
-                print("\nStill invalid after rerun:")
-                for s, tags in still_bad.items():
-                    print(f"  seed {s}: {tags}")
-            else:
-                print("\nAll previously invalid configs are now valid.")
-
-        results_by_seed = load_seed_curves(seeds=PLOT_SEEDS)
-
-    elif mode == "plot":
-        results_by_seed = load_seed_curves(seeds=PLOT_SEEDS)
+    elif args.mode == "rerun":
+        bad = find_bad_configs(load_seeds, dataset_keys)
+        if bad:
+            print("Invalid saved configurations:")
+            for seed, tags in bad.items():
+                print(f"  seed {seed}: {tags}")
+            with ProcessPoolExecutor(max_workers=min(args.workers, len(bad))) as pool:
+                futures = {
+                    pool.submit(
+                        run_seed, seed, dataset_keys, set(tags)
+                    ): seed
+                    for seed, tags in bad.items()
+                }
+                for future in as_completed(futures):
+                    future.result()
+            remaining = find_bad_configs(load_seeds, dataset_keys)
+            if remaining:
+                raise RuntimeError(f"Some configurations remain invalid: {remaining}")
+        else:
+            print("No invalid saved configurations found.")
+        results_by_seed = load_seed_curves(load_seeds)
 
     else:
-        raise ValueError(f"Unknown mode: {mode!r} (use 'run', 'rerun' or 'plot')")
+        results_by_seed = load_seed_curves(load_seeds)
 
+    results_by_seed = {
+        seed: results
+        for seed, results in results_by_seed.items()
+        if results
+    }
     if not results_by_seed:
-        print("No results collected - aborting.")
-        return
+        raise FileNotFoundError(
+            "No appendix results were found. Run with --mode run first."
+        )
 
     all_seed_results = list(results_by_seed.values())
 
@@ -668,7 +775,7 @@ def main():
     # plot
     plot_curves(agg, n_seeds=len(all_seed_results))
 
-    print("\nDone. All outputs are in the results/ directory.")
+    print(f"\nAppendix results saved under {RESULTS_DIR}.")
 
 
 if __name__ == "__main__":

@@ -1,3 +1,10 @@
+"""Create PyTorch loaders from cached traffic participant data.
+
+P1/P2 are loaded from Parquet files. Each is split into two self-division
+subsets, and every resulting client dataset is divided into training and test
+partitions using the configured random seed.
+"""
+
 import os, numpy as np, pandas as pd
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
@@ -5,17 +12,22 @@ from torch.utils.data import DataLoader
 from data.custom_dataset import CustomDataset
 
 def setup_directories(cfg):
-    '''
-    Folder structure initialization based on the provided configuration.
-    '''
+    """Create result, dataset, and configured participant-split directories.
 
+    Args:
+        cfg: Hydra configuration containing dataset mode and split paths.
+
+    Raises:
+        ValueError: If the selected dataset mode is unsupported.
+    """
     mode_dirs = [
         'full',
         'half',
-        'quarter',
         '80percent',
         '30percent',
     ]
+    if cfg.dataset.mode not in mode_dirs:
+        raise ValueError(f"Unsupported dataset mode: {cfg.dataset.mode}")
     
     base_results_dirs = [
         '1_local_baseline', 
@@ -33,9 +45,6 @@ def setup_directories(cfg):
             os.makedirs(os.path.join('results', base, method), exist_ok=True)
             os.makedirs(os.path.join('results', base, method, 'P1'), exist_ok=True)
             os.makedirs(os.path.join('results', base, method, 'P2'), exist_ok=True)
-            os.makedirs(os.path.join('results', base, "plots"), exist_ok=True)
-            os.makedirs(os.path.join('results', base, "games"), exist_ok=True)
-            os.makedirs(os.path.join('results', base, "games/average"), exist_ok=True)
             
     if hasattr(cfg.dataset, 'paths'):
         for key in cfg.dataset.paths.keys():
@@ -46,10 +55,20 @@ def setup_directories(cfg):
                     os.makedirs(directory, exist_ok=True)
 
 def prepare_data_and_loaders(cfg):
-    '''
-    1. Load raw data, scale features, and encode target.
-    2. Perform hierarchical splits (Base -> P1/P2, then P1 -> P11/P12, P2 -> P21/P22) and save them if not already done.
-    3. Create DataLoader objects for each split and return them in a structured dict format'''
+    """Load cached splits and construct train/test DataLoaders for all clients.
+
+    P1/P2 are read from ``dataset/<mode>/``. The self-division subsets are
+    recreated from those participant datasets using the current seed and
+    written to their configured Parquet paths.
+
+    Args:
+        cfg: Hydra configuration with data paths, columns, split ratios, and
+            loader batch size.
+
+    Returns:
+        A mapping from client IDs to dictionaries containing ``train`` and
+        ``test`` DataLoaders.
+    """
     ds_cfg = cfg.dataset
     seed = cfg.config.seed
     mode = ds_cfg.mode

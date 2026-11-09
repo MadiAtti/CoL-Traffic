@@ -1,3 +1,10 @@
+"""Run regular DP-noise or feature-suppression scenario grids.
+
+Each parameter pair is simulated with Flower in a worker process. Scenario
+results are written to the per-seed JSON log, replacing an existing entry for
+the same parameter pair when a run is resumed.
+"""
+
 import logging
 
 from data.custom_dataset import CustomDataset
@@ -13,10 +20,16 @@ from utils.save import save_federated_history, setup_file
 from utils.metrics import player_specific_metrics
 
 def _run_single_scenario(args):
-    """
-    Helper function to run a single simulation scenario in a separate process.
-    """
+    """Execute and persist one two-client federated scenario.
 
+    Args:
+        args: Worker tuple containing parameter values, configuration, client
+            loaders, output metadata, and the shared file lock.
+
+    Returns:
+        The two parameter values and the final accuracy measured for each
+        client.
+    """
     silence_log()
 
     (val1, val2, config, raw_train_loaders, test_loaders, subdir, 
@@ -104,11 +117,23 @@ def _run_single_scenario(args):
 
 
 def run_experiment(config, train_loaders, test_loaders, subdir, mode):
-    """
-    Universal experiment runner that parallelizes scenarios using multiprocessing.
+    """Run every configured parameter pair for one method and client split.
+
+    Args:
+        config: Hydra experiment configuration.
+        train_loaders: The two clients' training DataLoaders.
+        test_loaders: The two clients' evaluation DataLoaders.
+        subdir: Result subdirectory, empty for P1/P2 or ``P1``/``P2`` for
+            self-division experiments.
+        mode: Either ``"dp"`` for noise or ``"sup"`` for feature suppression.
+
+    Raises:
+        ValueError: If the dataset mode or experiment mode is unsupported.
     """
     # Setup directories and parameters based on mode
     ds_mode = config.dataset.mode
+    if ds_mode not in {"full", "half", "80percent", "30percent"}:
+        raise ValueError(f"Unsupported dataset mode: {ds_mode}")
     if mode == "dp": # Differentially Private mode
         base_dir = f"results/{ds_mode}/3_noise"
         metric_name = "noise"
@@ -116,8 +141,6 @@ def run_experiment(config, train_loaders, test_loaders, subdir, mode):
             levels = config.config.full_noise_levels
         elif ds_mode == "half":
             levels = config.config.half_noise_levels
-        elif ds_mode == "quarter":
-            levels = config.config.quarter_noise_levels
         elif ds_mode == "80percent":
             levels = config.config.percent80_noise_levels
         elif ds_mode == "30percent":
@@ -125,11 +148,13 @@ def run_experiment(config, train_loaders, test_loaders, subdir, mode):
         else:
             raise ValueError(f"Unsupported dataset mode: {ds_mode}")
         param_keys = ["client1_noise", "client2_noise"]
-    else:  # Suppression mode
+    elif mode == "sup":
         base_dir = f"results/{ds_mode}/2_suppression"
         metric_name = "features"
         levels = config.config.sup_levels
         param_keys = ["client1_features", "client2_features"]
+    else:
+        raise ValueError(f"Unsupported experiment mode: {mode}")
 
     # Initalize file for saving results 
     setup_file(config, subdir, base_dir=base_dir)
@@ -162,10 +187,7 @@ def run_experiment(config, train_loaders, test_loaders, subdir, mode):
     try:
         with mp.Pool(processes=num_parallel_scenarios) as pool:
             pool.map(_run_single_scenario, tasks)
-    except Exception as e:
-        print(f"❌ Error during parallel execution: {e}")
     finally:
-        # Final cleanup of Ray after all scenarios in this mode are done
         ray.shutdown()
 
     print(f"\n✨ All {mode.upper()} scenarios for {subdir} completed.")

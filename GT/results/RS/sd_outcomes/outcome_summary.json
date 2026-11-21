@@ -1,0 +1,230 @@
+{
+  "split": "RS",
+  "grid": {
+    "RS_NF1/Noise": {
+      "C_min": 0.0,
+      "C_max": 0.0027,
+      "C_step": 5.5102041e-05,
+      "cells": 2500
+    },
+    "RS_NF5/Noise": {
+      "C_min": 0.0,
+      "C_max": 0.00084,
+      "C_step": 1.7142857e-05,
+      "cells": 2500
+    },
+    "RS_NF1/Suppression": {
+      "C_min": 0.0,
+      "C_max": 0.0027,
+      "C_step": 5.5102041e-05,
+      "cells": 2500
+    },
+    "RS_NF5/Suppression": {
+      "C_min": 0.0,
+      "C_max": 0.00084,
+      "C_step": 1.7142857e-05,
+      "cells": 2500
+    }
+  },
+  "start_order": "DP: P1 moves first (order-invariant); Suppression: both orders",
+  "tie_seed": 0,
+  "outcomes": [
+    "hit",
+    "miss, ++",
+    "miss, +",
+    "miss, -",
+    "miss, 0",
+    "no pure NE"
+  ],
+  "zero_tol": 1e-09,
+  "configurations": [
+    {
+      "mode": "RS_NF1",
+      "method": "Noise",
+      "size": "size1",
+      "mechanism": "DP",
+      "cells": 2500,
+      "player_cells": 5000,
+      "pct": {
+        "hit": 66.8,
+        "miss, ++": 12.6,
+        "miss, +": 0.0,
+        "miss, -": 16.6,
+        "miss, 0": 4.0,
+        "no pure NE": 0.0
+      },
+      "pct_p1": {
+        "hit": 66.8,
+        "miss, ++": 16.8,
+        "miss, +": 0.0,
+        "miss, -": 16.4,
+        "miss, 0": 0.0,
+        "no pure NE": 0.0
+      },
+      "pct_p2": {
+        "hit": 66.8,
+        "miss, ++": 8.4,
+        "miss, +": 0.0,
+        "miss, -": 16.8,
+        "miss, 0": 8.0,
+        "no pure NE": 0.0
+      },
+      "hit_cells_pct": 66.8,
+      "better_than_ne_pct": 25.2,
+      "sd_ties": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_nonconverged": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_orientation_B_pct": {
+        "p1": 90.0,
+        "p2": 21.0
+      },
+      "first": 1
+    },
+    {
+      "mode": "RS_NF5",
+      "method": "Noise",
+      "size": "size2",
+      "mechanism": "DP",
+      "cells": 2500,
+      "player_cells": 5000,
+      "pct": {
+        "hit": 50.56,
+        "miss, ++": 18.24,
+        "miss, +": 0.0,
+        "miss, -": 24.72,
+        "miss, 0": 6.48,
+        "no pure NE": 0.0
+      },
+      "pct_p1": {
+        "hit": 50.56,
+        "miss, ++": 0.16,
+        "miss, +": 0.0,
+        "miss, -": 36.8,
+        "miss, 0": 12.48,
+        "no pure NE": 0.0
+      },
+      "pct_p2": {
+        "hit": 50.56,
+        "miss, ++": 36.32,
+        "miss, +": 0.0,
+        "miss, -": 12.64,
+        "miss, 0": 0.48,
+        "no pure NE": 0.0
+      },
+      "hit_cells_pct": 50.56,
+      "better_than_ne_pct": 36.480000000000004,
+      "sd_ties": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_nonconverged": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_orientation_B_pct": {
+        "p1": 73.92,
+        "p2": 12.8
+      },
+      "first": 1
+    },
+    {
+      "mode": "RS_NF1",
+      "method": "Suppression",
+      "size": "size1",
+      "mechanism": "Sup",
+      "cells": 2500,
+      "player_cells": 5000,
+      "pct": {
+        "hit": 68.2,
+        "miss, ++": 0.0,
+        "miss, +": 0.0,
+        "miss, -": 13.12,
+        "miss, 0": 18.68,
+        "no pure NE": 0.0
+      },
+      "pct_p1": {
+        "hit": 68.2,
+        "miss, ++": 0.0,
+        "miss, +": 0.0,
+        "miss, -": 26.24,
+        "miss, 0": 5.56,
+        "no pure NE": 0.0
+      },
+      "pct_p2": {
+        "hit": 68.2,
+        "miss, ++": 0.0,
+        "miss, +": 0.0,
+        "miss, -": 0.0,
+        "miss, 0": 31.8,
+        "no pure NE": 0.0
+      },
+      "hit_cells_pct": 68.2,
+      "better_than_ne_pct": 0.0,
+      "sd_ties": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_nonconverged": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_orientation_B_pct": {
+        "p1": 51.04,
+        "p2": 10.12
+      },
+      "first": 1
+    },
+    {
+      "mode": "RS_NF5",
+      "method": "Suppression",
+      "size": "size2",
+      "mechanism": "Sup",
+      "cells": 2500,
+      "player_cells": 5000,
+      "pct": {
+        "hit": 64.44,
+        "miss, ++": 4.02,
+        "miss, +": 0.0,
+        "miss, -": 5.92,
+        "miss, 0": 25.62,
+        "no pure NE": 0.0
+      },
+      "pct_p1": {
+        "hit": 64.44,
+        "miss, ++": 0.0,
+        "miss, +": 0.0,
+        "miss, -": 8.24,
+        "miss, 0": 27.32,
+        "no pure NE": 0.0
+      },
+      "pct_p2": {
+        "hit": 64.44,
+        "miss, ++": 8.04,
+        "miss, +": 0.0,
+        "miss, -": 3.6,
+        "miss, 0": 23.92,
+        "no pure NE": 0.0
+      },
+      "hit_cells_pct": 64.44,
+      "better_than_ne_pct": 8.04,
+      "sd_ties": {
+        "p1": 0,
+        "p2": 34
+      },
+      "sd_nonconverged": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_orientation_B_pct": {
+        "p1": 33.6,
+        "p2": 7.359999999999999
+      },
+      "first": 1
+    }
+  ]
+}

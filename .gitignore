@@ -4,6 +4,7 @@
 __pycache__/
 *.pyc
 *.pyo
-temp_logs*.DS_Store
+temp_logs*
+.DS_Store
 *.png
-flower_fl_traffic/docs/_build/
+NT/docs/_build/

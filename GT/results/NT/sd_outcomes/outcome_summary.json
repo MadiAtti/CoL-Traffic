@@ -1,0 +1,324 @@
+{
+  "split": "80-30",
+  "grid": {
+    "30percent/Noise": {
+      "C_min": 0.0,
+      "C_max": 0.28,
+      "C_step": 0.005714285714,
+      "cells": 2500
+    },
+    "80percent/Noise": {
+      "C_min": 0.0,
+      "C_max": 0.28,
+      "C_step": 0.005714285714,
+      "cells": 2500
+    },
+    "30percent/Suppression": {
+      "C_min": 0.0,
+      "C_max": 0.41,
+      "C_step": 0.008367346939,
+      "cells": 2500
+    },
+    "80percent/Suppression": {
+      "C_min": 0.0,
+      "C_max": 0.41,
+      "C_step": 0.008367346939,
+      "cells": 2500
+    }
+  },
+  "start_order": "DP: P1 moves first (order-invariant); Suppression: both orders",
+  "tie_seed": 0,
+  "outcomes": [
+    "hit",
+    "miss, ++",
+    "miss, +",
+    "miss, -",
+    "miss, 0",
+    "no pure NE"
+  ],
+  "zero_tol": 1e-09,
+  "configurations": [
+    {
+      "mode": "30percent",
+      "method": "Noise",
+      "size": "size1",
+      "mechanism": "DP",
+      "cells": 2500,
+      "player_cells": 5000,
+      "pct": {
+        "hit": 61.32,
+        "miss, ++": 5.34,
+        "miss, +": 10.9,
+        "miss, -": 14.96,
+        "miss, 0": 7.48,
+        "no pure NE": 0.0
+      },
+      "pct_p1": {
+        "hit": 61.32,
+        "miss, ++": 0.0,
+        "miss, +": 4.36,
+        "miss, -": 23.44,
+        "miss, 0": 10.88,
+        "no pure NE": 0.0
+      },
+      "pct_p2": {
+        "hit": 61.32,
+        "miss, ++": 10.68,
+        "miss, +": 17.44,
+        "miss, -": 6.48,
+        "miss, 0": 4.08,
+        "no pure NE": 0.0
+      },
+      "hit_cells_pct": 61.31999999999999,
+      "better_than_ne_pct": 10.68,
+      "sd_ties": {
+        "p1": 204,
+        "p2": 0
+      },
+      "sd_nonconverged": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_orientation_B_pct": {
+        "p1": 7.000000000000001,
+        "p2": 6.239999999999999
+      },
+      "first": 1
+    },
+    {
+      "mode": "80percent",
+      "method": "Noise",
+      "size": "size2",
+      "mechanism": "DP",
+      "cells": 2500,
+      "player_cells": 5000,
+      "pct": {
+        "hit": 38.84,
+        "miss, ++": 11.52,
+        "miss, +": 20.12,
+        "miss, -": 21.94,
+        "miss, 0": 7.58,
+        "no pure NE": 0.0
+      },
+      "pct_p1": {
+        "hit": 38.84,
+        "miss, ++": 20.24,
+        "miss, +": 32.24,
+        "miss, -": 6.88,
+        "miss, 0": 1.8,
+        "no pure NE": 0.0
+      },
+      "pct_p2": {
+        "hit": 38.84,
+        "miss, ++": 2.8,
+        "miss, +": 8.0,
+        "miss, -": 37.0,
+        "miss, 0": 13.36,
+        "no pure NE": 0.0
+      },
+      "hit_cells_pct": 38.84,
+      "better_than_ne_pct": 20.32,
+      "sd_ties": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_nonconverged": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_orientation_B_pct": {
+        "p1": 12.36,
+        "p2": 20.04
+      },
+      "first": 1
+    },
+    {
+      "mode": "30percent",
+      "method": "Suppression",
+      "size": "size1",
+      "mechanism": "Sup",
+      "cells": 2500,
+      "player_cells": 5000,
+      "pct": {
+        "hit": 3.88,
+        "miss, ++": 13.24,
+        "miss, +": 50.04,
+        "miss, -": 27.28,
+        "miss, 0": 5.56,
+        "no pure NE": 0.0
+      },
+      "pct_p1": {
+        "hit": 3.88,
+        "miss, ++": 8.64,
+        "miss, +": 51.32,
+        "miss, -": 32.24,
+        "miss, 0": 3.92,
+        "no pure NE": 0.0
+      },
+      "pct_p2": {
+        "hit": 3.88,
+        "miss, ++": 17.84,
+        "miss, +": 48.76,
+        "miss, -": 22.32,
+        "miss, 0": 7.2,
+        "no pure NE": 0.0
+      },
+      "hit_cells_pct": 3.88,
+      "better_than_ne_pct": 26.479999999999997,
+      "sd_ties": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_nonconverged": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_orientation_B_pct": {
+        "p1": 24.52,
+        "p2": 9.120000000000001
+      },
+      "first": 1
+    },
+    {
+      "mode": "80percent",
+      "method": "Suppression",
+      "size": "size2",
+      "mechanism": "Sup",
+      "cells": 2500,
+      "player_cells": 5000,
+      "pct": {
+        "hit": 0.24,
+        "miss, ++": 26.24,
+        "miss, +": 32.22,
+        "miss, -": 41.3,
+        "miss, 0": 0.0,
+        "no pure NE": 0.0
+      },
+      "pct_p1": {
+        "hit": 0.24,
+        "miss, ++": 44.08,
+        "miss, +": 31.68,
+        "miss, -": 24.0,
+        "miss, 0": 0.0,
+        "no pure NE": 0.0
+      },
+      "pct_p2": {
+        "hit": 0.24,
+        "miss, ++": 8.4,
+        "miss, +": 32.76,
+        "miss, -": 58.6,
+        "miss, 0": 0.0,
+        "no pure NE": 0.0
+      },
+      "hit_cells_pct": 0.24,
+      "better_than_ne_pct": 52.480000000000004,
+      "sd_ties": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_nonconverged": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_orientation_B_pct": {
+        "p1": 100.0,
+        "p2": 0.0
+      },
+      "first": 1
+    },
+    {
+      "mode": "30percent",
+      "method": "Suppression",
+      "size": "size1",
+      "mechanism": "Sup",
+      "cells": 2500,
+      "player_cells": 5000,
+      "pct": {
+        "hit": 3.88,
+        "miss, ++": 10.06,
+        "miss, +": 39.7,
+        "miss, -": 40.8,
+        "miss, 0": 5.56,
+        "no pure NE": 0.0
+      },
+      "pct_p1": {
+        "hit": 3.88,
+        "miss, ++": 3.12,
+        "miss, +": 43.84,
+        "miss, -": 45.24,
+        "miss, 0": 3.92,
+        "no pure NE": 0.0
+      },
+      "pct_p2": {
+        "hit": 3.88,
+        "miss, ++": 17.0,
+        "miss, +": 35.56,
+        "miss, -": 36.36,
+        "miss, 0": 7.2,
+        "no pure NE": 0.0
+      },
+      "hit_cells_pct": 3.88,
+      "better_than_ne_pct": 20.119999999999997,
+      "sd_ties": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_nonconverged": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_orientation_B_pct": {
+        "p1": 12.4,
+        "p2": 6.64
+      },
+      "first": 2
+    },
+    {
+      "mode": "80percent",
+      "method": "Suppression",
+      "size": "size2",
+      "mechanism": "Sup",
+      "cells": 2500,
+      "player_cells": 5000,
+      "pct": {
+        "hit": 0.24,
+        "miss, ++": 22.74,
+        "miss, +": 28.62,
+        "miss, -": 48.4,
+        "miss, 0": 0.0,
+        "no pure NE": 0.0
+      },
+      "pct_p1": {
+        "hit": 0.24,
+        "miss, ++": 38.28,
+        "miss, +": 28.68,
+        "miss, -": 32.8,
+        "miss, 0": 0.0,
+        "no pure NE": 0.0
+      },
+      "pct_p2": {
+        "hit": 0.24,
+        "miss, ++": 7.2,
+        "miss, +": 28.56,
+        "miss, -": 64.0,
+        "miss, 0": 0.0,
+        "no pure NE": 0.0
+      },
+      "hit_cells_pct": 0.24,
+      "better_than_ne_pct": 45.48,
+      "sd_ties": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_nonconverged": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_orientation_B_pct": {
+        "p1": 100.0,
+        "p2": 7.04
+      },
+      "first": 2
+    }
+  ]
+}

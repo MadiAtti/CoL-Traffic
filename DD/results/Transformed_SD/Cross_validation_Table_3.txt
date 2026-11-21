@@ -1,0 +1,19 @@
+WEIGHTED RMSE EVALUATION (the function belongs to the RS use case)
+============================================================
+Weights: x=0.638798, y=-2.213972e-08, alpha=1.802863, beta=0.136894, gamma=-0.016301
+
+1. Overall RMSE (Without Function)
+0.272530
+
+2. Overall RMSE (With Weights)
+0.432344
+
+3. RMSE by Dataset Size
+
+data_30%:
+  Raw RMSE (Without Function): 0.295844
+  Transformed RMSE (With Weights): 0.440050
+
+data_80%:
+  Raw RMSE (Without Function): 0.247025
+  Transformed RMSE (With Weights): 0.424499

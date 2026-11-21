@@ -1,0 +1,56 @@
+=====================================================
+      OPTIMIZATION BENCHMARK & COMPARISON            
+=====================================================
+Baseline Overall RMSE (Without Function): 0.001448
+
+[Differential Evolution]
+  Achieved RMSE: 0.000687 | Runtime: 0.3193s
+  Parameters: x=0.638798, y=-2.213972e-08, alpha=1.802863, beta=0.136894, gamma=-0.016301
+
+[Trust-Region Reflective (Least Squares)]
+  Achieved RMSE: 0.000687 | Runtime: 0.0042s
+  Parameters: x=1.071666, y=-3.643646e-08, alpha=1.071372, beta=0.083883, gamma=-0.009170
+
+[Multi-Start L-BFGS-B (30 Restarts)]
+  Achieved RMSE: 0.004003 | Runtime: 0.3452s
+  Parameters: x=-0.110216, y=1.227011e-09, alpha=-9.873474, beta=-5.115424, gamma=8.394426
+
+[Dual Annealing]
+  Achieved RMSE: 0.000694 | Runtime: 0.7718s
+  Parameters: x=0.127449, y=-4.803527e-09, alpha=9.125592, beta=0.720351, gamma=-0.179872
+
+=====================================================
+  SELECTED BEST METHODS (TIED MINIMUMS)
+=====================================================
+Optimal Minimum RMSE (Overall): 0.000687
+Method: Differential Evolution
+Universal Weights: x=0.638798, y=-2.213972e-08, alpha=1.802863, beta=0.136894, gamma=-0.016301
+
+Method: Trust-Region Reflective (Least Squares)
+Universal Weights: x=1.071666, y=-3.643646e-08, alpha=1.071372, beta=0.083883, gamma=-0.009170
+
+=====================================================
+    TABLE 2: RMSE PER DATASET SIZE (EVALUATION)      
+=====================================================
+Evaluation using: Differential Evolution
+Dataset Size (Samples = 1003980):
+  Raw SD RMSE (Without Function): 0.001995
+  Transformed SD RMSE (With Function f(Phi)): 0.000907
+  Error Reduction: 54.52%
+
+Dataset Size (Samples = 5019837):
+  Raw SD RMSE (Without Function): 0.000463
+  Transformed SD RMSE (With Function f(Phi)): 0.000349
+  Error Reduction: 24.73%
+
+Evaluation using: Trust-Region Reflective (Least Squares)
+Dataset Size (Samples = 1003980):
+  Raw SD RMSE (Without Function): 0.001995
+  Transformed SD RMSE (With Function f(Phi)): 0.000908
+  Error Reduction: 54.48%
+
+Dataset Size (Samples = 5019837):
+  Raw SD RMSE (Without Function): 0.000463
+  Transformed SD RMSE (With Function f(Phi)): 0.000346
+  Error Reduction: 25.32%
+

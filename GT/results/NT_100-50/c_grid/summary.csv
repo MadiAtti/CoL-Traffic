@@ -1,0 +1,5 @@
+size,method,case,match_pct,misdirected_pct,p1_hurt_pct,p1_help_pct,p2_hurt_pct,p2_help_pct,welfare_hurt_pct,welfare_help_pct,order_sensitive_true_cells,order_sensitive_true_pct,order_sensitive_sd_cells,order_sensitive_sd_pct
+100% data,Noise,B,87.60,12.40,12.40,0.00,9.28,3.12,9.28,3.12,0,0.00,122,4.88
+100% data,Suppression,A,77.96,22.04,13.68,8.36,21.72,0.32,14.44,7.60,42,1.68,106,4.24
+50% data,Noise,A,12.76,87.24,23.04,64.20,81.32,5.92,60.64,26.60,8,0.32,386,15.44
+50% data,Suppression,A,64.36,35.64,32.44,3.20,29.04,3.24,32.12,3.52,197,7.88,474,18.96

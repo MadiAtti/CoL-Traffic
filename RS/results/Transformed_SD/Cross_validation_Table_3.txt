@@ -1,0 +1,19 @@
+WEIGHTED RMSE EVALUATION (Tested on the DD use case optimal function)
+============================================================
+Weights: x=0.732183, y=-3.528741e-07, alpha=0.603868, beta=0.472478, gamma=0.472746
+
+1. Overall RMSE (Without Function)
+0.001448
+
+2. Overall RMSE (With Weights)
+0.013101
+
+3. RMSE by Dataset Size
+
+NF_1:
+  Raw RMSE (Without Function): 0.001995
+  Transformed RMSE (With Weights): 0.007837
+
+NF_5:
+  Raw RMSE (Without Function): 0.000463
+  Transformed RMSE (With Weights): 0.016788

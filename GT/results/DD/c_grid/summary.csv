@@ -1,0 +1,5 @@
+size,method,case,match_pct,misdirected_pct,p1_misdirected_pct,p2_misdirected_pct,mean_abs_dp1,mean_abs_dp2,order_sensitive_true_cells,order_sensitive_true_pct,order_sensitive_sd_cells,order_sensitive_sd_pct
+DD 80% data,Noise,B,83.08,16.92,16.8,13.24,0.168,0.1324,0,0,0,0
+DD 80% data,Suppression,A,75.84,24.16,14.96,14.04,0.07616,0.06928,0,0,60,2.4
+DD 30% data,Noise,B,89.16,10.84,5.32,9.8,0.0532,0.098,0,0,0,0
+DD 30% data,Suppression,A,58.32,41.68,33.44,31,0.2115,0.245,37,1.48,0,0

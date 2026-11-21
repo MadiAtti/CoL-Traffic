@@ -1,0 +1,33 @@
+{
+  "mode": "RS_NF5",
+  "usecase": "RS",
+  "source": "RS/results/large_data_NF5/isotonic_csv",
+  "D_n": 2.5099185,
+  "unit": "millions of ratings",
+  "methods": {
+    "Noise": {
+      "grid": [
+        0.0,
+        0.001,
+        0.005,
+        0.01,
+        0.05,
+        0.1,
+        1.0
+      ],
+      "max_deviation_from_their_Transformed_SD": 9.974659986866641e-17
+    },
+    "Suppression": {
+      "grid": [
+        0.0,
+        0.05,
+        0.08,
+        0.2,
+        0.4,
+        0.8,
+        1.0
+      ],
+      "max_deviation_from_their_Transformed_SD": 9.996344030316351e-17
+    }
+  }
+}

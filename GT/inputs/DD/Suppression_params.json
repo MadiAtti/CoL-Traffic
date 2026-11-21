@@ -1,0 +1,16 @@
+{
+    "method": "Suppression",
+    "split": "DD",
+    "usecase": "DD",
+    "source": "DD/results/Transformed_SD/data_30%/Difference/sup_difference_transformed.csv",
+    "params": {
+        "x": 0.7973799538489089,
+        "y": 0.0004275308320664,
+        "alpha": 0.0845706105824494,
+        "beta": 0.1411629504205852
+    },
+    "D_n": {
+        "small": 35.427,
+        "big": 94.4725
+    }
+}

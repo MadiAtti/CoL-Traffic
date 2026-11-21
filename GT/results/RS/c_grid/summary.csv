@@ -1,0 +1,5 @@
+size,method,case,match_pct,misdirected_pct,p1_misdirected_pct,p2_misdirected_pct,mean_abs_dp1,mean_abs_dp2,order_sensitive_true_cells,order_sensitive_true_pct,order_sensitive_sd_cells,order_sensitive_sd_pct
+RS NF 5x data,Noise,B,50.56,49.44,36.8,48.12,0.368,0.4812,0,0,0,0
+RS NF 5x data,Suppression,B,64.44,35.56,20.56,26.28,0.2056,0.2628,0,0,0,0
+RS NF 1x data,Noise,B,66.8,33.2,31.64,26.04,0.3164,0.2604,0,0,0,0
+RS NF 1x data,Suppression,B,68.2,31.8,12.12,25.08,0.1212,0.2508,0,0,0,0

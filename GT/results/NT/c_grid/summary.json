@@ -1,0 +1,394 @@
+{
+  "split": "80-30",
+  "grid": {
+    "C_min": 0.0,
+    "C_max": 0.49,
+    "C_step": 0.01,
+    "cells": 2500
+  },
+  "tolerance": 1e-09,
+  "primary_order": "p1_first",
+  "definitions": {
+    "match": "realized SD cell == true-NE cell (P1 moves first)",
+    "p1/p2_misdirected": "p1_SD != p1* / p2_SD != p2*",
+    "mean_abs_dp": "mean over cells of |p_SD - p*|",
+    "case": "B if every true and SD outcome lies in {0,1}^2, else A",
+    "order_sensitive": "outcome differs between P1-first and P2-first passes"
+  },
+  "configurations": [
+    {
+      "mode": "80percent",
+      "size": "80% data",
+      "method": "Noise",
+      "case": "A",
+      "cells": 2500,
+      "match_pct": 38.84,
+      "misdirected_pct": 61.16,
+      "p1_misdirected_pct": 10.68,
+      "p2_misdirected_pct": 54.88,
+      "mean_abs_dp1": 0.09936774193548388,
+      "mean_abs_dp2": 0.31431724137931033,
+      "order_sensitive_true_cells": 0,
+      "order_sensitive_true_pct": 0.0,
+      "order_sensitive_true_breakdown": {
+        "only $p_2$ differs": 0,
+        "only $p_1$ differs": 0,
+        "$p_1$ and $p_2$ differ": 0
+      },
+      "order_sensitive_sd_cells": 44,
+      "order_sensitive_sd_pct": 1.76,
+      "order_sensitive_sd_breakdown": {
+        "only $p_2$ differs": 0,
+        "only $p_1$ differs": 44,
+        "$p_1$ and $p_2$ differ": 0
+      },
+      "nonconverged": {
+        "p1_first_status_true": 0,
+        "p1_first_status_sd1": 0,
+        "p1_first_status_sd2": 0,
+        "p2_first_status_true": 0,
+        "p2_first_status_sd1": 0,
+        "p2_first_status_sd2": 0
+      },
+      "distinct_true_outcomes": [
+        {
+          "p1": 0.0,
+          "p2": 0.0,
+          "cells": 1147
+        },
+        {
+          "p1": 0.0,
+          "p2": 1.0,
+          "cells": 338
+        },
+        {
+          "p1": 1.0,
+          "p2": 0.0,
+          "cells": 19
+        },
+        {
+          "p1": 1.0,
+          "p2": 1.0,
+          "cells": 996
+        }
+      ],
+      "distinct_sd_outcomes": [
+        {
+          "p1": 0.0,
+          "p2": 0.0,
+          "cells": 358
+        },
+        {
+          "p1": 0.0,
+          "p2": 0.137931034,
+          "cells": 680
+        },
+        {
+          "p1": 0.0,
+          "p2": 1.0,
+          "cells": 528
+        },
+        {
+          "p1": 0.193548387,
+          "p2": 0.0,
+          "cells": 42
+        },
+        {
+          "p1": 0.193548387,
+          "p2": 1.0,
+          "cells": 54
+        },
+        {
+          "p1": 1.0,
+          "p2": 0.0,
+          "cells": 420
+        },
+        {
+          "p1": 1.0,
+          "p2": 1.0,
+          "cells": 418
+        }
+      ],
+      "C_max": 0.28,
+      "C_step": 0.005714285714
+    },
+    {
+      "mode": "80percent",
+      "size": "80% data",
+      "method": "Suppression",
+      "case": "A",
+      "cells": 2500,
+      "match_pct": 0.24,
+      "misdirected_pct": 99.76,
+      "p1_misdirected_pct": 98.0,
+      "p2_misdirected_pct": 69.0,
+      "mean_abs_dp1": 0.6758,
+      "mean_abs_dp2": 0.658,
+      "order_sensitive_true_cells": 0,
+      "order_sensitive_true_pct": 0.0,
+      "order_sensitive_true_breakdown": {
+        "only $p_2$ differs": 0,
+        "only $p_1$ differs": 0,
+        "$p_1$ and $p_2$ differ": 0
+      },
+      "order_sensitive_sd_cells": 1980,
+      "order_sensitive_sd_pct": 79.2,
+      "order_sensitive_sd_breakdown": {
+        "only $p_2$ differs": 1980,
+        "only $p_1$ differs": 0,
+        "$p_1$ and $p_2$ differ": 0
+      },
+      "nonconverged": {
+        "p1_first_status_true": 0,
+        "p1_first_status_sd1": 0,
+        "p1_first_status_sd2": 0,
+        "p2_first_status_true": 0,
+        "p2_first_status_sd1": 0,
+        "p2_first_status_sd2": 0
+      },
+      "distinct_true_outcomes": [
+        {
+          "p1": 0.0,
+          "p2": 0.0,
+          "cells": 21
+        },
+        {
+          "p1": 0.0,
+          "p2": 1.0,
+          "cells": 29
+        },
+        {
+          "p1": 0.071428571,
+          "p2": 0.0,
+          "cells": 819
+        },
+        {
+          "p1": 1.0,
+          "p2": 0.0,
+          "cells": 10
+        },
+        {
+          "p1": 1.0,
+          "p2": 1.0,
+          "cells": 1621
+        }
+      ],
+      "distinct_sd_outcomes": [
+        {
+          "p1": 0.0,
+          "p2": 0.0,
+          "cells": 2280
+        },
+        {
+          "p1": 0.0,
+          "p2": 0.071428571,
+          "cells": 220
+        }
+      ],
+      "C_max": 0.41,
+      "C_step": 0.008367346939
+    },
+    {
+      "mode": "30percent",
+      "size": "30% data",
+      "method": "Noise",
+      "case": "B",
+      "cells": 2500,
+      "match_pct": 61.32,
+      "misdirected_pct": 38.68,
+      "p1_misdirected_pct": 18.44,
+      "p2_misdirected_pct": 24.32,
+      "mean_abs_dp1": 0.1844,
+      "mean_abs_dp2": 0.2432,
+      "order_sensitive_true_cells": 0,
+      "order_sensitive_true_pct": 0.0,
+      "order_sensitive_true_breakdown": {
+        "only $p_2$ differs": 0,
+        "only $p_1$ differs": 0,
+        "$p_1$ and $p_2$ differ": 0
+      },
+      "order_sensitive_sd_cells": 0,
+      "order_sensitive_sd_pct": 0.0,
+      "order_sensitive_sd_breakdown": {
+        "only $p_2$ differs": 0,
+        "only $p_1$ differs": 0,
+        "$p_1$ and $p_2$ differ": 0
+      },
+      "nonconverged": {
+        "p1_first_status_true": 0,
+        "p1_first_status_sd1": 0,
+        "p1_first_status_sd2": 0,
+        "p2_first_status_true": 0,
+        "p2_first_status_sd1": 0,
+        "p2_first_status_sd2": 0
+      },
+      "distinct_true_outcomes": [
+        {
+          "p1": 0.0,
+          "p2": 0.0,
+          "cells": 1364
+        },
+        {
+          "p1": 0.0,
+          "p2": 1.0,
+          "cells": 247
+        },
+        {
+          "p1": 1.0,
+          "p2": 0.0,
+          "cells": 6
+        },
+        {
+          "p1": 1.0,
+          "p2": 1.0,
+          "cells": 883
+        }
+      ],
+      "distinct_sd_outcomes": [
+        {
+          "p1": 0.0,
+          "p2": 0.0,
+          "cells": 742
+        },
+        {
+          "p1": 0.0,
+          "p2": 1.0,
+          "cells": 942
+        },
+        {
+          "p1": 1.0,
+          "p2": 0.0,
+          "cells": 176
+        },
+        {
+          "p1": 1.0,
+          "p2": 1.0,
+          "cells": 640
+        }
+      ],
+      "C_max": 0.28,
+      "C_step": 0.005714285714
+    },
+    {
+      "mode": "30percent",
+      "size": "30% data",
+      "method": "Suppression",
+      "case": "A",
+      "cells": 2500,
+      "match_pct": 3.88,
+      "misdirected_pct": 96.12,
+      "p1_misdirected_pct": 80.96,
+      "p2_misdirected_pct": 66.0,
+      "mean_abs_dp1": 0.35065714285714283,
+      "mean_abs_dp2": 0.35828571428571426,
+      "order_sensitive_true_cells": 658,
+      "order_sensitive_true_pct": 26.32,
+      "order_sensitive_true_breakdown": {
+        "only $p_2$ differs": 0,
+        "only $p_1$ differs": 0,
+        "$p_1$ and $p_2$ differ": 658
+      },
+      "order_sensitive_sd_cells": 1744,
+      "order_sensitive_sd_pct": 69.76,
+      "order_sensitive_sd_breakdown": {
+        "only $p_2$ differs": 185,
+        "only $p_1$ differs": 644,
+        "$p_1$ and $p_2$ differ": 915
+      },
+      "nonconverged": {
+        "p1_first_status_true": 0,
+        "p1_first_status_sd1": 0,
+        "p1_first_status_sd2": 0,
+        "p2_first_status_true": 0,
+        "p2_first_status_sd1": 0,
+        "p2_first_status_sd2": 0
+      },
+      "distinct_true_outcomes": [
+        {
+          "p1": 0.0,
+          "p2": 0.0,
+          "cells": 20
+        },
+        {
+          "p1": 0.0,
+          "p2": 0.071428571,
+          "cells": 100
+        },
+        {
+          "p1": 0.0,
+          "p2": 0.142857143,
+          "cells": 760
+        },
+        {
+          "p1": 0.0,
+          "p2": 1.0,
+          "cells": 6
+        },
+        {
+          "p1": 0.214285714,
+          "p2": 0.0,
+          "cells": 544
+        },
+        {
+          "p1": 1.0,
+          "p2": 0.0,
+          "cells": 14
+        },
+        {
+          "p1": 1.0,
+          "p2": 1.0,
+          "cells": 1056
+        }
+      ],
+      "distinct_sd_outcomes": [
+        {
+          "p1": 0.0,
+          "p2": 0.0,
+          "cells": 219
+        },
+        {
+          "p1": 0.0,
+          "p2": 0.214285714,
+          "cells": 92
+        },
+        {
+          "p1": 0.0,
+          "p2": 1.0,
+          "cells": 35
+        },
+        {
+          "p1": 0.071428571,
+          "p2": 0.0,
+          "cells": 1156
+        },
+        {
+          "p1": 0.142857143,
+          "p2": 0.0,
+          "cells": 341
+        },
+        {
+          "p1": 0.214285714,
+          "p2": 0.0,
+          "cells": 322
+        },
+        {
+          "p1": 0.214285714,
+          "p2": 1.0,
+          "cells": 145
+        },
+        {
+          "p1": 1.0,
+          "p2": 0.0,
+          "cells": 98
+        },
+        {
+          "p1": 1.0,
+          "p2": 1.0,
+          "cells": 92
+        }
+      ],
+      "C_max": 0.41,
+      "C_step": 0.008367346939
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+    "method": "Suppression",
+    "split": "RS",
+    "usecase": "RS",
+    "source": "RS fit_per_mechanism.py (RS_PARAMS in DD fit_per_mechanism.py)",
+    "params": {
+        "x": 0.758332,
+        "y": -0.0442311,
+        "alpha": 0.608741,
+        "beta": 0.066067
+    },
+    "D_n": {
+        "small": 0.50199,
+        "big": 2.5099185
+    }
+}

@@ -1,0 +1,3 @@
+# Matan's raw results and run logs are tracked, unlike the working CSVs in code/DD
+!*.csv
+!*.out

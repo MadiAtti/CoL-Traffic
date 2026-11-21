@@ -1,0 +1,16 @@
+{
+    "method": "Noise",
+    "split": "RS",
+    "usecase": "RS",
+    "source": "RS fit_per_mechanism.py (RS_PARAMS in DD fit_per_mechanism.py)",
+    "params": {
+        "x": 1.1639,
+        "y": -0.0838379,
+        "alpha": 0.0754697,
+        "beta": 0.0173887
+    },
+    "D_n": {
+        "small": 0.50199,
+        "big": 2.5099185
+    }
+}

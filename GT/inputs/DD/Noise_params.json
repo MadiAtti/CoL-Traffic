@@ -1,0 +1,16 @@
+{
+    "method": "Noise",
+    "split": "DD",
+    "usecase": "DD",
+    "source": "DD/results/Transformed_SD/data_30%/Difference/dp_difference_transformed.csv",
+    "params": {
+        "x": 0.9708911569783348,
+        "y": 0.0003951174734666,
+        "alpha": 0.1152111853353217,
+        "beta": 0.1152551895908613
+    },
+    "D_n": {
+        "small": 35.427,
+        "big": 94.4725
+    }
+}

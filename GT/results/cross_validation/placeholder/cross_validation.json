@@ -1,0 +1,986 @@
+{
+  "data_mode": "placeholder",
+  "definition": "RMSE(mono(f_source(Delta_tilde_target)), Delta_target), echo/echo cell excluded; same mechanism for source and target",
+  "summary": {
+    "cross_cells": 24,
+    "cells_worse_than_sd": 0,
+    "ratio_to_sd_min": 1.0,
+    "ratio_to_sd_max": 1.0,
+    "ratio_into_NT": [
+      1.0,
+      1.0
+    ],
+    "ratio_from_NT": [
+      1.0,
+      1.0
+    ],
+    "negative_g": [],
+    "any_placeholder": true
+  },
+  "inputs": {
+    "RS/Sup/size1": {
+      "placeholder": true,
+      "D_n": 0.5,
+      "grid": [
+        0.0,
+        0.1,
+        0.2,
+        0.35,
+        0.5,
+        0.7,
+        0.85,
+        1.0
+      ],
+      "provenance": "PLACEHOLDER: forced (--data placeholder)"
+    },
+    "RS/Sup/size2": {
+      "placeholder": true,
+      "D_n": 1.0,
+      "grid": [
+        0.0,
+        0.1,
+        0.2,
+        0.35,
+        0.5,
+        0.7,
+        0.85,
+        1.0
+      ],
+      "provenance": "PLACEHOLDER: forced (--data placeholder)"
+    },
+    "RS/DP/size1": {
+      "placeholder": true,
+      "D_n": 0.5,
+      "grid": [
+        0.0,
+        0.1,
+        0.2,
+        0.35,
+        0.5,
+        0.7,
+        0.85,
+        1.0
+      ],
+      "provenance": "PLACEHOLDER: forced (--data placeholder)"
+    },
+    "RS/DP/size2": {
+      "placeholder": true,
+      "D_n": 1.0,
+      "grid": [
+        0.0,
+        0.1,
+        0.2,
+        0.35,
+        0.5,
+        0.7,
+        0.85,
+        1.0
+      ],
+      "provenance": "PLACEHOLDER: forced (--data placeholder)"
+    },
+    "DD/Sup/size1": {
+      "placeholder": true,
+      "D_n": 30.0,
+      "grid": [
+        0.0,
+        0.1,
+        0.2,
+        0.35,
+        0.5,
+        0.7,
+        0.85,
+        1.0
+      ],
+      "provenance": "PLACEHOLDER: forced (--data placeholder)"
+    },
+    "DD/Sup/size2": {
+      "placeholder": true,
+      "D_n": 80.0,
+      "grid": [
+        0.0,
+        0.1,
+        0.2,
+        0.35,
+        0.5,
+        0.7,
+        0.85,
+        1.0
+      ],
+      "provenance": "PLACEHOLDER: forced (--data placeholder)"
+    },
+    "DD/DP/size1": {
+      "placeholder": true,
+      "D_n": 30.0,
+      "grid": [
+        0.0,
+        0.1,
+        0.2,
+        0.35,
+        0.5,
+        0.7,
+        0.85,
+        1.0
+      ],
+      "provenance": "PLACEHOLDER: forced (--data placeholder)"
+    },
+    "DD/DP/size2": {
+      "placeholder": true,
+      "D_n": 80.0,
+      "grid": [
+        0.0,
+        0.1,
+        0.2,
+        0.35,
+        0.5,
+        0.7,
+        0.85,
+        1.0
+      ],
+      "provenance": "PLACEHOLDER: forced (--data placeholder)"
+    },
+    "NT/Sup/size1": {
+      "placeholder": true,
+      "D_n": 0.474519,
+      "grid": [
+        0.0,
+        0.1,
+        0.2,
+        0.35,
+        0.5,
+        0.7,
+        0.85,
+        1.0
+      ],
+      "provenance": "PLACEHOLDER: forced (--data placeholder)"
+    },
+    "NT/Sup/size2": {
+      "placeholder": true,
+      "D_n": 1.265384,
+      "grid": [
+        0.0,
+        0.1,
+        0.2,
+        0.35,
+        0.5,
+        0.7,
+        0.85,
+        1.0
+      ],
+      "provenance": "PLACEHOLDER: forced (--data placeholder)"
+    },
+    "NT/DP/size1": {
+      "placeholder": true,
+      "D_n": 0.474519,
+      "grid": [
+        0.0,
+        0.1,
+        0.2,
+        0.35,
+        0.5,
+        0.7,
+        0.85,
+        1.0
+      ],
+      "provenance": "PLACEHOLDER: forced (--data placeholder)"
+    },
+    "NT/DP/size2": {
+      "placeholder": true,
+      "D_n": 1.265384,
+      "grid": [
+        0.0,
+        0.1,
+        0.2,
+        0.35,
+        0.5,
+        0.7,
+        0.85,
+        1.0
+      ],
+      "provenance": "PLACEHOLDER: forced (--data placeholder)"
+    }
+  },
+  "operators": {
+    "RS/Sup": {
+      "params": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    "RS/DP": {
+      "params": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    "DD/Sup": {
+      "params": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    "DD/DP": {
+      "params": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    "NT/Sup": {
+      "params": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    "NT/DP": {
+      "params": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    }
+  },
+  "rows": [
+    {
+      "source": "RS",
+      "mechanism": "Sup",
+      "target": "RS",
+      "size": "size1",
+      "in_domain": true,
+      "D_n_target": 0.5,
+      "g_target": 1.0,
+      "rmse_transfer": 0.00020695649729510107,
+      "rmse_sd": 0.00020695649729510107,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "RS",
+      "mechanism": "Sup",
+      "target": "RS",
+      "size": "size2",
+      "in_domain": true,
+      "D_n_target": 1.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.0001967558286314734,
+      "rmse_sd": 0.0001967558286314734,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "RS",
+      "mechanism": "Sup",
+      "target": "DD",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 30.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.011151831569435909,
+      "rmse_sd": 0.011151831569435909,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "RS",
+      "mechanism": "Sup",
+      "target": "DD",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 80.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.010839411625172466,
+      "rmse_sd": 0.010839411625172466,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "RS",
+      "mechanism": "Sup",
+      "target": "NT",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.474519,
+      "g_target": 1.0,
+      "rmse_transfer": 0.005665545865966454,
+      "rmse_sd": 0.005665545865966454,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "RS",
+      "mechanism": "Sup",
+      "target": "NT",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 1.265384,
+      "g_target": 1.0,
+      "rmse_transfer": 0.0060654890587038095,
+      "rmse_sd": 0.0060654890587038095,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "RS",
+      "mechanism": "DP",
+      "target": "RS",
+      "size": "size1",
+      "in_domain": true,
+      "D_n_target": 0.5,
+      "g_target": 1.0,
+      "rmse_transfer": 0.00019476953062433296,
+      "rmse_sd": 0.00019476953062433296,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "RS",
+      "mechanism": "DP",
+      "target": "RS",
+      "size": "size2",
+      "in_domain": true,
+      "D_n_target": 1.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.00018534960650986023,
+      "rmse_sd": 0.00018534960650986023,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "RS",
+      "mechanism": "DP",
+      "target": "DD",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 30.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.01052104247512585,
+      "rmse_sd": 0.01052104247512585,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "RS",
+      "mechanism": "DP",
+      "target": "DD",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 80.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.010872353933913097,
+      "rmse_sd": 0.010872353933913097,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "RS",
+      "mechanism": "DP",
+      "target": "NT",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.474519,
+      "g_target": 1.0,
+      "rmse_transfer": 0.005603861299512869,
+      "rmse_sd": 0.005603861299512869,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "RS",
+      "mechanism": "DP",
+      "target": "NT",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 1.265384,
+      "g_target": 1.0,
+      "rmse_transfer": 0.0059475218271975916,
+      "rmse_sd": 0.0059475218271975916,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "DD",
+      "mechanism": "Sup",
+      "target": "RS",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.5,
+      "g_target": 1.0,
+      "rmse_transfer": 0.00020695649729510107,
+      "rmse_sd": 0.00020695649729510107,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "DD",
+      "mechanism": "Sup",
+      "target": "RS",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 1.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.0001967558286314734,
+      "rmse_sd": 0.0001967558286314734,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "DD",
+      "mechanism": "Sup",
+      "target": "DD",
+      "size": "size1",
+      "in_domain": true,
+      "D_n_target": 30.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.011151831569435909,
+      "rmse_sd": 0.011151831569435909,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "DD",
+      "mechanism": "Sup",
+      "target": "DD",
+      "size": "size2",
+      "in_domain": true,
+      "D_n_target": 80.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.010839411625172466,
+      "rmse_sd": 0.010839411625172466,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "DD",
+      "mechanism": "Sup",
+      "target": "NT",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.474519,
+      "g_target": 1.0,
+      "rmse_transfer": 0.005665545865966454,
+      "rmse_sd": 0.005665545865966454,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "DD",
+      "mechanism": "Sup",
+      "target": "NT",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 1.265384,
+      "g_target": 1.0,
+      "rmse_transfer": 0.0060654890587038095,
+      "rmse_sd": 0.0060654890587038095,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "DD",
+      "mechanism": "DP",
+      "target": "RS",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.5,
+      "g_target": 1.0,
+      "rmse_transfer": 0.00019476953062433296,
+      "rmse_sd": 0.00019476953062433296,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "DD",
+      "mechanism": "DP",
+      "target": "RS",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 1.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.00018534960650986023,
+      "rmse_sd": 0.00018534960650986023,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "DD",
+      "mechanism": "DP",
+      "target": "DD",
+      "size": "size1",
+      "in_domain": true,
+      "D_n_target": 30.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.01052104247512585,
+      "rmse_sd": 0.01052104247512585,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "DD",
+      "mechanism": "DP",
+      "target": "DD",
+      "size": "size2",
+      "in_domain": true,
+      "D_n_target": 80.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.010872353933913097,
+      "rmse_sd": 0.010872353933913097,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "DD",
+      "mechanism": "DP",
+      "target": "NT",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.474519,
+      "g_target": 1.0,
+      "rmse_transfer": 0.005603861299512869,
+      "rmse_sd": 0.005603861299512869,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "DD",
+      "mechanism": "DP",
+      "target": "NT",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 1.265384,
+      "g_target": 1.0,
+      "rmse_transfer": 0.0059475218271975916,
+      "rmse_sd": 0.0059475218271975916,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "NT",
+      "mechanism": "Sup",
+      "target": "RS",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.5,
+      "g_target": 1.0,
+      "rmse_transfer": 0.00020695649729510107,
+      "rmse_sd": 0.00020695649729510107,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "NT",
+      "mechanism": "Sup",
+      "target": "RS",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 1.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.0001967558286314734,
+      "rmse_sd": 0.0001967558286314734,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "NT",
+      "mechanism": "Sup",
+      "target": "DD",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 30.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.011151831569435909,
+      "rmse_sd": 0.011151831569435909,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "NT",
+      "mechanism": "Sup",
+      "target": "DD",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 80.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.010839411625172466,
+      "rmse_sd": 0.010839411625172466,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "NT",
+      "mechanism": "Sup",
+      "target": "NT",
+      "size": "size1",
+      "in_domain": true,
+      "D_n_target": 0.474519,
+      "g_target": 1.0,
+      "rmse_transfer": 0.005665545865966454,
+      "rmse_sd": 0.005665545865966454,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "NT",
+      "mechanism": "Sup",
+      "target": "NT",
+      "size": "size2",
+      "in_domain": true,
+      "D_n_target": 1.265384,
+      "g_target": 1.0,
+      "rmse_transfer": 0.0060654890587038095,
+      "rmse_sd": 0.0060654890587038095,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "NT",
+      "mechanism": "DP",
+      "target": "RS",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.5,
+      "g_target": 1.0,
+      "rmse_transfer": 0.00019476953062433296,
+      "rmse_sd": 0.00019476953062433296,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "NT",
+      "mechanism": "DP",
+      "target": "RS",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 1.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.00018534960650986023,
+      "rmse_sd": 0.00018534960650986023,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "NT",
+      "mechanism": "DP",
+      "target": "DD",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 30.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.01052104247512585,
+      "rmse_sd": 0.01052104247512585,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "NT",
+      "mechanism": "DP",
+      "target": "DD",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 80.0,
+      "g_target": 1.0,
+      "rmse_transfer": 0.010872353933913097,
+      "rmse_sd": 0.010872353933913097,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "NT",
+      "mechanism": "DP",
+      "target": "NT",
+      "size": "size1",
+      "in_domain": true,
+      "D_n_target": 0.474519,
+      "g_target": 1.0,
+      "rmse_transfer": 0.005603861299512869,
+      "rmse_sd": 0.005603861299512869,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    },
+    {
+      "source": "NT",
+      "mechanism": "DP",
+      "target": "NT",
+      "size": "size2",
+      "in_domain": true,
+      "D_n_target": 1.265384,
+      "g_target": 1.0,
+      "rmse_transfer": 0.0059475218271975916,
+      "rmse_sd": 0.0059475218271975916,
+      "ratio_to_sd": 1.0,
+      "params": {
+        "x": 1.0,
+        "y": 0.0,
+        "alpha": 0.0,
+        "beta": 0.0
+      },
+      "params_provenance": "PLACEHOLDER: identity operator",
+      "placeholder": true
+    }
+  ]
+}

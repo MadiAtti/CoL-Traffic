@@ -1,0 +1,23 @@
+{
+  "rule": "both players reach p = 1 on both axes; band = last 10% of each axis",
+  "points": 50,
+  "per_size": true,
+  "ranges": {
+    "RS_NF1/Suppression": {
+      "C_max": 0.0027,
+      "threshold": 0.002396347795245449
+    },
+    "RS_NF5/Suppression": {
+      "C_max": 0.00084,
+      "threshold": 0.0007504980647790803
+    },
+    "RS_NF1/Noise": {
+      "C_max": 0.0027,
+      "threshold": 0.002396347795245449
+    },
+    "RS_NF5/Noise": {
+      "C_max": 0.00084,
+      "threshold": 0.0007504980647790803
+    }
+  }
+}

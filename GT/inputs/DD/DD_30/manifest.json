@@ -1,0 +1,33 @@
+{
+  "mode": "DD_30",
+  "usecase": "DD",
+  "source": "DD/results/Small_data_30%/CSVs_Isotonic",
+  "D_n": 35.427,
+  "unit": "thousands of compounds",
+  "methods": {
+    "Noise": {
+      "grid": [
+        0.0,
+        0.001,
+        0.01,
+        0.05,
+        0.3,
+        0.7,
+        1.0
+      ],
+      "max_deviation_from_their_Transformed_SD": 2.220446049250313e-16
+    },
+    "Suppression": {
+      "grid": [
+        0.0,
+        0.3,
+        0.5,
+        0.6,
+        0.7,
+        0.9,
+        1.0
+      ],
+      "max_deviation_from_their_Transformed_SD": 9.974659986866641e-17
+    }
+  }
+}

@@ -1,0 +1,230 @@
+{
+  "split": "DD",
+  "grid": {
+    "DD_30/Noise": {
+      "C_min": 0.0,
+      "C_max": 0.12,
+      "C_step": 0.002448979592,
+      "cells": 2500
+    },
+    "DD_80/Noise": {
+      "C_min": 0.0,
+      "C_max": 0.12,
+      "C_step": 0.002448979592,
+      "cells": 2500
+    },
+    "DD_30/Suppression": {
+      "C_min": 0.0,
+      "C_max": 0.14,
+      "C_step": 0.002857142857,
+      "cells": 2500
+    },
+    "DD_80/Suppression": {
+      "C_min": 0.0,
+      "C_max": 0.14,
+      "C_step": 0.002857142857,
+      "cells": 2500
+    }
+  },
+  "start_order": "DP: P1 moves first (order-invariant); Suppression: both orders",
+  "tie_seed": 0,
+  "outcomes": [
+    "hit",
+    "miss, ++",
+    "miss, +",
+    "miss, -",
+    "miss, 0",
+    "no pure NE"
+  ],
+  "zero_tol": 1e-09,
+  "configurations": [
+    {
+      "mode": "DD_30",
+      "method": "Noise",
+      "size": "size1",
+      "mechanism": "DP",
+      "cells": 2500,
+      "player_cells": 5000,
+      "pct": {
+        "hit": 89.16,
+        "miss, ++": 0.0,
+        "miss, +": 2.76,
+        "miss, -": 3.2,
+        "miss, 0": 4.88,
+        "no pure NE": 0.0
+      },
+      "pct_p1": {
+        "hit": 89.16,
+        "miss, ++": 0.0,
+        "miss, +": 0.0,
+        "miss, -": 5.44,
+        "miss, 0": 5.4,
+        "no pure NE": 0.0
+      },
+      "pct_p2": {
+        "hit": 89.16,
+        "miss, ++": 0.0,
+        "miss, +": 5.52,
+        "miss, -": 0.96,
+        "miss, 0": 4.36,
+        "no pure NE": 0.0
+      },
+      "hit_cells_pct": 89.16,
+      "better_than_ne_pct": 0.0,
+      "sd_ties": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_nonconverged": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_orientation_B_pct": {
+        "p1": 9.8,
+        "p2": 1.5599999999999998
+      },
+      "first": 1
+    },
+    {
+      "mode": "DD_80",
+      "method": "Noise",
+      "size": "size2",
+      "mechanism": "DP",
+      "cells": 2500,
+      "player_cells": 5000,
+      "pct": {
+        "hit": 83.08,
+        "miss, ++": 6.44,
+        "miss, +": 0.0,
+        "miss, -": 8.74,
+        "miss, 0": 1.74,
+        "no pure NE": 0.0
+      },
+      "pct_p1": {
+        "hit": 83.08,
+        "miss, ++": 4.68,
+        "miss, +": 0.0,
+        "miss, -": 12.24,
+        "miss, 0": 0.0,
+        "no pure NE": 0.0
+      },
+      "pct_p2": {
+        "hit": 83.08,
+        "miss, ++": 8.2,
+        "miss, +": 0.0,
+        "miss, -": 5.24,
+        "miss, 0": 3.48,
+        "no pure NE": 0.0
+      },
+      "hit_cells_pct": 83.08,
+      "better_than_ne_pct": 12.879999999999999,
+      "sd_ties": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_nonconverged": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_orientation_B_pct": {
+        "p1": 1.72,
+        "p2": 1.96
+      },
+      "first": 1
+    },
+    {
+      "mode": "DD_30",
+      "method": "Suppression",
+      "size": "size1",
+      "mechanism": "Sup",
+      "cells": 2500,
+      "player_cells": 5000,
+      "pct": {
+        "hit": 58.32,
+        "miss, ++": 0.0,
+        "miss, +": 15.82,
+        "miss, -": 4.72,
+        "miss, 0": 21.14,
+        "no pure NE": 0.0
+      },
+      "pct_p1": {
+        "hit": 58.32,
+        "miss, ++": 0.0,
+        "miss, +": 15.32,
+        "miss, -": 6.56,
+        "miss, 0": 19.8,
+        "no pure NE": 0.0
+      },
+      "pct_p2": {
+        "hit": 58.32,
+        "miss, ++": 0.0,
+        "miss, +": 16.32,
+        "miss, -": 2.88,
+        "miss, 0": 22.48,
+        "no pure NE": 0.0
+      },
+      "hit_cells_pct": 58.32000000000001,
+      "better_than_ne_pct": 0.0,
+      "sd_ties": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_nonconverged": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_orientation_B_pct": {
+        "p1": 7.359999999999999,
+        "p2": 2.56
+      },
+      "first": 1
+    },
+    {
+      "mode": "DD_80",
+      "method": "Suppression",
+      "size": "size2",
+      "mechanism": "Sup",
+      "cells": 2500,
+      "player_cells": 5000,
+      "pct": {
+        "hit": 75.84,
+        "miss, ++": 0.68,
+        "miss, +": 14.74,
+        "miss, -": 2.8,
+        "miss, 0": 5.94,
+        "no pure NE": 0.0
+      },
+      "pct_p1": {
+        "hit": 75.84,
+        "miss, ++": 0.0,
+        "miss, +": 15.32,
+        "miss, -": 2.72,
+        "miss, 0": 6.12,
+        "no pure NE": 0.0
+      },
+      "pct_p2": {
+        "hit": 75.84,
+        "miss, ++": 1.36,
+        "miss, +": 14.16,
+        "miss, -": 2.88,
+        "miss, 0": 5.76,
+        "no pure NE": 0.0
+      },
+      "hit_cells_pct": 75.84,
+      "better_than_ne_pct": 1.3599999999999999,
+      "sd_ties": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_nonconverged": {
+        "p1": 0,
+        "p2": 0
+      },
+      "sd_orientation_B_pct": {
+        "p1": 4.32,
+        "p2": 4.12
+      },
+      "first": 1
+    }
+  ]
+}

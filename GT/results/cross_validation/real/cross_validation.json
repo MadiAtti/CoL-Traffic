@@ -1,0 +1,987 @@
+{
+  "data_mode": "real",
+  "definition": "RMSE(mono(f_source(Delta_tilde_target)), Delta_target), echo/echo cell excluded; same mechanism for source and target",
+  "summary": {
+    "cross_cells": 24,
+    "cells_worse_than_sd": 19,
+    "ratio_to_sd_min": 0.7752249181833125,
+    "ratio_to_sd_max": 566.8215713956464,
+    "ratio_into_NT": [
+      0.8308912915046792,
+      1.1962804928420554
+    ],
+    "ratio_from_NT": [
+      0.8493352473071916,
+      566.8215713956464
+    ],
+    "negative_g": [
+      "RS->DD Sup size1: g = -0.809",
+      "RS->DD Sup size2: g = -3.42",
+      "RS->DD DP size1: g = -1.81",
+      "RS->DD DP size2: g = -6.76",
+      "NT->DD DP size1: g = -12.3",
+      "NT->DD DP size2: g = -35.2"
+    ],
+    "any_placeholder": false
+  },
+  "inputs": {
+    "RS/Sup/size1": {
+      "placeholder": false,
+      "D_n": 0.50199,
+      "grid": [
+        0.0,
+        0.05,
+        0.08,
+        0.2,
+        0.4,
+        0.8,
+        1.0
+      ],
+      "provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/RS_NF1/Suppression_Final_Real.npy, /Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/RS_NF1/Suppression_Final_Pred.npy"
+    },
+    "RS/Sup/size2": {
+      "placeholder": false,
+      "D_n": 2.5099185,
+      "grid": [
+        0.0,
+        0.05,
+        0.08,
+        0.2,
+        0.4,
+        0.8,
+        1.0
+      ],
+      "provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/RS_NF5/Suppression_Final_Real.npy, /Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/RS_NF5/Suppression_Final_Pred.npy"
+    },
+    "RS/DP/size1": {
+      "placeholder": false,
+      "D_n": 0.50199,
+      "grid": [
+        0.0,
+        0.001,
+        0.005,
+        0.01,
+        0.05,
+        0.1,
+        1.0
+      ],
+      "provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/RS_NF1/Noise_Final_Real.npy, /Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/RS_NF1/Noise_Final_Pred.npy"
+    },
+    "RS/DP/size2": {
+      "placeholder": false,
+      "D_n": 2.5099185,
+      "grid": [
+        0.0,
+        0.001,
+        0.005,
+        0.01,
+        0.05,
+        0.1,
+        1.0
+      ],
+      "provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/RS_NF5/Noise_Final_Real.npy, /Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/RS_NF5/Noise_Final_Pred.npy"
+    },
+    "DD/Sup/size1": {
+      "placeholder": false,
+      "D_n": 35.427,
+      "grid": [
+        0.0,
+        0.3,
+        0.5,
+        0.6,
+        0.7,
+        0.9,
+        1.0
+      ],
+      "provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/DD_30/Suppression_Final_Real.npy, /Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/DD_30/Suppression_Final_Pred.npy"
+    },
+    "DD/Sup/size2": {
+      "placeholder": false,
+      "D_n": 94.4725,
+      "grid": [
+        0.0,
+        0.35,
+        0.55,
+        0.75,
+        0.9,
+        0.95,
+        1.0
+      ],
+      "provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/DD_80/Suppression_Final_Real.npy, /Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/DD_80/Suppression_Final_Pred.npy"
+    },
+    "DD/DP/size1": {
+      "placeholder": false,
+      "D_n": 35.427,
+      "grid": [
+        0.0,
+        0.001,
+        0.01,
+        0.05,
+        0.3,
+        0.7,
+        1.0
+      ],
+      "provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/DD_30/Noise_Final_Real.npy, /Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/DD_30/Noise_Final_Pred.npy"
+    },
+    "DD/DP/size2": {
+      "placeholder": false,
+      "D_n": 94.4725,
+      "grid": [
+        0.0,
+        0.001,
+        0.01,
+        0.1,
+        0.4,
+        0.75,
+        1.0
+      ],
+      "provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/DD_80/Noise_Final_Real.npy, /Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/DD_80/Noise_Final_Pred.npy"
+    },
+    "NT/Sup/size1": {
+      "placeholder": false,
+      "D_n": 0.474519,
+      "grid": [
+        0.0,
+        0.07142857142857142,
+        0.14285714285714285,
+        0.21428571428571427,
+        0.2857142857142857,
+        0.35714285714285715,
+        0.42857142857142855,
+        0.5,
+        1.0
+      ],
+      "provenance": "results/30percent/accuracy/games/average/Suppression_Final_Real.npy, results/30percent/accuracy/games/average/Suppression_Final_Pred.npy"
+    },
+    "NT/Sup/size2": {
+      "placeholder": false,
+      "D_n": 1.265384,
+      "grid": [
+        0.0,
+        0.07142857142857142,
+        0.14285714285714285,
+        0.21428571428571427,
+        0.2857142857142857,
+        0.35714285714285715,
+        0.42857142857142855,
+        0.5,
+        1.0
+      ],
+      "provenance": "results/80percent/accuracy/games/average/Suppression_Final_Real.npy, results/80percent/accuracy/games/average/Suppression_Final_Pred.npy"
+    },
+    "NT/DP/size1": {
+      "placeholder": false,
+      "D_n": 0.474519,
+      "grid": [
+        0.0,
+        0.029126213592233007,
+        0.056603773584905655,
+        0.08256880733944953,
+        0.10714285714285712,
+        0.13043478260869565,
+        0.15254237288135594,
+        1.0
+      ],
+      "provenance": "results/30percent/accuracy/games/average/Noise_Final_Real.npy, results/30percent/accuracy/games/average/Noise_Final_Pred.npy"
+    },
+    "NT/DP/size2": {
+      "placeholder": false,
+      "D_n": 1.265384,
+      "grid": [
+        0.0,
+        0.07407407407407407,
+        0.13793103448275865,
+        0.1935483870967742,
+        0.24242424242424243,
+        0.28571428571428575,
+        0.32432432432432434,
+        1.0
+      ],
+      "provenance": "results/80percent/accuracy/games/average/Noise_Final_Real.npy, results/80percent/accuracy/games/average/Noise_Final_Pred.npy"
+    }
+  },
+  "operators": {
+    "RS/Sup": {
+      "params": [
+        0.758332,
+        -0.0442311,
+        0.608741,
+        0.066067
+      ],
+      "provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/Suppression_params.json",
+      "placeholder": false
+    },
+    "RS/DP": {
+      "params": [
+        1.1639,
+        -0.0838379,
+        0.0754697,
+        0.0173887
+      ],
+      "provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/Noise_params.json",
+      "placeholder": false
+    },
+    "DD/Sup": {
+      "params": [
+        0.7973799538489089,
+        0.0004275308320664,
+        0.0845706105824494,
+        0.1411629504205852
+      ],
+      "provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/Suppression_params.json",
+      "placeholder": false
+    },
+    "DD/DP": {
+      "params": [
+        0.9708911569783348,
+        0.0003951174734666,
+        0.1152111853353217,
+        0.1152551895908613
+      ],
+      "provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/Noise_params.json",
+      "placeholder": false
+    },
+    "NT/Sup": {
+      "params": [
+        1.43665380201538,
+        0.2025951034532248,
+        -0.07927718715547835,
+        0.143013825861636
+      ],
+      "provenance": "results/final_80-30/Suppression_params.json",
+      "placeholder": false
+    },
+    "NT/DP": {
+      "params": [
+        1.4155680486976885,
+        -0.3872920382846634,
+        0.07029953461177296,
+        0.1371833344034612
+      ],
+      "provenance": "results/final_80-30/Noise_params.json",
+      "placeholder": false
+    }
+  },
+  "rows": [
+    {
+      "source": "RS",
+      "mechanism": "Sup",
+      "target": "RS",
+      "size": "size1",
+      "in_domain": true,
+      "D_n_target": 0.50199,
+      "g_target": 0.736128430111,
+      "rmse_transfer": 0.0005422132107066338,
+      "rmse_sd": 0.001757424156499044,
+      "ratio_to_sd": 0.30852723214341954,
+      "params": {
+        "x": 0.758332,
+        "y": -0.0442311,
+        "alpha": 0.608741,
+        "beta": 0.066067
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "RS",
+      "mechanism": "Sup",
+      "target": "RS",
+      "size": "size2",
+      "in_domain": true,
+      "D_n_target": 2.5099185,
+      "g_target": 0.6473155438346501,
+      "rmse_transfer": 0.00019196751483697253,
+      "rmse_sd": 0.00044244702334327344,
+      "ratio_to_sd": 0.4338768365676949,
+      "params": {
+        "x": 0.758332,
+        "y": -0.0442311,
+        "alpha": 0.608741,
+        "beta": 0.066067
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "RS",
+      "mechanism": "Sup",
+      "target": "DD",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 35.427,
+      "g_target": -0.8086431797,
+      "rmse_transfer": 0.34596303339140244,
+      "rmse_sd": 0.021369114828842642,
+      "ratio_to_sd": 16.189862620067164,
+      "params": {
+        "x": 0.758332,
+        "y": -0.0442311,
+        "alpha": 0.608741,
+        "beta": 0.066067
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "RS",
+      "mechanism": "Sup",
+      "target": "DD",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 94.4725,
+      "g_target": -3.42029059475,
+      "rmse_transfer": 1.5616655821126502,
+      "rmse_sd": 0.008738784936395197,
+      "ratio_to_sd": 178.70511672722856,
+      "params": {
+        "x": 0.758332,
+        "y": -0.0442311,
+        "alpha": 0.608741,
+        "beta": 0.066067
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "RS",
+      "mechanism": "Sup",
+      "target": "NT",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.474519,
+      "g_target": 0.7373435026591,
+      "rmse_transfer": 1.2483413422901217,
+      "rmse_sd": 1.1717929440170984,
+      "ratio_to_sd": 1.0653258740495593,
+      "params": {
+        "x": 0.758332,
+        "y": -0.0442311,
+        "alpha": 0.608741,
+        "beta": 0.066067
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "RS",
+      "mechanism": "Sup",
+      "target": "NT",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 1.265384,
+      "g_target": 0.7023626737576,
+      "rmse_transfer": 3.1217732968697294,
+      "rmse_sd": 2.8074999406133365,
+      "ratio_to_sd": 1.1119406457361263,
+      "params": {
+        "x": 0.758332,
+        "y": -0.0442311,
+        "alpha": 0.608741,
+        "beta": 0.066067
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "RS",
+      "mechanism": "DP",
+      "target": "RS",
+      "size": "size1",
+      "in_domain": true,
+      "D_n_target": 0.50199,
+      "g_target": 1.1218142125789998,
+      "rmse_transfer": 0.0009684851485642384,
+      "rmse_sd": 0.0020831684708218063,
+      "ratio_to_sd": 0.4649096614745579,
+      "params": {
+        "x": 1.1639,
+        "y": -0.0838379,
+        "alpha": 0.0754697,
+        "beta": 0.0173887
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "RS",
+      "mechanism": "DP",
+      "target": "RS",
+      "size": "size2",
+      "in_domain": true,
+      "D_n_target": 2.5099185,
+      "g_target": 0.9534737037888499,
+      "rmse_transfer": 0.00034131188883913826,
+      "rmse_sd": 0.0004828531177391404,
+      "ratio_to_sd": 0.7068648338386224,
+      "params": {
+        "x": 1.1639,
+        "y": -0.0838379,
+        "alpha": 0.0754697,
+        "beta": 0.0173887
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "RS",
+      "mechanism": "DP",
+      "target": "DD",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 35.427,
+      "g_target": -1.8062252833000003,
+      "rmse_transfer": 2.8930661610250032,
+      "rmse_sd": 0.16621498915197275,
+      "ratio_to_sd": 17.40556718612081,
+      "params": {
+        "x": 1.1639,
+        "y": -0.0838379,
+        "alpha": 0.0754697,
+        "beta": 0.0173887
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "RS",
+      "mechanism": "DP",
+      "target": "DD",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 94.4725,
+      "g_target": -6.756476007750001,
+      "rmse_transfer": 10.331380243127137,
+      "rmse_sd": 0.19095556902609134,
+      "ratio_to_sd": 54.1035817694089,
+      "params": {
+        "x": 1.1639,
+        "y": -0.0838379,
+        "alpha": 0.0754697,
+        "beta": 0.0173887
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "RS",
+      "mechanism": "DP",
+      "target": "NT",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.474519,
+      "g_target": 1.1241173235299,
+      "rmse_transfer": 0.04016267222667299,
+      "rmse_sd": 0.048336855419367226,
+      "ratio_to_sd": 0.8308912915046792,
+      "params": {
+        "x": 1.1639,
+        "y": -0.0838379,
+        "alpha": 0.0754697,
+        "beta": 0.0173887
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "RS",
+      "mechanism": "DP",
+      "target": "NT",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 1.265384,
+      "g_target": 1.0578128627463999,
+      "rmse_transfer": 0.042607915190084354,
+      "rmse_sd": 0.039392765253616346,
+      "ratio_to_sd": 1.0816177771671627,
+      "params": {
+        "x": 1.1639,
+        "y": -0.0838379,
+        "alpha": 0.0754697,
+        "beta": 0.0173887
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/RS/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "DD",
+      "mechanism": "Sup",
+      "target": "RS",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.50199,
+      "g_target": 0.797594570051298,
+      "rmse_transfer": 0.0025630020991847732,
+      "rmse_sd": 0.001757424156499044,
+      "ratio_to_sd": 1.4583856092490028,
+      "params": {
+        "x": 0.7973799538489089,
+        "y": 0.0004275308320664,
+        "alpha": 0.0845706105824494,
+        "beta": 0.1411629504205852
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "DD",
+      "mechanism": "Sup",
+      "target": "RS",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 2.5099185,
+      "g_target": 0.7984530213936327,
+      "rmse_transfer": 0.0009331708014942038,
+      "rmse_sd": 0.00044244702334327344,
+      "ratio_to_sd": 2.1091130740192625,
+      "params": {
+        "x": 0.7973799538489089,
+        "y": 0.0004275308320664,
+        "alpha": 0.0845706105824494,
+        "beta": 0.1411629504205852
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "DD",
+      "mechanism": "Sup",
+      "target": "DD",
+      "size": "size1",
+      "in_domain": true,
+      "D_n_target": 35.427,
+      "g_target": 0.8125260886365253,
+      "rmse_transfer": 0.02046203209725912,
+      "rmse_sd": 0.021369114828842642,
+      "ratio_to_sd": 0.9575516937014535,
+      "params": {
+        "x": 0.7973799538489089,
+        "y": 0.0004275308320664,
+        "alpha": 0.0845706105824494,
+        "beta": 0.1411629504205852
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "DD",
+      "mechanism": "Sup",
+      "target": "DD",
+      "size": "size2",
+      "in_domain": true,
+      "D_n_target": 94.4725,
+      "g_target": 0.8377698603813019,
+      "rmse_transfer": 0.006200655602538119,
+      "rmse_sd": 0.008738784936395197,
+      "ratio_to_sd": 0.7095558075486782,
+      "params": {
+        "x": 0.7973799538489089,
+        "y": 0.0004275308320664,
+        "alpha": 0.0845706105824494,
+        "beta": 0.1411629504205852
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "DD",
+      "mechanism": "Sup",
+      "target": "NT",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.474519,
+      "g_target": 0.7975828253518102,
+      "rmse_transfer": 1.4017930405776176,
+      "rmse_sd": 1.1717929440170984,
+      "ratio_to_sd": 1.1962804928420554,
+      "params": {
+        "x": 0.7973799538489089,
+        "y": 0.0004275308320664,
+        "alpha": 0.0845706105824494,
+        "beta": 0.1411629504205852
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "DD",
+      "mechanism": "Sup",
+      "target": "NT",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 1.265384,
+      "g_target": 0.7979209445233124,
+      "rmse_transfer": 3.2179767938594086,
+      "rmse_sd": 2.8074999406133365,
+      "ratio_to_sd": 1.1462072526905906,
+      "params": {
+        "x": 0.7973799538489089,
+        "y": 0.0004275308320664,
+        "alpha": 0.0845706105824494,
+        "beta": 0.1411629504205852
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "DD",
+      "mechanism": "DP",
+      "target": "RS",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.50199,
+      "g_target": 0.9710895019988404,
+      "rmse_transfer": 0.001614924107354891,
+      "rmse_sd": 0.0020831684708218063,
+      "ratio_to_sd": 0.7752249181833125,
+      "params": {
+        "x": 0.9708911569783348,
+        "y": 0.0003951174734666,
+        "alpha": 0.1152111853353217,
+        "beta": 0.1152551895908613
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "DD",
+      "mechanism": "DP",
+      "target": "RS",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 2.5099185,
+      "g_target": 0.9718828696346619,
+      "rmse_transfer": 0.0005763020228921597,
+      "rmse_sd": 0.0004828531177391404,
+      "ratio_to_sd": 1.193534848838865,
+      "params": {
+        "x": 0.9708911569783348,
+        "y": 0.0003951174734666,
+        "alpha": 0.1152111853353217,
+        "beta": 0.1152551895908613
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "DD",
+      "mechanism": "DP",
+      "target": "DD",
+      "size": "size1",
+      "in_domain": true,
+      "D_n_target": 35.427,
+      "g_target": 0.9848889837108361,
+      "rmse_transfer": 0.11049697544773894,
+      "rmse_sd": 0.16621498915197275,
+      "ratio_to_sd": 0.664783459130211,
+      "params": {
+        "x": 0.9708911569783348,
+        "y": 0.0003951174734666,
+        "alpha": 0.1152111853353217,
+        "beta": 0.1152551895908613
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "DD",
+      "mechanism": "DP",
+      "target": "DD",
+      "size": "size2",
+      "in_domain": true,
+      "D_n_target": 94.4725,
+      "g_target": 1.0082188924904083,
+      "rmse_transfer": 0.05782704040904958,
+      "rmse_sd": 0.19095556902609134,
+      "ratio_to_sd": 0.3028298190200902,
+      "params": {
+        "x": 0.9708911569783348,
+        "y": 0.0003951174734666,
+        "alpha": 0.1152111853353217,
+        "beta": 0.1152551895908613
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "DD",
+      "mechanism": "DP",
+      "target": "NT",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.474519,
+      "g_target": 0.9710786477267267,
+      "rmse_transfer": 0.04641872960565273,
+      "rmse_sd": 0.048336855419367226,
+      "ratio_to_sd": 0.9603175300281127,
+      "params": {
+        "x": 0.9708911569783348,
+        "y": 0.0003951174734666,
+        "alpha": 0.1152111853353217,
+        "beta": 0.1152551895908613
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "DD",
+      "mechanism": "DP",
+      "target": "NT",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 1.265384,
+      "g_target": 0.97139113230738,
+      "rmse_transfer": 0.03853914302043083,
+      "rmse_sd": 0.039392765253616346,
+      "ratio_to_sd": 0.9783304820646691,
+      "params": {
+        "x": 0.9708911569783348,
+        "y": 0.0003951174734666,
+        "alpha": 0.1152111853353217,
+        "beta": 0.1152551895908613
+      },
+      "params_provenance": "/Users/madiati/Projects/CoL-Traffic/GT/inputs/DD/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "NT",
+      "mechanism": "Sup",
+      "target": "RS",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.50199,
+      "g_target": 1.5383545179978644,
+      "rmse_transfer": 0.003604988209907176,
+      "rmse_sd": 0.001757424156499044,
+      "ratio_to_sd": 2.051290917207292,
+      "params": {
+        "x": 1.43665380201538,
+        "y": 0.2025951034532248,
+        "alpha": -0.07927718715547835,
+        "beta": 0.143013825861636
+      },
+      "params_provenance": "results/final_80-30/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "NT",
+      "mechanism": "Sup",
+      "target": "RS",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 2.5099185,
+      "g_target": 1.945151000182043,
+      "rmse_transfer": 0.006789593347858466,
+      "rmse_sd": 0.00044244702334327344,
+      "ratio_to_sd": 15.345550969139973,
+      "params": {
+        "x": 1.43665380201538,
+        "y": 0.2025951034532248,
+        "alpha": -0.07927718715547835,
+        "beta": 0.143013825861636
+      },
+      "params_provenance": "results/final_80-30/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "NT",
+      "mechanism": "Sup",
+      "target": "DD",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 35.427,
+      "g_target": 8.613990532052775,
+      "rmse_transfer": 1.251062672648897,
+      "rmse_sd": 0.021369114828842642,
+      "ratio_to_sd": 58.54536711835597,
+      "params": {
+        "x": 1.43665380201538,
+        "y": 0.2025951034532248,
+        "alpha": -0.07927718715547835,
+        "beta": 0.143013825861636
+      },
+      "params_provenance": "results/final_80-30/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "NT",
+      "mechanism": "Sup",
+      "target": "DD",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 94.4725,
+      "g_target": 20.57631971300016,
+      "rmse_transfer": 4.953331809736129,
+      "rmse_sd": 0.008738784936395197,
+      "ratio_to_sd": 566.8215713956464,
+      "params": {
+        "x": 1.43665380201538,
+        "y": 0.2025951034532248,
+        "alpha": -0.07927718715547835,
+        "beta": 0.143013825861636
+      },
+      "params_provenance": "results/final_80-30/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "NT",
+      "mechanism": "Sup",
+      "target": "NT",
+      "size": "size1",
+      "in_domain": true,
+      "D_n_target": 0.474519,
+      "g_target": 1.5327890279109009,
+      "rmse_transfer": 0.2557293101072227,
+      "rmse_sd": 1.1717929440170984,
+      "ratio_to_sd": 0.218237625864635,
+      "params": {
+        "x": 1.43665380201538,
+        "y": 0.2025951034532248,
+        "alpha": -0.07927718715547835,
+        "beta": 0.143013825861636
+      },
+      "params_provenance": "results/final_80-30/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "NT",
+      "mechanism": "Sup",
+      "target": "NT",
+      "size": "size2",
+      "in_domain": true,
+      "D_n_target": 1.265384,
+      "g_target": 1.6930144044034354,
+      "rmse_transfer": 0.6475485232599693,
+      "rmse_sd": 2.8074999406133365,
+      "ratio_to_sd": 0.2306495234042653,
+      "params": {
+        "x": 1.43665380201538,
+        "y": 0.2025951034532248,
+        "alpha": -0.07927718715547835,
+        "beta": 0.143013825861636
+      },
+      "params_provenance": "results/final_80-30/Suppression_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "NT",
+      "mechanism": "DP",
+      "target": "RS",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 0.50199,
+      "g_target": 1.2211513183991702,
+      "rmse_transfer": 0.0017693084083479828,
+      "rmse_sd": 0.0020831684708218063,
+      "ratio_to_sd": 0.8493352473071916,
+      "params": {
+        "x": 1.4155680486976885,
+        "y": -0.3872920382846634,
+        "alpha": 0.07029953461177296,
+        "beta": 0.1371833344034612
+      },
+      "params_provenance": "results/final_80-30/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "NT",
+      "mechanism": "DP",
+      "target": "RS",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 2.5099185,
+      "g_target": 0.44349659690430354,
+      "rmse_transfer": 0.003907031879384741,
+      "rmse_sd": 0.0004828531177391404,
+      "ratio_to_sd": 8.091553592277933,
+      "params": {
+        "x": 1.4155680486976885,
+        "y": -0.3872920382846634,
+        "alpha": 0.07029953461177296,
+        "beta": 0.1371833344034612
+      },
+      "params_provenance": "results/final_80-30/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "NT",
+      "mechanism": "DP",
+      "target": "DD",
+      "size": "size1",
+      "in_domain": false,
+      "D_n_target": 35.427,
+      "g_target": -12.305026991613083,
+      "rmse_transfer": 14.236536415608215,
+      "rmse_sd": 0.16621498915197275,
+      "ratio_to_sd": 85.6513391977636,
+      "params": {
+        "x": 1.4155680486976885,
+        "y": -0.3872920382846634,
+        "alpha": 0.07029953461177296,
+        "beta": 0.1371833344034612
+      },
+      "params_provenance": "results/final_80-30/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "NT",
+      "mechanism": "DP",
+      "target": "DD",
+      "size": "size2",
+      "in_domain": false,
+      "D_n_target": 94.4725,
+      "g_target": -35.17287903815018,
+      "rmse_transfer": 50.721530185726806,
+      "rmse_sd": 0.19095556902609134,
+      "ratio_to_sd": 265.6195388509273,
+      "params": {
+        "x": 1.4155680486976885,
+        "y": -0.3872920382846634,
+        "alpha": 0.07029953461177296,
+        "beta": 0.1371833344034612
+      },
+      "params_provenance": "results/final_80-30/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "NT",
+      "mechanism": "DP",
+      "target": "NT",
+      "size": "size1",
+      "in_domain": true,
+      "D_n_target": 0.474519,
+      "g_target": 1.2317906179828884,
+      "rmse_transfer": 0.03735519723384647,
+      "rmse_sd": 0.048336855419367226,
+      "ratio_to_sd": 0.7728098344370016,
+      "params": {
+        "x": 1.4155680486976885,
+        "y": -0.3872920382846634,
+        "alpha": 0.07029953461177296,
+        "beta": 0.1371833344034612
+      },
+      "params_provenance": "results/final_80-30/Noise_params.json",
+      "placeholder": false
+    },
+    {
+      "source": "NT",
+      "mechanism": "DP",
+      "target": "NT",
+      "size": "size2",
+      "in_domain": true,
+      "D_n_target": 1.265384,
+      "g_target": 0.925494900124888,
+      "rmse_transfer": 0.03618167836268214,
+      "rmse_sd": 0.039392765253616346,
+      "ratio_to_sd": 0.9184853647551585,
+      "params": {
+        "x": 1.4155680486976885,
+        "y": -0.3872920382846634,
+        "alpha": 0.07029953461177296,
+        "beta": 0.1371833344034612
+      },
+      "params_provenance": "results/final_80-30/Noise_params.json",
+      "placeholder": false
+    }
+  ]
+}

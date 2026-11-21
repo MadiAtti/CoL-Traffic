@@ -426,7 +426,10 @@ def write_outputs(data_mode, surfaces, operators, rows, out_dir):
                       for (d, m), (p, src, ph) in operators.items()},
         "rows": rows,
     }
-    (out_dir / "cross_validation.json").write_text(json.dumps(payload, indent=2))
+    text = json.dumps(payload, indent=2)
+    # provenance paths relative to the repo root, so no local absolute path is written
+    text = text.replace(json.dumps(str(usecases.REPO_ROOT) + "/")[1:-1], "")
+    (out_dir / "cross_validation.json").write_text(text)
     return summary
 
 

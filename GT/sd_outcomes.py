@@ -93,6 +93,8 @@ SIZE_LABELS = {"full": "100% data", "half": "50% data",
 METHODS = ("Suppression", "Noise")
 MECH_NAMES = {"Suppression": "Sup", "Noise": "DP"}
 
+# LEGACY: the old fixed 0..0.49 C grid; the analysis uses the per-case grid
+# (sd_outcomes.case_c_grid). Kept for c_grid() and old command lines.
 C_MAX, C_STEP = 0.49, 0.01
 TOL = 1e-12
 SEED = 0

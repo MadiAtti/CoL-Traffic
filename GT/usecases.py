@@ -22,8 +22,8 @@ from pathlib import Path
 
 import numpy as np
 
-GT_ROOT = Path(__file__).resolve().parent            # CoL-Traffic/GT
-REPO_ROOT = GT_ROOT.parent                             # CoL-Traffic
+GT_ROOT = Path(__file__).resolve().parent            # <repo>/GT
+REPO_ROOT = GT_ROOT.parent                             # <repo>: holds NT/, DD/, RS/, GT/
 NT_ROOT = REPO_ROOT / "NT"                             # the NT experiment code and results
 
 METHODS = ("Noise", "Suppression")

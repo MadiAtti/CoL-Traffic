@@ -1,10 +1,15 @@
 {
   "split": "DD",
   "grid": {
-    "C_min": 0.0,
-    "C_max": 0.49,
-    "C_step": 0.01,
-    "cells": 2500
+    "rule": "per configuration: 0 .. C_max, both players reach p = 1 on both axes; band = last 10% of each axis (sd_outcomes.c_ranges)",
+    "points": 50,
+    "cells": 2500,
+    "C_max": {
+      "DD_80/Noise": 0.12,
+      "DD_80/Suppression": 0.14,
+      "DD_30/Noise": 0.12,
+      "DD_30/Suppression": 0.14
+    }
   },
   "tolerance": 1e-09,
   "primary_order": "p1_first",

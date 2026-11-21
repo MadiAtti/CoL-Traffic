@@ -78,6 +78,8 @@ SIZE_LABELS = {"full": "100% data", "half": "50% data",
                "RS_NF1": "RS NF 1x data", "RS_NF5": "RS NF 5x data"}
 METHOD_LABELS = {"Noise": "DP (noise)", "Suppression": "SUP (suppression)"}
 
+# LEGACY: the old fixed 0..0.49 C grid; the analysis uses the per-case grid
+# (sd_outcomes.case_c_grid). Kept for c_grid() and old command lines.
 C_MAX = 0.49
 C_STEP = 0.01
 TOL = 1e-9            # tolerance for comparing protection levels
@@ -481,8 +483,12 @@ def write_summary(split, metrics_list, cs, out_dir):
                              for c in SUMMARY_COLUMNS])
     payload = {
         "split": split,
-        "grid": {"C_min": float(cs[0]), "C_max": float(cs[-1]), "C_step": _step(cs),
-                 "cells": int(len(cs) ** 2)},
+        # Each configuration has its own grid (sd_outcomes.case_c_grid); the
+        # global ``cs`` (--c-max / --c-step) is not used for the analysis.
+        "grid": {"rule": "per configuration: 0 .. C_max, both players reach p = 1 on both axes; "
+                         "band = last 10% of each axis (sd_outcomes.c_ranges)",
+                 "points": sd_outcomes.GRID_POINTS, "cells": int(sd_outcomes.GRID_POINTS ** 2),
+                 "C_max": {f"{m['mode']}/{m['method']}": m["C_max"] for m in metrics_list}},
         "tolerance": TOL,
         "primary_order": PRIMARY_ORDER,
         "definitions": {
@@ -496,7 +502,8 @@ def write_summary(split, metrics_list, cs, out_dir):
     }
     (out_dir / "summary.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
-    print(f"\n=== Summary {split} ({len(cs)}x{len(cs)} grid, P1 moves first) ===")
+    n = sd_outcomes.GRID_POINTS
+    print(f"\n=== Summary {split} ({n}x{n} grid per configuration, P1 moves first) ===")
     head = (f"{'size':10s} {'method':11s} case  match%  P1 off%  P2 off%  "
             f"mean|dp1|  mean|dp2|   start-order variant: true / SD")
     print(head)
@@ -527,7 +534,7 @@ def run_split(split, cs):
     for mode in SPLITS[split]:
         for method in METHODS:
             start = time.perf_counter()
-            # 50 x 50 from 0 to the case's C_max (about 20% of the grid at (max, max))
+            # 50 x 50 from 0 to the case's C_max (both players reach the p = 1 band on both axes)
             case_cs = sd_outcomes.case_c_grid(mode, method)
             res = analyse_configuration(mode, method, case_cs)
             metrics = compute_metrics(mode, method, res)
@@ -553,8 +560,9 @@ def run_split(split, cs):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--split", choices=(*SPLITS, "all"), default="80-30")
-    parser.add_argument("--c-max", type=float, default=C_MAX)
-    parser.add_argument("--c-step", type=float, default=C_STEP)
+    # LEGACY: unused since the per-configuration grid (sd_outcomes.case_c_grid); kept for old calls.
+    parser.add_argument("--c-max", type=float, default=C_MAX, help="LEGACY, unused")
+    parser.add_argument("--c-step", type=float, default=C_STEP, help="LEGACY, unused")
     args = parser.parse_args(argv)
     cs = c_grid(args.c_max, args.c_step)
     for split in (SPLITS if args.split == "all" else (args.split,)):
